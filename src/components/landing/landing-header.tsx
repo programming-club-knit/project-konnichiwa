@@ -36,7 +36,7 @@ export function LandingHeader() {
         <div className="hidden items-center gap-2 md:flex">
           <Button
             size="sm"
-            className="bg-gradient-to-r from-brand to-brand-3 text-white hover:opacity-90"
+            className="bg-brand text-white hover:bg-brand/90"
             nativeButton={false}
             render={<a href="/#join" />}
           >
@@ -69,7 +69,7 @@ export function LandingHeader() {
             <a
               href="/#join"
               onClick={() => setOpen(false)}
-              className="mt-2 rounded-lg bg-gradient-to-r from-brand to-brand-3 px-3 py-2.5 text-center text-sm font-medium text-white"
+              className="mt-2 rounded-lg bg-brand px-3 py-2.5 text-center text-sm font-medium text-white hover:bg-brand/90"
             >
               Join the club
             </a>

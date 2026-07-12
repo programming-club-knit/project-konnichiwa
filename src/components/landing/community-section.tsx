@@ -9,7 +9,7 @@ export function CommunitySection() {
         <LuSparkles className="size-8 text-brand-2" />
         <blockquote className="mt-6 max-w-3xl text-2xl font-medium leading-snug tracking-tight md:text-3xl">
           &ldquo;You don&apos;t need to be the smartest in the room — you need
-          the <span className="ptsc-gradient-text">right room</span>. PTSC is
+          the <span className="text-brand-2 font-semibold">right room</span>. PTSC is
           that room for anyone at KNIT who wants to build a career in tech.&rdquo;
         </blockquote>
         <div className="mt-8 flex flex-wrap items-center gap-6">

@@ -181,41 +181,24 @@
   mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
 }
 
-.ptsc-glow {
-  background: radial-gradient(closest-side, color-mix(in oklch, var(--brand) 42%, transparent), transparent);
-}
-.ptsc-glow-2 {
-  background: radial-gradient(closest-side, color-mix(in oklch, var(--brand-2) 38%, transparent), transparent);
-}
+.ptsc-glow,
+.ptsc-glow-2,
 .ptsc-glow-3 {
-  background: radial-gradient(closest-side, color-mix(in oklch, var(--brand-3) 36%, transparent), transparent);
+  display: none;
 }
 
 .ptsc-gradient-text {
-  background: linear-gradient(120deg, var(--brand-2) 0%, var(--brand) 55%, var(--brand-3) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--brand-2);
 }
 
-/* thin gradient border cards */
+/* solid border cards */
 .ptsc-card {
   position: relative;
-  background: color-mix(in oklch, var(--card) 70%, transparent);
+  background: color-mix(in oklch, var(--card) 80%, transparent);
   backdrop-filter: blur(8px);
+  border: 1px solid color-mix(in oklch, var(--foreground) 12%, transparent);
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 }
-.ptsc-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(140deg, color-mix(in oklch, var(--brand) 26%, transparent), transparent 42%, transparent 58%, color-mix(in oklch, var(--brand-2) 24%, transparent));
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-  opacity: 0.6;
-  transition: opacity 0.3s ease;
+.ptsc-card:hover {
+  border-color: color-mix(in oklch, var(--foreground) 22%, transparent);
 }
-.ptsc-card:hover::before { opacity: 1; }

@@ -16,7 +16,7 @@ export function JoinSection() {
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Button
             size="lg"
-            className="h-11 bg-gradient-to-r from-brand to-brand-3 px-6 text-white shadow-lg shadow-brand/25 hover:opacity-90"
+            className="h-11 bg-brand px-6 text-white shadow-lg shadow-brand/20 hover:bg-brand/90"
             nativeButton={false}
             render={<a href="#" />}
           >

@@ -31,7 +31,7 @@ export function HeroSection() {
             <h1 className="font-heading mt-6 max-w-xl text-4xl font-semibold leading-[0.98] tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
               We are PTSC.
               <br />
-              <span className="ptsc-gradient-text">We build.</span>
+              <span className="text-brand-2 font-semibold">We build.</span>
             </h1>
 
             <p className="mt-5 max-w-md text-base leading-relaxed text-muted-foreground sm:text-lg">
@@ -42,7 +42,7 @@ export function HeroSection() {
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Button
                 size="lg"
-                className="h-11 bg-linear-to-r from-brand to-brand-3 px-5 text-white shadow-lg shadow-brand/25 hover:opacity-90"
+                className="h-11 bg-brand px-5 text-white shadow-lg shadow-brand/20 hover:bg-brand/90"
                 nativeButton={false}
                 render={<a href="#join" />}
               >

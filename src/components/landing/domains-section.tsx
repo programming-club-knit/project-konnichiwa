@@ -18,7 +18,7 @@ export function DomainsSection() {
             key={domain.name}
             className="ptsc-card group flex items-start gap-4 rounded-2xl p-5"
           >
-            <div className="grid size-10 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-brand/20 to-brand-3/20 text-brand-2 ring-1 ring-white/10">
+            <div className="grid size-10 shrink-0 place-items-center rounded-lg bg-brand/15 text-brand-2 ring-1 ring-white/10">
               <domain.icon className="size-5" />
             </div>
             <div>
