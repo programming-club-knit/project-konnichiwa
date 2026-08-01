@@ -145,9 +145,7 @@ export function SupportUsSection() {
       <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-12">
         {/* Main Section Header */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 rounded-full bg-[#FF355E]/15 border border-[#FF355E]/30 px-4 py-1 text-xs font-black text-[#FF355E] uppercase tracking-widest mb-4">
-            <FiShield className="size-3.5" /> 100% Transparent Financial Ledger
-          </div>
+
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white font-sans leading-tight">
             Support{" "}
             <Highlighter action="underline" color="#FF355E" strokeWidth={4}>
@@ -192,7 +190,7 @@ export function SupportUsSection() {
 
         {/* Two-Column Main Content: Left Donation Form, Right Bank/UPI Details */}
         <div className="grid gap-8 lg:grid-cols-12 mb-20">
-          
+
           {/* Left Column: Direct Donation Box */}
           <div className="lg:col-span-7 rounded-3xl bg-[#121526] border border-white/10 p-6 sm:p-8 flex flex-col justify-between">
             <div>
@@ -217,11 +215,10 @@ export function SupportUsSection() {
                     key={amt}
                     type="button"
                     onClick={() => setCustomAmount(amt)}
-                    className={`rounded-xl py-3 text-sm font-extrabold font-mono transition-all ${
-                      customAmount === amt
+                    className={`rounded-xl py-3 text-sm font-extrabold font-mono transition-all ${customAmount === amt
                         ? "bg-[#FF355E] text-white shadow-none"
                         : "bg-white/5 text-[#8C93B0] border border-white/10 hover:bg-white/10 hover:text-white"
-                    }`}
+                      }`}
                   >
                     ₹{amt}
                   </button>
@@ -326,22 +323,20 @@ export function SupportUsSection() {
               <button
                 type="button"
                 onClick={() => setActiveLedgerTab("donations")}
-                className={`rounded-full px-5 py-2 text-xs font-extrabold uppercase tracking-wider transition-all ${
-                  activeLedgerTab === "donations"
+                className={`rounded-full px-5 py-2 text-xs font-extrabold uppercase tracking-wider transition-all ${activeLedgerTab === "donations"
                     ? "bg-[#FF355E] text-white shadow-none"
                     : "text-[#8C93B0] hover:text-white bg-transparent"
-                }`}
+                  }`}
               >
                 Recent Donors ({RECENT_DONORS.length})
               </button>
               <button
                 type="button"
                 onClick={() => setActiveLedgerTab("spend")}
-                className={`rounded-full px-5 py-2 text-xs font-extrabold uppercase tracking-wider transition-all ${
-                  activeLedgerTab === "spend"
+                className={`rounded-full px-5 py-2 text-xs font-extrabold uppercase tracking-wider transition-all ${activeLedgerTab === "spend"
                     ? "bg-[#FF355E] text-white shadow-none"
                     : "text-[#8C93B0] hover:text-white bg-transparent"
-                }`}
+                  }`}
               >
                 Spend History ({SPEND_HISTORY.length})
               </button>

@@ -56,13 +56,15 @@ export type EventCard = {
 };
 
 export const NAV: NavItem[] = [
+  { label: "Home", href: "/" },
   { label: "Events", href: "/events" },
-  { label: "OSS", href: "/oss" },
-  { label: "CP", href: "/cp" },
-  { label: "Team", href: "/members" },
+  // { label: "OSS", href: "/oss" },
+  // { label: "CP", href: "/cp" },
+  { label: "Team", href: "/team" },
   { label: "Our Peoples", href: "/people" },
   { label: "Achievements", href: "/achievements" },
   { label: "Support Us", href: "/support-us" },
+  { label: "Hire Us", href: "/hire-us" },
 ];
 
 export const SOCIAL_PLATFORMS = [

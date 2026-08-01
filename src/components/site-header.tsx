@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FiMenu, FiX, FiArrowRight } from "react-icons/fi";
 import { NAV } from "@/components/landing/landing-data";
+import { Highlighter } from "@/components/ui/highlighter";
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
@@ -40,7 +41,13 @@ export function SiteHeader() {
               href={item.href}
               className="text-sm font-medium text-[#C4C9E2] transition-colors hover:text-white"
             >
-              {item.label}
+              {item.label === "Hire Us" ? (
+                <Highlighter action="underline" color="#FF355E" strokeWidth={3}>
+                  <span className="text-white font-bold">{item.label}</span>
+                </Highlighter>
+              ) : (
+                item.label
+              )}
             </Link>
           ))}
         </div>
@@ -76,7 +83,13 @@ export function SiteHeader() {
                 onClick={() => setOpen(false)}
                 className="rounded-lg px-4 py-3 text-base font-medium text-[#C4C9E2] transition-colors hover:bg-white/5 hover:text-white"
               >
-                {item.label}
+                {item.label === "Hire Us" ? (
+                  <Highlighter action="underline" color="#FF355E" strokeWidth={3}>
+                    <span className="text-white font-bold">{item.label}</span>
+                  </Highlighter>
+                ) : (
+                  item.label
+                )}
               </Link>
             ))}
             <a
