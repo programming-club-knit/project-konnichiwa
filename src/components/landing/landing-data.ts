@@ -5,7 +5,20 @@ import {
   FiGitBranch,
   FiGlobe,
   FiTerminal,
+  FiInstagram,
+  FiGithub,
+  FiSlack,
+  FiGlobe as FiDribbble,
 } from "react-icons/fi";
+import {
+  FaSkype,
+  FaWhatsapp,
+  FaTwitch,
+  FaTiktok,
+  FaDiscord,
+  FaGoogle,
+  FaLinkedin,
+} from "react-icons/fa";
 import { LuRocket, LuTrophy } from "react-icons/lu";
 import { TbBraces } from "react-icons/tb";
 
@@ -27,6 +40,14 @@ export type FeatureCard = {
   span: string;
 };
 
+export type HeroTopicCard = {
+  title: string;
+  desc: string;
+  linkText: string;
+  href: string;
+  bgImage?: string;
+};
+
 export type EventCard = {
   tag: string;
   title: string;
@@ -41,8 +62,42 @@ export const NAV: NavItem[] = [
   { label: "Team", href: "/members" },
   { label: "Our Peoples", href: "/people" },
   { label: "Achievements", href: "/achievements" },
-  // { label: "Blogs", href: "/blogs" },
   { label: "Support Us", href: "/support-us" },
+];
+
+export const SOCIAL_PLATFORMS = [
+  { name: "Skype", icon: FaSkype },
+  { name: "WhatsApp", icon: FaWhatsapp },
+  { name: "Twitch", icon: FaTwitch },
+  { name: "Dribbble", icon: FiDribbble },
+  { name: "TikTok", icon: FaTiktok },
+  { name: "Slack", icon: FiSlack },
+  { name: "Discord", icon: FaDiscord },
+  { name: "Instagram", icon: FiInstagram },
+  { name: "Google", icon: FaGoogle },
+  { name: "GitHub", icon: FiGithub },
+  { name: "LinkedIn", icon: FaLinkedin },
+];
+
+export const HERO_TOPIC_CARDS: HeroTopicCard[] = [
+  {
+    title: "Competitive Programming",
+    desc: "Sharpen your algorithmic thinking with weekly problem sessions, contest ladders, and peer mentorship.",
+    linkText: "Learn More",
+    href: "/cp",
+  },
+  {
+    title: "Web & App Development",
+    desc: "Ship real full-stack products with modern web technologies — from first commit to cloud deployment.",
+    linkText: "Learn More",
+    href: "/#domains",
+  },
+  {
+    title: "Open Source & AI",
+    desc: "Contribute to open source repositories, build AI models, and learn how real software is crafted.",
+    linkText: "Learn More",
+    href: "/oss",
+  },
 ];
 
 export const STATS = [

@@ -18,13 +18,26 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
         link: "text-primary underline-offset-4 hover:underline",
+        sleek:
+          "rounded-full bg-gradient-to-r from-[#FF355E] via-[#FF4D70] to-[#FF355E] text-white font-extrabold tracking-wider uppercase border border-[#FF355E]/60 shadow-[0_0_20px_rgba(255,53,94,0.35)] hover:shadow-[0_0_30px_rgba(255,53,94,0.65)] hover:scale-[1.03] active:scale-[0.97] transition-all duration-300",
+        sleekOutline:
+          "rounded-full border border-white/20 bg-white/[0.04] text-white font-extrabold tracking-wider uppercase backdrop-blur-md hover:border-[#FF355E]/60 hover:bg-white/[0.09] hover:scale-[1.03] active:scale-[0.97] transition-all duration-300",
+        sleekNoBg:
+          "rounded-full border-2 border-[#FF355E] bg-transparent text-white font-extrabold tracking-wider uppercase shadow-[0_0_20px_rgba(255,53,94,0.2)] hover:shadow-[0_0_30px_rgba(255,53,94,0.5)] hover:bg-[#FF355E]/10 hover:scale-[1.03] active:scale-[0.97] transition-all duration-300",
+        sleekNoBgSecondary:
+          "rounded-full border border-white/25 bg-transparent text-white font-extrabold tracking-wider uppercase hover:border-white/60 hover:bg-white/5 hover:scale-[1.03] active:scale-[0.97] transition-all duration-300",
+        sleekClean:
+          "bg-transparent border-none text-[#FF355E] font-extrabold tracking-widest uppercase hover:text-[#FF4D70] hover:scale-[1.04] active:scale-[0.96] transition-all duration-300 shadow-none p-0",
+        sleekCleanMuted:
+          "bg-transparent border-none text-[#8C93B0] font-extrabold tracking-widest uppercase hover:text-white hover:scale-[1.04] active:scale-[0.96] transition-all duration-300 shadow-none p-0",
       },
       size: {
         default:
           "h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
         xs: "h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
-        sm: "h-7 gap-1 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5",
-        lg: "h-9 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
+        sm: "h-8 gap-1.5 rounded-full px-4 text-xs font-bold uppercase tracking-wider",
+        lg: "h-12 gap-2 rounded-full px-7 text-sm font-extrabold uppercase tracking-wider",
+        xl: "h-13 gap-2.5 rounded-full px-8 text-base font-extrabold uppercase tracking-wider",
         icon: "size-8",
         "icon-xs":
           "size-6 rounded-[min(var(--radius-md),10px)] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3",
