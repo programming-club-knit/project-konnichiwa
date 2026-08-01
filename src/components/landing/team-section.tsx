@@ -152,7 +152,7 @@ export function TeamSection() {
 
   return (
     // Outer scroll track container defining the pin height (300vh)
-    <div ref={targetRef} id="team" className="relative h-[300vh] bg-[#0B0D19]">
+    <div ref={targetRef} id="team" className="relative h-[300vh] bg-[#000]">
       {/* Sticky Pinned Screen Container */}
       <div className="sticky top-0 flex h-screen flex-col justify-center overflow-hidden border-b border-white/5">
         

@@ -20,7 +20,7 @@ const RIBBON_ITEMS_2 = [
 
 export function MarqueeSection() {
   return (
-    <section className="relative overflow-hidden bg-[#0B0D19] py-16 md:py-24 flex items-center justify-center min-h-[260px]">
+    <section className="relative overflow-hidden bg-[#00000] md:py-24 flex items-center justify-center min-h-[260px]">
       {/* Container with horizontal fade masks to create generous gaps at the left and right ends */}
       <div className="relative w-full flex items-center justify-center min-h-[180px] [mask-image:linear-gradient(to_right,transparent,#000_8%,#000_92%,transparent)]">
         {/* Ribbon 1: Angled Pinkish-Red Strip from Hero Section with Black Overlay */}

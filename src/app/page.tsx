@@ -6,7 +6,7 @@ import { TeamSection } from "@/components/landing/team-section";
 
 export default function Home() {
   return (
-    <div className="relative overflow-x-clip bg-[#0B0D19]">
+    <div className="relative overflow-x-clip bg-[#000000]">
       <HeroSection />
       <MarqueeSection />
       <UpcomingEventSection />
