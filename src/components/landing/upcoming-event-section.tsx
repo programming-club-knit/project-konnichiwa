@@ -1,8 +1,8 @@
-import { FiCalendar, FiClock, FiMapPin, FiArrowRight, FiImage, FiZap } from "react-icons/fi";
+import { FiArrowRight, FiImage } from "react-icons/fi";
 
 export function UpcomingEventSection() {
   return (
-    <section id="upcoming-event" className="relative bg-[#0B0D19] py-20 border-b border-white/5">
+    <section id="upcoming-event" className="relative bg-[#0B0D19] py-24 border-b border-white/5 overflow-hidden">
       {/* Vertical Dashed Guidelines Overlay */}
       <div className="pointer-events-none absolute inset-0 z-0 opacity-40">
         <div className="mx-auto h-full max-w-7xl px-6 lg:px-12 grid grid-cols-5 border-x border-dashed border-white/5">
@@ -14,102 +14,78 @@ export function UpcomingEventSection() {
       </div>
 
       <div className="relative z-10 mx-auto max-w-6xl px-6">
-        {/* Section Tag */}
-        <div className="flex items-center gap-2 mb-6">
-          <span className="relative flex size-2.5">
-            <span className="absolute inline-flex size-full animate-ping rounded-full bg-[#FF355E] opacity-75" />
-            <span className="relative inline-flex size-2.5 rounded-full bg-[#FF355E]" />
-          </span>
-          <span className="text-xs font-extrabold uppercase tracking-widest text-[#FFB800]">
-            Next Upcoming Event
-          </span>
-        </div>
-
-        {/* Featured Upcoming Event Card Container */}
-        <div className="playgame-card overflow-hidden rounded-3xl border border-white/10 p-7 lg:p-10">
-          <div className="grid gap-8 lg:grid-cols-12 items-center">
-            {/* Left: Photo Placeholder slot for Event Banner */}
-            <div className="lg:col-span-5">
-              <div className="relative aspect-[16/10] sm:aspect-[16/9] lg:aspect-[4/3] w-full overflow-hidden rounded-2xl bg-[#16192C] border border-white/10 flex flex-col items-center justify-center p-6 text-center group hover:border-[#FF355E]/40 transition-colors">
-                <div className="flex flex-col items-center justify-center gap-2 text-[#8C93B0] group-hover:text-white transition-colors">
-                  <div className="grid size-12 place-items-center rounded-xl bg-white/5 border border-white/10 group-hover:bg-[#FF355E]/10 group-hover:border-[#FF355E]/40 transition-colors">
-                    <FiImage className="size-6 text-[#FF355E]" />
-                  </div>
-                  <span className="text-xs font-semibold tracking-wide uppercase mt-1">
-                    Upcoming Event Poster Placeholder
-                  </span>
-                  <span className="text-[11px] font-mono text-[#8C93B0]">
-                    /images/upcoming-event.jpg
-                  </span>
-                </div>
-
-                <div className="absolute top-4 left-4 rounded-lg bg-[#FF355E] px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-white shadow-md">
-                  Flagship Hackathon
-                </div>
-              </div>
+        <div className="grid gap-12 lg:grid-cols-12 lg:items-center">
+          
+          {/* Left Column: Image Card with Decorative Dot Matrix Accent */}
+          <div className="relative lg:col-span-5">
+            {/* Bottom-Left Decorative Dot Matrix Pattern */}
+            <div className="absolute -bottom-6 -left-6 z-0 grid grid-cols-6 gap-2.5 opacity-30">
+              {Array.from({ length: 36 }).map((_, i) => (
+                <div key={`dot-${i}`} className="size-1.5 rounded-full bg-white/40" />
+              ))}
             </div>
 
-            {/* Right: Event Information & Registration Details */}
-            <div className="lg:col-span-7 flex flex-col justify-between">
-              <div>
-                <div className="flex flex-wrap items-center gap-4 text-xs font-semibold text-[#8C93B0] mb-3">
-                  <span className="flex items-center gap-1.5 text-white">
-                    <FiCalendar className="size-4 text-[#FF355E]" /> Aug 15–17, 2026
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <FiClock className="size-4 text-[#FFB800]" /> 09:00 AM IST
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <FiMapPin className="size-4 text-[#FF355E]" /> KNIT Campus Auditorium
-                  </span>
+            {/* Poster / Placeholder Card */}
+            <div className="relative z-10 aspect-[4/4] sm:aspect-[4/3] lg:aspect-[4/4] w-full overflow-hidden rounded-3xl bg-[#131627] border border-white/10 flex flex-col items-center justify-center p-8 text-center shadow-2xl group hover:border-[#FF355E]/40 transition-all duration-300">
+              <div className="flex flex-col items-center justify-center gap-3 text-[#8C93B0] group-hover:text-white transition-colors">
+                <div className="grid size-16 place-items-center rounded-2xl bg-white/5 border border-white/10 group-hover:bg-[#FF355E]/10 group-hover:border-[#FF355E]/40 transition-colors">
+                  <FiImage className="size-8 text-[#FF355E]" />
                 </div>
-
-                <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white font-sans">
-                  CodeStorm &apos;26 — 36-Hour Build Sprint
-                </h2>
-
-                <p className="mt-4 text-sm sm:text-base leading-relaxed text-[#8C93B0]">
-                  Join over 300+ student developers for PTSC&apos;s annual overnight hackathon. Build innovative prototypes, solve real-world tracks, win cash prizes, and get mentored by seniors and alumni engineers.
-                </p>
-
-                {/* Countdown metrics preview */}
-                <div className="mt-6 grid grid-cols-4 gap-3 max-w-md text-center">
-                  <div className="rounded-xl border border-white/10 bg-white/5 py-2.5">
-                    <div className="text-xl font-extrabold text-white">14</div>
-                    <div className="text-[10px] font-medium uppercase text-[#8C93B0]">Days</div>
-                  </div>
-                  <div className="rounded-xl border border-white/10 bg-white/5 py-2.5">
-                    <div className="text-xl font-extrabold text-white">08</div>
-                    <div className="text-[10px] font-medium uppercase text-[#8C93B0]">Hours</div>
-                  </div>
-                  <div className="rounded-xl border border-white/10 bg-white/5 py-2.5">
-                    <div className="text-xl font-extrabold text-white">45</div>
-                    <div className="text-[10px] font-medium uppercase text-[#8C93B0]">Mins</div>
-                  </div>
-                  <div className="rounded-xl border border-white/10 bg-white/5 py-2.5">
-                    <div className="text-xl font-extrabold text-white">12</div>
-                    <div className="text-[10px] font-medium uppercase text-[#8C93B0]">Secs</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="mt-8 flex flex-wrap items-center gap-4">
-                <a
-                  href="#register"
-                  className="playgame-btn-pink inline-flex items-center gap-2.5 rounded-xl px-7 py-3.5 text-sm sm:text-base font-bold text-white shadow-xl"
-                >
-                  <FiZap className="size-4" /> Register For Event
-                </a>
-                <a
-                  href="/events"
-                  className="playgame-btn-outline inline-flex items-center gap-2 rounded-xl px-6 py-3.5 text-sm sm:text-base font-bold text-white"
-                >
-                  View Details <FiArrowRight className="size-4" />
-                </a>
+                <span className="text-sm font-bold tracking-wider uppercase mt-2 text-white">
+                  Event Banner Placeholder
+                </span>
+                <span className="text-xs font-mono text-[#8C93B0]/80">
+                  Replace with event image
+                </span>
               </div>
             </div>
           </div>
+
+          {/* Right Column: Event Details & Content */}
+          <div className="lg:col-span-7 flex flex-col justify-center pl-0 lg:pl-4">
+            {/* Main Headline */}
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white font-sans leading-tight">
+              CodeStorm &apos;26 — Annual Tech Summit
+            </h2>
+
+            {/* Description */}
+            <p className="mt-5 text-base leading-relaxed text-[#8C93B0] max-w-xl">
+              We provide a wide range of hackathon tracks, hands-on workshop experiences, and project challenges completely tailored to accelerate your developer journey at KNIT.
+            </p>
+
+            {/* Two Detail Columns */}
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-xl">
+              <div>
+                <h3 className="text-lg font-bold text-white tracking-tight">
+                  Great Speakers
+                </h3>
+                <p className="mt-1.5 text-sm text-[#8C93B0] leading-normal">
+                  Senior engineers, founders, and industry leaders share insights and guidance.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-white tracking-tight">
+                  300+ Participants
+                </h3>
+                <p className="mt-1.5 text-sm text-[#8C93B0] leading-normal">
+                  Over 300 student developers competing live across multiple domain tracks.
+                </p>
+              </div>
+            </div>
+
+            {/* CTA Button */}
+            <div className="mt-10">
+              <a
+                href="#register"
+                className="inline-flex items-center justify-center rounded-full bg-[#FF355E] px-8 py-3.5 text-sm font-black uppercase tracking-wider text-white shadow-lg shadow-[#FF355E]/25 hover:bg-[#FF4D70] hover:shadow-[#FF355E]/40 hover:scale-[1.03] active:scale-[0.97] transition-all duration-300 gap-2 group"
+              >
+                Register Now <FiArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+              </a>
+            </div>
+
+          </div>
+
         </div>
       </div>
     </section>
