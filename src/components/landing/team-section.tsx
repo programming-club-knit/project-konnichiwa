@@ -170,7 +170,7 @@ export function TeamSection() {
         <div className="relative z-10 mx-auto max-w-6xl px-6 text-center mb-8">
           <h2 className="mx-auto max-w-4xl text-3xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl font-sans leading-[1.15]">
             Meet the team that makes the{" "}
-            <Highlighter action="highlight" color="#FF355E">
+            <Highlighter action="underline" color="#FF355E" strokeWidth={4}>
               <span className="font-serif italic font-normal text-white">
                 magic happen
               </span>

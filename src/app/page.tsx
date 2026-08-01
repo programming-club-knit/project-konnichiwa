@@ -1,8 +1,8 @@
 import { HeroSection } from "@/components/landing/hero-section";
 import { MarqueeSection } from "@/components/landing/marquee-section";
 import { UpcomingEventSection } from "@/components/landing/upcoming-event-section";
+import { ActivitiesSection } from "@/components/landing/activities-section";
 import { TeamSection } from "@/components/landing/team-section";
-import { JoinSection } from "@/components/landing/join-section";
 
 export default function Home() {
   return (
@@ -10,8 +10,8 @@ export default function Home() {
       <HeroSection />
       <MarqueeSection />
       <UpcomingEventSection />
+      <ActivitiesSection />
       <TeamSection />
-
     </div>
   );
 }
