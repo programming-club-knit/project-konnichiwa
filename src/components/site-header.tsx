@@ -3,12 +3,19 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { FiMenu, FiX, FiArrowRight } from "react-icons/fi";
 import { NAV } from "@/components/landing/landing-data";
 import { Highlighter } from "@/components/ui/highlighter";
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname.startsWith(href);
+  };
 
   return (
     <header className="absolute top-0 inset-x-0 z-50 bg-transparent">
@@ -35,21 +42,28 @@ export function SiteHeader() {
 
         {/* PTSC Header Nav Links */}
         <div className="hidden items-center gap-6 lg:gap-8 md:flex">
-          {NAV.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="text-sm font-medium text-[#C4C9E2] transition-colors hover:text-white"
-            >
-              {item.label === "Hire Us" ? (
-                <Highlighter action="underline" color="#FF355E" strokeWidth={3}>
-                  <span className="text-white font-bold">{item.label}</span>
-                </Highlighter>
-              ) : (
-                item.label
-              )}
-            </Link>
-          ))}
+          {NAV.map((item) => {
+            const active = isActive(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`text-sm font-medium transition-colors ${
+                  active ? "text-white font-bold" : "text-[#8C93B0] hover:text-white"
+                }`}
+              >
+                {item.label === "Hire Us" ? (
+                  <Highlighter action="underline" color="#FF355E" strokeWidth={3}>
+                    <span className={active ? "text-white font-bold" : "text-[#C4C9E2] font-bold"}>
+                      {item.label}
+                    </span>
+                  </Highlighter>
+                ) : (
+                  item.label
+                )}
+              </Link>
+            );
+          })}
         </div>
 
         {/* Action Button */}
@@ -76,22 +90,29 @@ export function SiteHeader() {
       {open && (
         <div className="border-t border-white/10 bg-[#0B0D19]/95 backdrop-blur-xl px-6 py-6 md:hidden">
           <div className="flex flex-col gap-3">
-            {NAV.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setOpen(false)}
-                className="rounded-lg px-4 py-3 text-base font-medium text-[#C4C9E2] transition-colors hover:bg-white/5 hover:text-white"
-              >
-                {item.label === "Hire Us" ? (
-                  <Highlighter action="underline" color="#FF355E" strokeWidth={3}>
-                    <span className="text-white font-bold">{item.label}</span>
-                  </Highlighter>
-                ) : (
-                  item.label
-                )}
-              </Link>
-            ))}
+            {NAV.map((item) => {
+              const active = isActive(item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  className={`rounded-lg px-4 py-3 text-base font-medium transition-colors ${
+                    active
+                      ? "bg-white/10 text-white font-bold border-l-2 border-[#FF355E]"
+                      : "text-[#C4C9E2] hover:bg-white/5 hover:text-white"
+                  }`}
+                >
+                  {item.label === "Hire Us" ? (
+                    <Highlighter action="underline" color="#FF355E" strokeWidth={3}>
+                      <span className="font-bold">{item.label}</span>
+                    </Highlighter>
+                  ) : (
+                    item.label
+                  )}
+                </Link>
+              );
+            })}
             <a
               href="/#join"
               onClick={() => setOpen(false)}
@@ -105,3 +126,5 @@ export function SiteHeader() {
     </header>
   );
 }
+
+

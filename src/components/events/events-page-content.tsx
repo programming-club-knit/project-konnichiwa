@@ -71,46 +71,59 @@ export function EventsPageContent() {
 
       {/* PAST EVENTS SECTION */}
       <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-12 py-24 w-full">
-        <h2 className="text-3xl sm:text-4xl font-black text-white mb-10 border-b border-white/10 pb-6">
+        <h2 className="text-3xl sm:text-4xl font-black text-white mb-16 border-b border-white/10 pb-6 flex items-center gap-4">
           Past Events Vault
+          <span className="text-sm font-mono font-normal text-[#8C93B0]">{PAST_EVENTS.length} events</span>
         </h2>
-        
-        <div className="grid gap-8 sm:grid-cols-2">
-          {PAST_EVENTS.map((event) => (
-            <div 
+
+        <div className="flex flex-col divide-y divide-white/8">
+          {PAST_EVENTS.map((event, index) => (
+            <div
               key={event.id}
-              className="group relative overflow-hidden rounded-2xl bg-[#121528] border border-white/10 transition-all duration-300 hover:border-white/30 flex flex-col sm:flex-row h-full hover:shadow-2xl hover:shadow-black/50"
+              className="group flex flex-col sm:flex-row items-start gap-6 sm:gap-10 py-10 hover:bg-white/[0.02] transition-colors duration-300 -mx-4 px-4 rounded-2xl cursor-default"
             >
-              {/* Event Image */}
-              <div className="relative h-48 sm:h-auto sm:w-2/5 overflow-hidden bg-[#0B0D19] shrink-0 border-b sm:border-b-0 sm:border-r border-white/10">
-                <Image 
+              {/* Index Number */}
+              <span className="hidden sm:block text-5xl font-black text-white/[0.06] font-mono tabular-nums shrink-0 w-12 pt-1 group-hover:text-white/10 transition-colors">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+
+              {/* Thumbnail */}
+              <div className="relative w-full sm:w-40 h-28 sm:h-24 shrink-0 overflow-hidden rounded-xl bg-[#121528] border border-white/10 group-hover:border-white/20 transition-colors">
+                <Image
                   src={event.imageSrc}
                   alt={event.title}
                   fill
-                  sizes="(max-width: 640px) 100vw, 40vw"
-                  className="object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0 opacity-70 group-hover:opacity-100"
+                  sizes="(max-width: 640px) 100vw, 160px"
+                  className="object-cover grayscale opacity-60 group-hover:opacity-90 group-hover:grayscale-0 transition-all duration-500"
                 />
               </div>
-              
-              {/* Event Details */}
-              <div className="p-6 sm:p-8 flex flex-col flex-1 justify-center">
-                <h3 className="text-xl font-black text-white mb-3 group-hover:text-[#FF355E] transition-colors leading-tight">
+
+              {/* Content */}
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-3 mb-2">
+                  <span className="text-[10px] font-mono font-bold text-[#FF355E] uppercase tracking-widest bg-[#FF355E]/10 px-2 py-0.5 rounded">
+                    Past
+                  </span>
+                  <span className="flex items-center gap-1.5 text-xs font-medium text-[#8C93B0]">
+                    <FiCalendar className="size-3 shrink-0" /> {event.date}
+                  </span>
+                  <span className="flex items-center gap-1.5 text-xs font-medium text-[#8C93B0]">
+                    <FiMapPin className="size-3 shrink-0" /> {event.location}
+                  </span>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-black text-white group-hover:text-[#FF355E] transition-colors duration-300 leading-tight mb-2">
                   {event.title}
                 </h3>
-                <p className="text-sm text-[#8C93B0] line-clamp-3 mb-6 leading-relaxed font-medium">
+                <p className="text-sm text-[#8C93B0] leading-relaxed line-clamp-2 max-w-2xl">
                   {event.description}
                 </p>
-                
-                <div className="mt-auto space-y-2.5 pt-4 border-t border-white/10">
-                  <div className="flex items-center gap-2.5 text-xs font-bold text-white/70 uppercase tracking-wider">
-                    <FiCalendar className="size-3.5 text-[#FF355E]" />
-                    {event.date}
-                  </div>
-                  <div className="flex items-center gap-2.5 text-xs font-bold text-white/70 uppercase tracking-wider">
-                    <FiMapPin className="size-3.5 text-[#FF355E]" />
-                    {event.location}
-                  </div>
-                </div>
+              </div>
+
+              {/* Arrow indicator */}
+              <div className="hidden sm:flex items-center self-center shrink-0 size-9 rounded-full border border-white/10 bg-white/5 text-white/40 group-hover:border-[#FF355E]/40 group-hover:bg-[#FF355E]/10 group-hover:text-[#FF355E] transition-all duration-300">
+                <svg className="size-4 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
               </div>
             </div>
           ))}
