@@ -89,7 +89,7 @@ export function PeopleSection() {
           <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white font-sans leading-tight">
             Cracked Minds of{" "}
             <Highlighter action="underline" color="#FF355E" strokeWidth={4}>
-              <span className="text-[#FF355E]">PTSC</span>
+              <span className="text-[#FF355E]">KNIT</span>
             </Highlighter>
           </h2>
           <p className="mt-4 text-sm sm:text-base text-[#8C93B0] max-w-2xl mx-auto font-sans leading-relaxed">
@@ -105,8 +105,8 @@ export function PeopleSection() {
                 key={batch}
                 onClick={() => setSelectedBatch(batch)}
                 className={`relative pb-4 -mb-[1px] text-xs font-black uppercase tracking-widest transition-colors duration-300 ${selectedBatch === batch
-                    ? "text-white"
-                    : "text-[#8C93B0] hover:text-white/80"
+                  ? "text-white"
+                  : "text-[#8C93B0] hover:text-white/80"
                   }`}
               >
                 {batch}
