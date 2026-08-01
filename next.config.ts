@@ -5,6 +5,10 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "ptsc-website.s3.ap-south-1.amazonaws.com",
+      },
+      {
+        protocol: "https",
         hostname: "**",
       },
       {

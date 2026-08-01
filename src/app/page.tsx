@@ -16,7 +16,7 @@ export default async function Home() {
   const landingEvents = allEvents.slice(0, 4);
 
   return (
-    <div className="relative overflow-x-clip bg-[#0B0D19]">
+    <div className="relative overflow-x-clip bg-[#000000]">
       <HeroSection />
       <MarqueeSection />
       <UpcomingEventSection event={featuredEvent} />

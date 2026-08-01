@@ -13,7 +13,17 @@ export function UpcomingEventSection({ event }: UpcomingEventSectionProps) {
   if (!event) return null;
 
   return (
-    <section id="upcoming-event" className="relative bg-[#0B0D19] py-16 overflow-hidden selection:bg-white/20">
+    <section id="upcoming-event" className="relative bg-[#000000] py-24 border-b border-white/5 overflow-hidden">
+      {/* Vertical Dashed Guidelines Overlay */}
+      <div className="pointer-events-none absolute inset-0 z-0 opacity-40">
+        <div className="mx-auto h-full max-w-7xl px-6 lg:px-12 grid grid-cols-5 border-x border-dashed border-white/5">
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+        </div>
+      </div>
+
       <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-12">
         <div className="grid lg:grid-cols-[5fr_7fr] gap-8 lg:gap-12 items-stretch">
 

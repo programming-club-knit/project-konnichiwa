@@ -1,23 +1,28 @@
 import { Button } from "@/components/ui/button";
-import { GlyphMatrix } from "@/components/ui/glyph-matrix";
 import { Highlighter } from "@/components/ui/highlighter";
 import { FiArrowRight, FiCalendar } from "react-icons/fi";
+import DarkVeil from "./DarkVeil";
 
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-[#0B0D19] pt-36 pb-16 sm:pt-44 md:pt-48 md:pb-24">
-      {/* GlyphMatrix Background Component */}
-      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden opacity-40">
-        <GlyphMatrix color="#8C93B0" cellSize={16} fadeBottom={0.85} />
+    <section className="relative overflow-hidden pt-36 pb-16 sm:pt-44 md:pt-48 md:pb-24">
+      <div className="absolute inset-0 h-150 w-full overflow-hidden">
+        <DarkVeil
+          hueShift={250}
+          noiseIntensity={0.05}
+          scanlineIntensity={0}
+          speed={0.9}
+          scanlineFrequency={1.2}
+          warpAmount={0.3}
+        />
       </div>
 
-      {/* Vertical Dashed Guidelines Overlay */}
       <div className="pointer-events-none absolute inset-0 z-0">
-        <div className="mx-auto h-full max-w-7xl px-6 lg:px-12 grid grid-cols-5 border-x border-dashed border-white/5">
-          <div className="border-r border-dashed border-white/5 h-full" />
-          <div className="border-r border-dashed border-white/5 h-full" />
-          <div className="border-r border-dashed border-white/5 h-full" />
-          <div className="border-r border-dashed border-white/5 h-full" />
+        <div className="mx-auto grid h-full max-w-7xl grid-cols-5 border-x border-dashed border-white/5 px-6 lg:px-12">
+          <div className="h-full border-r border-dashed border-white/5" />
+          <div className="h-full border-r border-dashed border-white/5" />
+          <div className="h-full border-r border-dashed border-white/5" />
+          <div className="h-full border-r border-dashed border-white/5" />
         </div>
       </div>
 
@@ -32,7 +37,7 @@ export function HeroSection() {
             <br />
             We{" "}
             <Highlighter action="underline" color="#FF355E" strokeWidth={4}>
-              <span className="text-[#FF355E]">build.</span>
+              <span className="text-pink-primary">build.</span>
             </Highlighter>
           </h1>
         </div>
