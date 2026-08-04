@@ -42,7 +42,7 @@ const leaderboardSchema = new Schema({
 }
 );
 
-const Leaderboard = mongoose.model('Leaderboard',leaderboardSchema);
+const Leaderboard = mongoose.models.Leaderboard || mongoose.model('Leaderboard', leaderboardSchema);
 
 module.exports = {
     Leaderboard

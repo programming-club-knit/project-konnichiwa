@@ -139,4 +139,4 @@ const eventSchema = new mongoose.Schema({
     published: { type: Boolean, default: false }
   }
 })
-module.exports = mongoose.model("Event", eventSchema);
+module.exports = mongoose.models.Event || mongoose.model("Event", eventSchema);
