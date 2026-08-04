@@ -22,10 +22,6 @@ export type UserType = {
   status: string;
   batch?: number;
   post?: string;
-  rollNo?: string;
-  hideAchievementsCard?: boolean;
-  achievements?: any[];
-  createdAt?: string;
 };
 
 export type EventType = {
@@ -35,11 +31,6 @@ export type EventType = {
   description: string;
   date: string;
   time: string;
-  venue?: string;
-  eventType?: 'offline' | 'online';
-  platform?: string;
-  meetLink?: string;
-  registrationDeadline?: string;
   status: string;
   googleFormLink?: string;
   whatsappGroupLink?: string;
@@ -53,8 +44,6 @@ export type EventType = {
   registrationFields?: any[];
   participantFields?: any[];
   resources?: { label: string; url: string }[];
-  completed?: boolean;
-  completedAt?: string;
 };
 
 export type RegistrationType = {

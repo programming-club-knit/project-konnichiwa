@@ -8,8 +8,7 @@
     "postbuild": "node scripts/seed-admin.js",
     "start": "next start",
     "lint": "eslint",
-    "seed:admin": "node scripts/seed-admin.js",
-    "migrate:db": "node scripts/migrate-db.js"
+    "seed:admin": "node scripts/seed-admin.js"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

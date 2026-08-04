@@ -8,22 +8,12 @@ export type EventItem = {
   description: string;
   date: string;
   time?: string;
-  venue?: string;
-  eventType?: 'offline' | 'online';
-  platform?: string;
-  meetLink?: string;
-  registrationDeadline?: string;
   status: string;
   coverImageUrl?: string;
   registrationType?: string;
-  teamMinSize?: number;
-  teamMaxSize?: number;
   googleFormLink?: string;
   ruleBookUrl?: string;
   whatsappGroupLink?: string;
-  useCustomForm?: boolean;
-  forceGoogleForm?: boolean;
-  completed?: boolean;
   resources?: { label: string; url: string }[];
 };
 
