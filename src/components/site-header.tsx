@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FiMenu, FiX, FiArrowRight } from "react-icons/fi";
+import { FiMenu, FiX, FiArrowRight, FiArrowLeft } from "react-icons/fi";
 import { NAV } from "@/components/landing/landing-data";
 import { Highlighter } from "@/components/ui/highlighter";
 
@@ -16,6 +16,24 @@ export function SiteHeader() {
     if (href === "/") return pathname === "/";
     return pathname.startsWith(href);
   };
+
+  if (pathname.startsWith('/admin')) {
+    if (pathname !== '/admin') return null;
+    return (
+      <header className="absolute top-0 inset-x-0 z-50 bg-transparent">
+        <nav className="mx-auto flex h-24 max-w-7xl items-center px-6 lg:px-12">
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="grid size-10 place-items-center rounded-xl border border-white/10 bg-white/5 text-[#8C93B0] transition-all group-hover:border-[#FF355E]/50 group-hover:bg-[#FF355E]/10 group-hover:text-white">
+              <FiArrowLeft className="size-5" />
+            </div>
+            <span className="font-sans font-medium text-sm text-[#8C93B0] transition-colors group-hover:text-white">
+              Back to Home
+            </span>
+          </Link>
+        </nav>
+      </header>
+    );
+  }
 
   return (
     <header className="absolute top-0 inset-x-0 z-50 bg-transparent">

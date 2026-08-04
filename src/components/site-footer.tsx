@@ -1,8 +1,17 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { SOCIAL_PLATFORMS } from "@/components/landing/landing-data";
 
 export function SiteFooter() {
+  const pathname = usePathname();
+
+  if (pathname.startsWith('/admin')) {
+    return null;
+  }
+
   return (
     <footer className="w-full border-t border-white/5 bg-[#0B0D19] py-12 relative overflow-hidden">
       {/* Vertical Dashed Guidelines Overlay */}

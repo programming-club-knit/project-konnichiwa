@@ -42,4 +42,4 @@ const eventRegistrationSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.model('EventRegistration', eventRegistrationSchema);
+module.exports = mongoose.models.EventRegistration || mongoose.model('EventRegistration', eventRegistrationSchema);

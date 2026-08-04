@@ -64,4 +64,4 @@ emailLogSchema.pre('save', function(next) {
   next();
 });
 
-module.exports = mongoose.model('EmailLog', emailLogSchema);
+module.exports = mongoose.models.EmailLog || mongoose.model('EmailLog', emailLogSchema);

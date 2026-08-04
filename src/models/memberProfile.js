@@ -14,4 +14,4 @@ const memberProfileSchema=new mongoose.Schema({
     }
 })
 
-module.exports = mongoose.model("memberProfile", memberProfileSchema);
+module.exports = mongoose.models.memberProfile || mongoose.model("memberProfile", memberProfileSchema);
