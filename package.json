@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postbuild": "node scripts/seed-admin.js",
     "start": "next start",
     "lint": "eslint",
     "seed:admin": "node scripts/seed-admin.js"

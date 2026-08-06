@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { FiGithub, FiLinkedin, FiMail, FiLoader } from "react-icons/fi";
 import { Highlighter } from "@/components/ui/highlighter";
 
@@ -22,158 +22,19 @@ export type ExecutiveMember = {
 };
 
 // Mock members structured across Final Year (2027), Third Year (2028), Second Year (2029), and Alumni batches
-const INITIAL_TEAM_MEMBERS: ExecutiveMember[] = [
-  // Final Year Post Holders (2027)
-  {
-    id: "team-1",
-    name: "Aarav Sharma",
-    category: "Final Year",
-    role: "President",
-    post: "President",
-    domain: "Overall Leadership",
-    batch: 2027,
-    imageSrc: "",
-    github: "https://github.com",
-    linkedin: "https://linkedin.com",
-    email: "aarav@ptsc.knit.ac.in",
-  },
-  {
-    id: "team-2",
-    name: "Riya Verma",
-    category: "Final Year",
-    role: "Vice President",
-    post: "Vice President",
-    domain: "Technical Operations",
-    batch: 2027,
-    imageSrc: "",
-    github: "https://github.com",
-    linkedin: "https://linkedin.com",
-    email: "riya@ptsc.knit.ac.in",
-  },
-  {
-    id: "team-3",
-    name: "Karan Singh",
-    category: "Final Year",
-    role: "Senior Executive",
-    post: "Joint Secretary",
-    domain: "Web & Infrastructure",
-    batch: 2027,
-    imageSrc: "",
-    github: "https://github.com",
-    linkedin: "https://linkedin.com",
-    email: "karan@ptsc.knit.ac.in",
-  },
-
-  // Third Year Post Holders (2028)
-  {
-    id: "team-4",
-    name: "Meera Patel",
-    category: "Third Year",
-    role: "Domain Head",
-    post: "Web Development Head",
-    domain: "Frontend & Full Stack",
-    batch: 2028,
-    imageSrc: "",
-    github: "https://github.com",
-    linkedin: "https://linkedin.com",
-    email: "meera@ptsc.knit.ac.in",
-  },
-  {
-    id: "team-5",
-    name: "Dev Kumar",
-    category: "Third Year",
-    role: "Domain Head",
-    post: "Competitive Programming Head",
-    domain: "Algorithms & DSA",
-    batch: 2028,
-    imageSrc: "",
-    github: "https://github.com",
-    linkedin: "https://linkedin.com",
-    email: "dev@ptsc.knit.ac.in",
-  },
-  {
-    id: "team-6",
-    name: "Ananya Gupta",
-    category: "Third Year",
-    role: "Domain Head",
-    post: "Data Science Head",
-    domain: "AI & Machine Learning",
-    batch: 2028,
-    imageSrc: "",
-    github: "https://github.com",
-    linkedin: "https://linkedin.com",
-    email: "ananya@ptsc.knit.ac.in",
-  },
-
-  // Second Year Executive Members (2029)
-  {
-    id: "team-7",
-    name: "Rahul Tiwari",
-    category: "Second Year",
-    role: "Executive Member",
-    post: "Executive members",
-    domain: "Open Source & Systems",
-    batch: 2029,
-    imageSrc: "",
-    github: "https://github.com",
-    linkedin: "https://linkedin.com",
-    email: "rahul@ptsc.knit.ac.in",
-  },
-  {
-    id: "team-8",
-    name: "Neha Joshi",
-    category: "Second Year",
-    role: "Executive Member",
-    post: "Executive members",
-    domain: "App Development",
-    batch: 2029,
-    imageSrc: "",
-    github: "https://github.com",
-    linkedin: "https://linkedin.com",
-    email: "neha@ptsc.knit.ac.in",
-  },
-
-  // Past / Alumni Batches (2026, 2025)
-  {
-    id: "team-9",
-    name: "Saurabh Mishra",
-    category: "Batch of '26",
-    role: "Alumni Advisor",
-    post: "Class Mentor",
-    domain: "Cloud & Devops",
-    batch: 2026,
-    imageSrc: "/teams/pfp.jpg",
-    github: "https://github.com",
-    linkedin: "https://linkedin.com",
-    email: "saurabh@ptsc.knit.ac.in",
-  },
-  {
-    id: "team-10",
-    name: "Vikas Chauhan",
-    category: "Batch of '25",
-    role: "Alumni Mentor",
-    post: "Class Mentor",
-    domain: "Cybersecurity",
-    batch: 2025,
-    imageSrc: "/teams/pfp.jpg",
-    github: "https://github.com",
-    linkedin: "https://linkedin.com",
-    email: "vikas@ptsc.knit.ac.in",
-  },
-];
 
 // Helper function to map batch/category to tier order and section header
 function getLayerMetadata(batchNum?: number | string, category?: string) {
   const b = Number(batchNum);
 
   if (b === 2027 || category === "Final Year") {
-    return { priority: 1, title: "Final Year — Post Holders (Batch of 2027)", filterLabel: "Final Year ('27)" };
+    return { priority: 1, title: "Final Year Post Holders (Batch of 2027)", filterLabel: "Final Year ('27)" };
   }
   if (b === 2028 || category === "Third Year") {
-    return { priority: 2, title: "Third Year — Post Holders (Batch of 2028)", filterLabel: "Third Year ('28)" };
+    return { priority: 2, title: "Third Year Post Holders (Batch of 2028)", filterLabel: "Third Year ('28)" };
   }
   if (b === 2029 || category === "Second Year") {
-    return { priority: 3, title: "Second Year — Executive Members (Batch of 2029)", filterLabel: "Second Year ('29)" };
+    return { priority: 3, title: "Second Year Executive Members (Batch of 2029)", filterLabel: "Second Year ('29)" };
   }
   if (b && b <= 2026) {
     return {
@@ -189,20 +50,20 @@ export function TeamPageContent() {
   const [members, setMembers] = useState<ExecutiveMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedFilter, setSelectedFilter] = useState<string>("All Members");
+  const hasFetchedRef = useRef(false);
 
   useEffect(() => {
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
+
     fetch("/api/members")
       .then((res) => res.json())
       .then((data) => {
-        if (data.success && data.members && data.members.length > 0) {
+        if (data.success && Array.isArray(data.members)) {
           setMembers(data.members);
-        } else {
-          setMembers(INITIAL_TEAM_MEMBERS);
         }
       })
-      .catch(() => {
-        setMembers(INITIAL_TEAM_MEMBERS);
-      })
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
@@ -272,8 +133,8 @@ export function TeamPageContent() {
                   type="button"
                   onClick={() => setSelectedFilter(tabLabel)}
                   className={`relative pb-3 text-xs sm:text-sm font-bold uppercase tracking-widest transition-colors duration-300 ${selectedFilter === tabLabel
-                      ? "text-white"
-                      : "text-[#8C93B0] hover:text-white/80"
+                    ? "text-white"
+                    : "text-[#8C93B0] hover:text-white/80"
                     }`}
                 >
                   {tabLabel}
@@ -312,7 +173,7 @@ export function TeamPageContent() {
                     const splitName = fullName.split(" ");
                     const firstName = splitName[0];
                     const lastName = splitName.slice(1).join(" ");
-                    const userImage = person.imageSrc || "/teams/pfp.jpg";
+                    const userImage = person.imageSrc || "/teams/default-avatar.png";
 
                     return (
                       <div
