@@ -76,6 +76,28 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  showInHireUs: {
+    type: Boolean,
+    default: false,
+  },
+  availability: {
+    type: String,
+    enum: ["Internship", "Full-time", "Freelance", "Part-time"],
+    default: "Full-time",
+  },
+  headlineRole: {
+    type: String,
+    trim: true,
+  },
+  domain: {
+    type: String,
+    trim: true,
+  },
+  skills: [{ type: String }],
+  github: { type: String, trim: true },
+  linkedin: { type: String, trim: true },
+  portfolio: { type: String, trim: true },
+  resume: { type: String, trim: true },
   resetPasswordToken: String,
   resetPasswordExpire: Date,
 });

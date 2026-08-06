@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, useRef } from "react";
-import Image from "next/image";
-import { FiGithub, FiLinkedin } from "react-icons/fi";
+import { PeopleCard } from "@/components/people/people-card";
 import { Highlighter } from "@/components/ui/highlighter";
 
 export type PeopleMember = {
@@ -144,85 +143,19 @@ export function PeopleSection() {
 
         {/* Original Cracked People Cards Grid */}
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredPeople.map((person) => {
-            const splitName = person.name.split(" ");
-            const firstName = splitName[0];
-            const lastName = splitName.slice(1).join(" ");
-
-            return (
-              <div
-                key={person._id || person.id}
-                className="relative overflow-hidden rounded-xl bg-[#0B0D19] border border-white/10 aspect-[3/4.5] flex flex-col justify-between"
-              >
-                {/* Background Image */}
-                <Image
-                  src={person.imageSrc || "/teams/pfp.jpg"}
-                  alt={person.name}
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className="object-cover"
-                />
-
-                {/* Gradient Overlay for text readability */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D19] via-[#0B0D19]/40 to-transparent" />
-
-                {/* Top Left Info: Alumni & Batch */}
-                <div className="absolute top-5 left-5 z-10 flex flex-col gap-1">
-                  <span className="text-[10px] font-extrabold tracking-widest text-[#FF355E] uppercase">
-                    {person.isPTSCAlumni !== false ? "PTSC ALUMNI" : "ALUMNI"}
-                  </span>
-                  <span className="text-xs font-semibold tracking-widest text-white/80 uppercase font-sans">
-                    {formatBatchYear(person.batch).toUpperCase()}
-                  </span>
-                </div>
-
-                {/* Right vertical CRACKED watermark */}
-                <div className="absolute top-0 right-2 bottom-0 z-0 flex items-center justify-center pointer-events-none">
-                  <span
-                    className="text-[90px] font-black text-white/5 uppercase leading-none tracking-tighter"
-                    style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}
-                  >
-                    CRACKED.
-                  </span>
-                </div>
-
-                {/* Bottom Info Container */}
-                <div className="relative z-10 p-6 mt-auto flex flex-col">
-                  {/* Name split into two lines with pink underline */}
-                  <div className="mb-3">
-                    <h3 className="text-4xl font-black text-white uppercase leading-none tracking-tight">
-                      {firstName}
-                    </h3>
-                    <h3 className="text-4xl font-black text-white uppercase leading-none tracking-tight inline-block border-b-4 border-[#FF355E] pb-1">
-                      {lastName}
-                    </h3>
-                  </div>
-
-                  {/* Role and Company */}
-                  <p className="text-sm font-medium text-white/90">
-                    {person.role}
-                  </p>
-                  <p className="text-sm font-black text-[#FFB800] uppercase tracking-wider mt-1">
-                    {person.company}
-                  </p>
-
-                  {/* Footer Socials */}
-                  <div className="mt-5 pt-4 flex items-center gap-5 border-t border-white/20">
-                    {person.github && (
-                      <a href={person.github} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs font-semibold text-white/80 transition-colors hover:text-white group/social">
-                        <FiGithub className="size-4 group-hover/social:text-[#FF355E] transition-colors" /> GitHub
-                      </a>
-                    )}
-                    {person.linkedin && (
-                      <a href={person.linkedin} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs font-semibold text-white/80 transition-colors hover:text-white group/social">
-                        <FiLinkedin className="size-4 group-hover/social:text-[#FF355E] transition-colors" /> LinkedIn
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          {filteredPeople.map((person) => (
+            <PeopleCard
+              key={person._id || person.id}
+              name={person.name}
+              batch={person.batch}
+              company={person.company}
+              role={person.role}
+              imageSrc={person.imageSrc}
+              github={person.github}
+              linkedin={person.linkedin}
+              isPTSCAlumni={person.isPTSCAlumni}
+            />
+          ))}
         </div>
       </div>
     </section>
