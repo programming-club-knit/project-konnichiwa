@@ -16,7 +16,7 @@ export const ACTIVITIES: ActivityItem[] = [
     badge: "PTSC Hustle",
     description:
       "Since 2019, PTSC has built a strong competitive programming culture. Participation scaled rapidly, with teams qualifying for ICPC Regionals.",
-    imageSrc: "/teams/pfp.jpg",
+    imageSrc: "",
   },
   {
     id: "development",
@@ -24,7 +24,7 @@ export const ACTIVITIES: ActivityItem[] = [
     badge: "PTSC Chronicles",
     description:
       "We host hands-on workshops across web, mobile, DevOps, machine learning, and open source, focused on real skills rather than slides.",
-    imageSrc: "/teams/pfp.jpg",
+    imageSrc: "",
   },
   {
     id: "hackathons",
@@ -32,7 +32,7 @@ export const ACTIVITIES: ActivityItem[] = [
     badge: "Smart India Hackathon",
     description:
       "PTSC organizes the internal Smart India Hackathon annually, with consistent national qualifications, finals, and wins.",
-    imageSrc: "/teams/pfp.jpg",
+    imageSrc: "",
   },
   {
     id: "open-source",
@@ -40,7 +40,7 @@ export const ACTIVITIES: ActivityItem[] = [
     badge: "GSoC",
     description:
       "Our open-source community has produced GSoC contributors, LFX scholars, and GitHub Externs across top global tech organizations.",
-    imageSrc: "/teams/pfp.jpg",
+    imageSrc: "",
   },
   {
     id: "cybersecurity",

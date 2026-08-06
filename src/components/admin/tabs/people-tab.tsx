@@ -569,7 +569,7 @@ export function PeopleTab() {
               <div className="flex items-start gap-4">
                 <div className="relative size-14 rounded-xl overflow-hidden border border-white/15 shrink-0 bg-white/5">
                   <Image
-                    src={person.imageSrc || "/teams/pfp.jpg"}
+                    src={person.imageSrc || "/teams/default-avatar.png"}
                     alt={person.name}
                     fill
                     className="object-cover"

@@ -32,7 +32,7 @@ const INITIAL_TEAM_MEMBERS: ExecutiveMember[] = [
     post: "President",
     domain: "Overall Leadership",
     batch: 2027,
-    imageSrc: "/teams/pfp.jpg",
+    imageSrc: "",
     github: "https://github.com",
     linkedin: "https://linkedin.com",
     email: "aarav@ptsc.knit.ac.in",
@@ -45,7 +45,7 @@ const INITIAL_TEAM_MEMBERS: ExecutiveMember[] = [
     post: "Vice President",
     domain: "Technical Operations",
     batch: 2027,
-    imageSrc: "/teams/pfp.jpg",
+    imageSrc: "",
     github: "https://github.com",
     linkedin: "https://linkedin.com",
     email: "riya@ptsc.knit.ac.in",
@@ -58,7 +58,7 @@ const INITIAL_TEAM_MEMBERS: ExecutiveMember[] = [
     post: "Joint Secretary",
     domain: "Web & Infrastructure",
     batch: 2027,
-    imageSrc: "/teams/pfp.jpg",
+    imageSrc: "",
     github: "https://github.com",
     linkedin: "https://linkedin.com",
     email: "karan@ptsc.knit.ac.in",
@@ -73,7 +73,7 @@ const INITIAL_TEAM_MEMBERS: ExecutiveMember[] = [
     post: "Web Development Head",
     domain: "Frontend & Full Stack",
     batch: 2028,
-    imageSrc: "/teams/pfp.jpg",
+    imageSrc: "",
     github: "https://github.com",
     linkedin: "https://linkedin.com",
     email: "meera@ptsc.knit.ac.in",
@@ -86,7 +86,7 @@ const INITIAL_TEAM_MEMBERS: ExecutiveMember[] = [
     post: "Competitive Programming Head",
     domain: "Algorithms & DSA",
     batch: 2028,
-    imageSrc: "/teams/pfp.jpg",
+    imageSrc: "",
     github: "https://github.com",
     linkedin: "https://linkedin.com",
     email: "dev@ptsc.knit.ac.in",
@@ -99,7 +99,7 @@ const INITIAL_TEAM_MEMBERS: ExecutiveMember[] = [
     post: "Data Science Head",
     domain: "AI & Machine Learning",
     batch: 2028,
-    imageSrc: "/teams/pfp.jpg",
+    imageSrc: "",
     github: "https://github.com",
     linkedin: "https://linkedin.com",
     email: "ananya@ptsc.knit.ac.in",
@@ -114,7 +114,7 @@ const INITIAL_TEAM_MEMBERS: ExecutiveMember[] = [
     post: "Executive members",
     domain: "Open Source & Systems",
     batch: 2029,
-    imageSrc: "/teams/pfp.jpg",
+    imageSrc: "",
     github: "https://github.com",
     linkedin: "https://linkedin.com",
     email: "rahul@ptsc.knit.ac.in",
@@ -127,7 +127,7 @@ const INITIAL_TEAM_MEMBERS: ExecutiveMember[] = [
     post: "Executive members",
     domain: "App Development",
     batch: 2029,
-    imageSrc: "/teams/pfp.jpg",
+    imageSrc: "",
     github: "https://github.com",
     linkedin: "https://linkedin.com",
     email: "neha@ptsc.knit.ac.in",
@@ -165,7 +165,7 @@ const INITIAL_TEAM_MEMBERS: ExecutiveMember[] = [
 // Helper function to map batch/category to tier order and section header
 function getLayerMetadata(batchNum?: number | string, category?: string) {
   const b = Number(batchNum);
-  
+
   if (b === 2027 || category === "Final Year") {
     return { priority: 1, title: "Final Year — Post Holders (Batch of 2027)", filterLabel: "Final Year ('27)" };
   }
@@ -176,10 +176,10 @@ function getLayerMetadata(batchNum?: number | string, category?: string) {
     return { priority: 3, title: "Second Year — Executive Members (Batch of 2029)", filterLabel: "Second Year ('29)" };
   }
   if (b && b <= 2026) {
-    return { 
-      priority: 1000 - b, 
-      title: `Alumni & Past Post Holders — Batch of ${b}`, 
-      filterLabel: `Batch of '${String(b).slice(-2)}` 
+    return {
+      priority: 1000 - b,
+      title: `Alumni & Past Post Holders — Batch of ${b}`,
+      filterLabel: `Batch of '${String(b).slice(-2)}`
     };
   }
   return { priority: 999, title: "PTSC Executive Members", filterLabel: "Executives" };
@@ -258,7 +258,7 @@ export function TeamPageContent() {
             </Highlighter>
           </h1>
           <p className="mt-6 text-base sm:text-lg text-[#8C93B0] max-w-3xl mx-auto font-sans leading-relaxed">
-            The passionate minds and dedicated leaders driving technical excellence at KNIT Sultanpur — organized by year layer from Final Year post holders down to second year executive members.
+            The passionate minds and dedicated leaders driving technical excellence at KNIT Sultanpur
           </p>
         </div>
 
@@ -271,11 +271,10 @@ export function TeamPageContent() {
                   key={tabLabel}
                   type="button"
                   onClick={() => setSelectedFilter(tabLabel)}
-                  className={`relative pb-3 text-xs sm:text-sm font-bold uppercase tracking-widest transition-colors duration-300 ${
-                    selectedFilter === tabLabel
+                  className={`relative pb-3 text-xs sm:text-sm font-bold uppercase tracking-widest transition-colors duration-300 ${selectedFilter === tabLabel
                       ? "text-white"
                       : "text-[#8C93B0] hover:text-white/80"
-                  }`}
+                    }`}
                 >
                   {tabLabel}
                   {selectedFilter === tabLabel && (

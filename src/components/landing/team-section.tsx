@@ -21,7 +21,7 @@ export const POSITION_HOLDERS: PositionHolder[] = [
     id: "lead-1",
     name: "Abhay Pratap",
     role: "PTSC President & Lead",
-    imageSrc: "/teams/pfp.jpg",
+    imageSrc: "",
     github: "https://github.com",
     linkedin: "https://linkedin.com",
   },
@@ -29,7 +29,7 @@ export const POSITION_HOLDERS: PositionHolder[] = [
     id: "lead-2",
     name: "Orlando Diggs",
     role: "PTSC Vice President",
-    imageSrc: "/teams/pfp.jpg",
+    imageSrc: "",
     github: "https://github.com",
     linkedin: "https://linkedin.com",
   },
@@ -37,7 +37,7 @@ export const POSITION_HOLDERS: PositionHolder[] = [
     id: "lead-3",
     name: "Sophie Chamberlain",
     role: "Head of CP Division",
-    imageSrc: "/teams/pfp.jpg",
+    imageSrc: "",
     github: "https://github.com",
     linkedin: "https://linkedin.com",
   },
@@ -45,7 +45,7 @@ export const POSITION_HOLDERS: PositionHolder[] = [
     id: "lead-4",
     name: "Lana Steiner",
     role: "Lead Web Developer",
-    imageSrc: "/teams/pfp.jpg",
+    imageSrc: "",
     github: "https://github.com",
     linkedin: "https://linkedin.com",
   },
@@ -53,7 +53,7 @@ export const POSITION_HOLDERS: PositionHolder[] = [
     id: "lead-5",
     name: "Emily Donnavan",
     role: "Product & UI/UX Lead",
-    imageSrc: "/teams/pfp.jpg",
+    imageSrc: "",
     github: "https://github.com",
     linkedin: "https://linkedin.com",
   },
@@ -196,7 +196,7 @@ export function TeamSection() {
                 {/* Photo Area */}
                 <div className="relative aspect-[4/4.8] w-full overflow-hidden rounded-2xl bg-[#1A1D33]">
                   <Image
-                    src={member.imageSrc}
+                    src={member.imageSrc || "/teams/default-avatar.png"}
                     alt={member.name}
                     fill
                     className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
