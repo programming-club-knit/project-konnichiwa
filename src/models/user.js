@@ -58,6 +58,9 @@ const userSchema = new mongoose.Schema({
       "Executive members",
     ],
   },
+  imageSrc: {
+    type: String,
+  },
   resetPasswordToken: String,
   resetPasswordExpire: Date,
 });

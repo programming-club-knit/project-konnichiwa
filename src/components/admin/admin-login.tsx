@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FiLock, FiMail, FiArrowRight, FiLoader } from 'react-icons/fi';
 import { Button } from "@/components/ui/button";
@@ -33,7 +34,6 @@ export function AdminLoginForm() {
 
       // On success, redirect to the admin dashboard
       router.push("/admin/dashboard");
-      router.refresh();
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred");
     } finally {
@@ -42,7 +42,7 @@ export function AdminLoginForm() {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden bg-[#0B0D19]">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden bg-[#0B0D19] font-sans">
       {/* Vertical Dashed Guidelines Overlay to match UI layout style */}
       <div className="pointer-events-none absolute inset-0 z-0">
         <div className="mx-auto h-full max-w-7xl px-6 lg:px-12 grid grid-cols-5 border-x border-dashed border-white/5">
@@ -53,7 +53,7 @@ export function AdminLoginForm() {
         </div>
       </div>
 
-      <div className="relative z-10 w-full max-w-md px-6">
+      <div className="relative z-10 w-full max-w-md px-6 font-sans">
         <div className="flex flex-col items-center mb-8">
           <div className="grid size-16 place-items-center rounded-2xl border border-white/10 bg-[#121528] shadow-xl mb-6">
             <Image
@@ -72,15 +72,15 @@ export function AdminLoginForm() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-8 rounded-2xl border border-white/10 bg-[#121528] shadow-xl">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-8 rounded-2xl border border-white/10 bg-[#121528] shadow-xl font-sans">
           {error && (
-            <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold font-mono uppercase tracking-wider text-center">
+            <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold font-sans uppercase tracking-wider text-center">
               {error}
             </div>
           )}
 
-          <div className="flex flex-col gap-2">
-            <label className="text-xs font-black text-[#8C93B0] uppercase tracking-widest ml-0.5">
+          <div className="flex flex-col gap-2 font-sans">
+            <label className="text-xs font-black text-[#8C93B0] uppercase tracking-widest ml-0.5 font-sans">
               Email Address
             </label>
             <div className="relative">
@@ -99,12 +99,12 @@ export function AdminLoginForm() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between ml-0.5">
-              <label className="text-xs font-black text-[#8C93B0] uppercase tracking-widest">
+          <div className="flex flex-col gap-2 font-sans">
+            <div className="flex items-center justify-between ml-0.5 font-sans">
+              <label className="text-xs font-black text-[#8C93B0] uppercase tracking-widest font-sans">
                 Password
               </label>
-              <a href="#" className="text-xs font-bold text-[#FF355E] hover:underline transition-all">
+              <a href="#" className="text-xs font-bold text-[#FF355E] hover:underline transition-all font-sans">
                 Forgot?
               </a>
             </div>
@@ -128,7 +128,7 @@ export function AdminLoginForm() {
             type="submit"
             variant="sleek"
             size="lg"
-            className="w-full mt-2 justify-center shadow-lg gap-2"
+            className="w-full mt-2 justify-center shadow-lg gap-2 font-sans"
             disabled={loading}
           >
             {loading ? (
@@ -144,8 +144,14 @@ export function AdminLoginForm() {
           </Button>
         </form>
 
-        <div className="mt-8 text-center">
-          <p className="text-xs text-[#8C93B0] font-sans font-semibold tracking-wider uppercase">
+        <div className="mt-6 text-center space-y-2 font-sans">
+          <p className="text-xs text-[#8C93B0] font-sans">
+            PTSC Executive Member?{" "}
+            <Link href="/admin/register" className="text-[#FF355E] font-bold hover:underline font-sans">
+              Register Here
+            </Link>
+          </p>
+          <p className="text-[11px] text-white/30 uppercase tracking-widest font-sans">
             Authorized Personnel Only
           </p>
         </div>

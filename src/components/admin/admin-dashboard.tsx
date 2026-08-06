@@ -76,22 +76,18 @@ export function AdminDashboard() {
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  // Guard against duplicate fetches from Fast Refresh re-mounts
-  const hasFetched = useRef(false);
-  // Keep stable router ref so router change doesn't re-trigger auth useEffect
   const routerRef = useRef(router);
-
-  // Verify Admin Auth
   useEffect(() => {
-    // Skip if already fetched in this session (Fast Refresh guard)
-    if (hasFetched.current) return;
-    hasFetched.current = true;
+    routerRef.current = router;
+  }, [router]);
 
-    const controller = new AbortController();
+  // Verify Admin Auth (runs once on mount)
+  useEffect(() => {
+    let isMounted = true;
 
     const checkAuth = async () => {
       try {
-        const res = await fetch('/api/auth/me', { signal: controller.signal });
+        const res = await fetch('/api/auth/me');
         if (!res.ok) throw new Error("Unauthorized");
         const data = await res.json();
         
@@ -99,26 +95,41 @@ export function AdminDashboard() {
           throw new Error("Access denied. Admin required.");
         }
         
-        setAdminUser(data.user);
-        setAuthLoading(false);
-        fetchInitialData(controller.signal);
+        if (isMounted) {
+          setAdminUser(data.user);
+          setAuthLoading(false);
+          fetchInitialData();
+        }
       } catch (err: any) {
-        if (err.name === 'AbortError') return; // cancelled — ignore
         console.error("Auth verification failed", err);
-        routerRef.current.push('/admin');
+        if (isMounted) {
+          routerRef.current.push('/admin');
+        }
       }
     };
+
     checkAuth();
 
-    return () => { controller.abort(); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  const fetchInitialData = async (signal?: AbortSignal) => {
+  const [allowSignup, setAllowSignup] = useState<boolean>(true);
+
+  const fetchInitialData = async () => {
     setDataLoading(true);
     setError(null);
     try {
-      const usersRes = await fetch('/api/admin/users', signal ? { signal } : undefined);
+      const settingsRes = await fetch('/api/admin/settings');
+      if (settingsRes.ok) {
+        const settingsData = await settingsRes.json();
+        if (settingsData.success && settingsData.settings) {
+          setAllowSignup(Boolean(settingsData.settings.allowSignup));
+        }
+      }
+
+      const usersRes = await fetch('/api/admin/users');
       if (usersRes.ok) {
         const usersData = await usersRes.json();
         if (usersData.success) {
@@ -127,7 +138,7 @@ export function AdminDashboard() {
         }
       }
 
-      const eventsRes = await fetch('/api/events', signal ? { signal } : undefined);
+      const eventsRes = await fetch('/api/events');
       if (eventsRes.ok) {
         const eventsData = await eventsRes.json();
         if (eventsData.success) {
@@ -139,11 +150,30 @@ export function AdminDashboard() {
         }
       }
     } catch (err: any) {
-      if (err.name === 'AbortError') return; // cancelled — ignore
       console.error("Error fetching data:", err);
       setError("Failed to fetch dashboard data.");
     } finally {
       setDataLoading(false);
+    }
+  };
+
+  const handleToggleSignup = async () => {
+    const nextVal = !allowSignup;
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ allowSignup: nextVal }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAllowSignup(Boolean(data.allowSignup));
+        showNotification(data.message);
+      } else {
+        showNotification(data.message || 'Failed to update signup settings');
+      }
+    } catch {
+      showNotification('Error updating signup setting');
     }
   };
 
@@ -564,6 +594,8 @@ export function AdminDashboard() {
             setUserRoleFilter={setUserRoleFilter}
             dataLoading={dataLoading}
             updatingUserId={updatingUserId}
+            allowSignup={allowSignup}
+            onToggleSignup={handleToggleSignup}
             onApproveUser={handleApproveUser}
             onDenyUser={handleDenyUser}
             onUpdateUser={handleUpdateUser}
