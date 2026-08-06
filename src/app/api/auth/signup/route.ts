@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
   try {
     await connectDB();
     const body = await request.json().catch(() => ({}));
-    const { firstName, lastName, email, password, username, mobile, batch, post, registrationType } = body;
+    const { firstName, lastName, email, password, username, mobile, batch, post, rollNo, registrationType } = body;
 
     if (!firstName || !lastName || !email || !password || !username || !mobile) {
       return NextResponse.json(
@@ -79,6 +79,7 @@ export async function POST(request: NextRequest) {
       mobile,
       batch: batch ? Number(batch) : undefined,
       post: post || undefined,
+      rollNo: rollNo || undefined,
       role: userRole,
       status: userStatus,
     });

@@ -31,7 +31,7 @@ export async function PUT(request: NextRequest) {
 
     await connectDB();
     const body = await request.json().catch(() => ({}));
-    const { firstName, lastName, username, mobile, password, imageSrc } = body;
+    const { firstName, lastName, username, mobile, password, imageSrc, rollNo } = body;
 
     const userToUpdate = await User.findById(currentUser._id);
     if (!userToUpdate) {
@@ -51,6 +51,7 @@ export async function PUT(request: NextRequest) {
     if (mobile) userToUpdate.mobile = Number(mobile);
     if (password) userToUpdate.password = password;
     if (imageSrc !== undefined) userToUpdate.imageSrc = imageSrc;
+    if (rollNo !== undefined) userToUpdate.rollNo = rollNo;
 
     await userToUpdate.save();
 
