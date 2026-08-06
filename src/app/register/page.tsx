@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FiArrowRight, FiArrowLeft, FiCheck, FiAlertCircle, FiLoader, FiUserCheck, FiZap, FiBookOpen } from "react-icons/fi";
@@ -50,7 +50,12 @@ export default function RegisterPage() {
     }
   }, [parsedAcademic]);
 
+  const hasFetchedSettingsRef = useRef(false);
+
   useEffect(() => {
+    if (hasFetchedSettingsRef.current) return;
+    hasFetchedSettingsRef.current = true;
+
     fetch("/api/settings/public")
       .then((res) => res.json())
       .then((data) => {

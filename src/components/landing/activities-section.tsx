@@ -48,7 +48,7 @@ export const ACTIVITIES: ActivityItem[] = [
     badge: "PTSCTF",
     description:
       "We run hands-on cybersecurity sessions and host PTSCTF, an in-house Capture The Flag event with wide campus-wide student participation.",
-    imageSrc: "/teams/pfp.jpg",
+    imageSrc: "/teams/default-avatar.png",
   },
   {
     id: "innovation",
@@ -56,7 +56,7 @@ export const ACTIVITIES: ActivityItem[] = [
     badge: "Research",
     description:
       "From hardware prototypes to published research, we foster a strong culture of experimentation and innovation beyond the classroom.",
-    imageSrc: "/teams/pfp.jpg",
+    imageSrc: "/teams/default-avatar.png",
   },
 ];
 
@@ -98,7 +98,7 @@ export function ActivitiesSection() {
                 {/* Photo Banner with Zero Radius */}
                 <div className="relative aspect-[16/10] w-full rounded-none overflow-hidden bg-[#1A1D33] border border-white/10">
                   <Image
-                    src={activity.imageSrc || "/teams/pfp.jpg"}
+                    src={activity.imageSrc || "/teams/default-avatar.png"}
                     alt={activity.title}
                     fill
                     className="object-cover rounded-none grayscale transition-all duration-500 group-hover:grayscale-0 group-hover:scale-105"
