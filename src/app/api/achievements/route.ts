@@ -108,7 +108,7 @@ export async function GET() {
       id: u._id.toString(),
       name: `${u.firstName} ${u.lastName}`,
       username: u.username,
-      imageSrc: u.imageSrc || "/teams/pfp.jpg",
+      imageSrc: u.imageSrc || "/teams/default-avatar.png",
       achievements: u.achievements || [],
     }));
 
