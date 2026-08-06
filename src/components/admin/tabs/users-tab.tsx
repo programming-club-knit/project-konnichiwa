@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { FiSearch, FiLoader } from 'react-icons/fi';
+import { FiSearch, FiLoader, FiUserCheck, FiToggleLeft, FiToggleRight, FiShield } from 'react-icons/fi';
 import { UserType, POSTS } from '../types';
 
 interface UsersTabProps {
@@ -13,6 +13,8 @@ interface UsersTabProps {
   setUserRoleFilter: (role: string) => void;
   dataLoading: boolean;
   updatingUserId: string | null;
+  allowSignup: boolean;
+  onToggleSignup: () => void;
   onApproveUser: (userId: string) => void;
   onDenyUser: (userId: string) => void;
   onUpdateUser: (user: UserType) => void;
@@ -27,17 +29,52 @@ export function UsersTab({
   setUserRoleFilter,
   dataLoading,
   updatingUserId,
+  allowSignup,
+  onToggleSignup,
   onApproveUser,
   onDenyUser,
   onUpdateUser,
 }: UsersTabProps) {
   return (
-    <div className="space-y-5">
-      {/* Header */}
+    <div className="space-y-6">
+      {/* Settings Banner for Signups */}
+      <div className="p-5 rounded-2xl border border-white/10 bg-[#121528] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-md">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <FiShield className="size-4 text-[#FF355E]" />
+            <h2 className="text-sm font-bold text-white uppercase tracking-wider font-mono">Registration Settings</h2>
+          </div>
+          <p className="text-xs text-white/50">
+            Control whether new users & executive members can register through the sign-up page.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={onToggleSignup}
+          className={`inline-flex items-center gap-2.5 px-4 py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider transition-all shadow-md ${
+            allowSignup
+              ? "bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/30"
+              : "bg-red-500/20 border border-red-500/30 text-red-300 hover:bg-red-500/30"
+          }`}
+        >
+          {allowSignup ? (
+            <>
+              <FiToggleRight className="size-5 text-emerald-400" /> Signups Enabled (ALLOW)
+            </>
+          ) : (
+            <>
+              <FiToggleLeft className="size-5 text-red-400" /> Signups Disabled (BLOCK)
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* Header & Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-white tracking-tight">Users & Roles Management</h1>
-          <p className="text-xs text-white/50 mt-0.5">Manage user approvals, assign positions, batches, and system roles.</p>
+          <h1 className="text-xl font-bold text-white tracking-tight">Users & Access Control</h1>
+          <p className="text-xs text-white/50 mt-0.5">Manage user approvals, assign executive positions, and grant admin panel access.</p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -58,9 +95,9 @@ export function UsersTab({
             className="bg-[#0E101A] border border-white/10 rounded-lg py-2 px-3 text-xs text-white focus:outline-none focus:border-white/30 font-mono"
           >
             <option value="all">All Roles</option>
-            <option value="normal">Normal</option>
-            <option value="member">Member</option>
-            <option value="admin">Admin</option>
+            <option value="normal">Normal (General)</option>
+            <option value="member">Member (Executive)</option>
+            <option value="admin">Admin Panel</option>
           </select>
         </div>
       </div>
@@ -76,9 +113,9 @@ export function UsersTab({
             <thead>
               <tr className="border-b border-white/10 text-[10px] font-mono uppercase tracking-wider text-white/40 bg-white/[0.02]">
                 <th className="py-3 px-4">Name</th>
-                <th className="py-3 px-4">Email</th>
+                <th className="py-3 px-4">Email / Type</th>
                 <th className="py-3 px-4">Status</th>
-                <th className="py-3 px-4">Role</th>
+                <th className="py-3 px-4">Role / Access</th>
                 <th className="py-3 px-4">Batch</th>
                 <th className="py-3 px-4">Post</th>
                 <th className="py-3 px-4 text-right">Actions</th>
@@ -88,7 +125,12 @@ export function UsersTab({
               {filteredUsers.map(u => (
                 <tr key={u._id} className="hover:bg-white/[0.02] transition-colors">
                   <td className="py-3 px-4 font-medium text-white">{u.firstName} {u.lastName}</td>
-                  <td className="py-3 px-4 font-mono text-[11px] text-white/50">{u.email}</td>
+                  <td className="py-3 px-4 font-mono text-[11px] text-white/50">
+                    <div>{u.email}</div>
+                    <div className="text-[10px] text-white/30">
+                      {u.email?.toLowerCase().endsWith("@knit.ac.in") ? "General KNIT" : "External / Executive"}
+                    </div>
+                  </td>
                   <td className="py-3 px-4">
                     <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono border ${
                       u.status === 'approved'
@@ -112,9 +154,9 @@ export function UsersTab({
                       }}
                       className="bg-[#0B0D19] border border-white/15 rounded-md py-1 px-2 text-[11px] font-mono text-white focus:outline-none focus:border-white/30"
                     >
-                      <option value="normal">normal</option>
-                      <option value="member">member</option>
-                      <option value="admin">admin</option>
+                      <option value="normal">normal (no admin)</option>
+                      <option value="member">member (executive)</option>
+                      <option value="admin">admin (full panel)</option>
                     </select>
                   </td>
                   <td className="py-3 px-4">

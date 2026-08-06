@@ -10,10 +10,10 @@ export const metadata: Metadata = {
 
 export default async function EventsPage() {
   const allEvents = await getEvents();
-  const upcomingEvents = allEvents.filter(
-    (e) => e.status === "upcoming" || e.status === "ongoing"
+  const pastEvents = allEvents.filter(
+    (e) => e.status?.toLowerCase() === "past" || e.status?.toLowerCase() === "completed"
   );
-  const pastEvents = allEvents.filter((e) => e.status === "past");
+  const upcomingEvents = allEvents.filter((e) => !pastEvents.includes(e));
 
   return (
     <main>

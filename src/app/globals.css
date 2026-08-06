@@ -152,6 +152,13 @@ textarea,
     @apply scroll-smooth font-sans;
     background-color: #0B0D19;
   }
+
+  input,
+  select,
+  textarea,
+  button {
+    font-family: inherit;
+  }
 }
 
 /* ---- Animations & Marquee ---- */

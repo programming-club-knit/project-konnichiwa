@@ -2,10 +2,10 @@ import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import crypto from "crypto";
 
-// POST /api/upload/sign — admin/member only, generates a signed Cloudinary upload signature
+// POST /api/upload/sign — generates a signed Cloudinary upload signature
 export async function POST() {
-  // Only authenticated admins/members can get an upload signature
-  const { response } = await requireAuth(["admin", "member"]);
+  // Allow any authenticated user to get an upload signature
+  const { response } = await requireAuth();
   if (response) return response;
 
   const apiSecret = process.env.CLOUDINARY_API_SECRET;
