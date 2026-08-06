@@ -61,6 +61,21 @@ const userSchema = new mongoose.Schema({
   imageSrc: {
     type: String,
   },
+  rollNo: {
+    type: String,
+    trim: true,
+  },
+  achievements: [
+    {
+      event: { type: String, required: true },
+      status: { type: String, required: true },
+      category: { type: String, required: true, default: "HACKATHONS" },
+    },
+  ],
+  hideAchievementsCard: {
+    type: Boolean,
+    default: false,
+  },
   resetPasswordToken: String,
   resetPasswordExpire: Date,
 });
@@ -74,5 +89,9 @@ userSchema.pre("save", async function () {
 userSchema.methods.matchPassword = function (enteredPassword) {
   return bcrypt.compare(enteredPassword, this.password);
 };
+
+if (mongoose.models && mongoose.models.User) {
+  delete mongoose.models.User;
+}
 
 module.exports = mongoose.models.User || mongoose.model("User", userSchema);

@@ -22,6 +22,9 @@ export type UserType = {
   status: string;
   batch?: number;
   post?: string;
+  rollNo?: string;
+  hideAchievementsCard?: boolean;
+  achievements?: any[];
 };
 
 export type EventType = {
