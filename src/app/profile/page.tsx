@@ -1,10 +1,15 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FiUser, FiMail, FiPhone, FiCalendar, FiShield, FiEdit2, FiCheck, FiLogOut, FiLoader, FiCamera, FiTrash2, FiAward } from "react-icons/fi";
+import {
+  FiUser, FiMail, FiPhone, FiLock, FiLogOut, FiEdit2, FiCheck,
+  FiCamera, FiTrash2, FiShield, FiLoader, FiAward, FiPlus, FiX
+} from "react-icons/fi";
+
+const CATEGORY_OPTIONS = ["HACKATHONS", "GSOC", "LFX", "SIH", "ICPC", "ACM", "CP", "OTHER"];
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -14,17 +19,26 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [uploadingPhoto, setUploadingPhoto] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
   // Form states for profile editing
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
   const [mobile, setMobile] = useState("");
+  const [rollNo, setRollNo] = useState("");
   const [password, setPassword] = useState("");
   const [imageSrc, setImageSrc] = useState("");
+
+  // Achievements state
+  const [achievements, setAchievements] = useState<any[]>([]);
+  const [newAchEvent, setNewAchEvent] = useState("");
+  const [newAchStatus, setNewAchStatus] = useState("");
+  const [newAchCategory, setNewAchCategory] = useState("HACKATHONS");
+  const [savingAch, setSavingAch] = useState(false);
+
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const fetchProfile = async () => {
     try {
@@ -40,7 +54,9 @@ export default function ProfilePage() {
         setLastName(data.user.lastName || "");
         setUsername(data.user.username || "");
         setMobile(String(data.user.mobile || ""));
+        setRollNo(data.user.rollNo || "");
         setImageSrc(data.user.imageSrc || "");
+        setAchievements(data.user.achievements || []);
       } else {
         router.push("/login");
       }
@@ -51,31 +67,33 @@ export default function ProfilePage() {
     }
   };
 
+  const hasFetchedRef = useRef(false);
+
   useEffect(() => {
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
     fetchProfile();
   }, []);
 
-  // Handle uploading or changing profile photo
   const handlePhotoUpload = async (file: File) => {
-    if (!file) return;
     const allowed = ["image/jpeg", "image/png", "image/webp", "image/gif"];
     if (!allowed.includes(file.type)) {
-      setError("Only JPEG, PNG, WebP or GIF images are allowed.");
+      setError("Only JPEG, PNG, WebP or GIF image formats are allowed.");
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      setError("Photo must be under 5 MB.");
+      setError("Profile image must be smaller than 5 MB.");
       return;
     }
 
-    setError(null);
     setUploadingPhoto(true);
+    setError(null);
+    setSuccess(null);
 
     try {
-      let finalImageUrl = "";
-
-      // Step 1: Request signed Cloudinary upload signature
+      let finalUrl = "";
       const signRes = await fetch("/api/upload/sign", { method: "POST" });
+      
       if (signRes.ok) {
         const { signature, timestamp, apiKey, cloudName, folder } = await signRes.json();
         const formData = new FormData();
@@ -90,47 +108,41 @@ export default function ProfilePage() {
           { method: "POST", body: formData }
         );
         const uploadData = await uploadRes.json();
-
         if (uploadRes.ok && uploadData.secure_url) {
-          finalImageUrl = uploadData.secure_url;
+          finalUrl = uploadData.secure_url;
         }
       }
 
-      // Fallback: If Cloudinary isn't configured, encode as base64 data URL for profile avatar
-      if (!finalImageUrl) {
-        finalImageUrl = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result as string);
-          reader.onerror = reject;
+      if (!finalUrl) {
+        const reader = new FileReader();
+        finalUrl = await new Promise<string>((resolve) => {
+          reader.onloadend = () => resolve(reader.result as string);
           reader.readAsDataURL(file);
         });
       }
 
-      // Step 2: Save the image URL in user profile via PUT /api/user/profile
       const updateRes = await fetch("/api/user/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imageSrc: finalImageUrl }),
+        body: JSON.stringify({ imageSrc: finalUrl }),
       });
 
       const updateData = await updateRes.json();
-      if (!updateRes.ok) throw new Error(updateData.message || "Failed to update profile photo");
+      if (!updateRes.ok) throw new Error(updateData.message || "Failed to update profile picture");
 
+      setImageSrc(finalUrl);
       setUser(updateData.user);
-      setImageSrc(finalImageUrl);
-      setSuccess("Profile photo updated successfully!");
+      setSuccess("Profile picture updated successfully!");
     } catch (err: any) {
-      setError(err.message || "Failed to upload photo.");
+      setError(err.message || "Failed to upload photo. Please try again.");
     } finally {
       setUploadingPhoto(false);
     }
   };
 
   const handleRemovePhoto = async () => {
-    setError(null);
-    setUploadingPhoto(true);
-
     try {
+      setUploadingPhoto(true);
       const updateRes = await fetch("/api/user/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -140,11 +152,11 @@ export default function ProfilePage() {
       const updateData = await updateRes.json();
       if (!updateRes.ok) throw new Error(updateData.message || "Failed to remove photo");
 
-      setUser(updateData.user);
       setImageSrc("");
-      setSuccess("Profile photo removed!");
+      setUser(updateData.user);
+      setSuccess("Profile photo removed.");
     } catch (err: any) {
-      setError(err.message || "Failed to remove photo.");
+      setError(err.message || "Failed to remove photo");
     } finally {
       setUploadingPhoto(false);
     }
@@ -152,9 +164,9 @@ export default function ProfilePage() {
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaving(true);
     setError(null);
     setSuccess(null);
-    setSaving(true);
 
     try {
       const res = await fetch("/api/user/profile", {
@@ -165,6 +177,7 @@ export default function ProfilePage() {
           lastName,
           username,
           mobile: Number(mobile),
+          rollNo,
           password: password ? password : undefined,
           imageSrc,
         }),
@@ -184,17 +197,55 @@ export default function ProfilePage() {
     }
   };
 
+  const handleAddAchievement = () => {
+    if (!newAchEvent.trim() || !newAchStatus.trim()) return;
+    setAchievements((prev) => [
+      ...prev,
+      { event: newAchEvent.trim(), status: newAchStatus.trim(), category: newAchCategory },
+    ]);
+    setNewAchEvent("");
+    setNewAchStatus("");
+  };
+
+  const handleRemoveAchievement = (index: number) => {
+    setAchievements((prev) => prev.filter((_, idx) => idx !== index));
+  };
+
+  const handleSaveAchievements = async () => {
+    setSavingAch(true);
+    setError(null);
+    setSuccess(null);
+    try {
+      const res = await fetch("/api/user/profile/achievements", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ achievements }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to save achievements");
+
+      setSuccess("Achievements updated! Validated achievements are displayed on the Showcase page.");
+      if (data.achievements) setAchievements(data.achievements);
+    } catch (err: any) {
+      setError(err.message || "Failed to save achievements");
+    } finally {
+      setSavingAch(false);
+    }
+  };
+
   const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/login");
-    router.refresh();
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      router.push("/login");
+    } catch {
+      router.push("/login");
+    }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0B0D19] text-white flex flex-col items-center justify-center gap-3 font-sans">
-        <FiLoader className="size-8 text-[#FF355E] animate-spin" />
-        <p className="text-sm text-[#8C93B0]">Loading profile...</p>
+      <div className="min-h-screen w-full bg-[#0B0D19] flex items-center justify-center text-white/50 text-xs font-mono">
+        <FiLoader className="size-6 animate-spin text-[#FF355E] mr-3" /> Loading profile...
       </div>
     );
   }
@@ -202,9 +253,10 @@ export default function ProfilePage() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-[#0B0D19] text-white pt-24 pb-20 selection:bg-[#FF355E]/30 font-sans">
-      <div className="max-w-4xl mx-auto px-6 lg:px-8">
-        {/* Hidden File Input for Avatar Upload */}
+    <div className="min-h-screen w-full bg-[#0B0D19] text-white pt-24 pb-16 font-sans selection:bg-[#FF355E]/30">
+      <div className="max-w-4xl mx-auto px-6">
+        
+        {/* Hidden File Picker Input */}
         <input
           type="file"
           ref={fileInputRef}
@@ -216,7 +268,7 @@ export default function ProfilePage() {
           }}
         />
 
-        {/* Profile Card Header */}
+        {/* Profile Header Card */}
         <div className="rounded-3xl border border-white/10 bg-[#121528] p-6 sm:p-8 shadow-2xl space-y-8 font-sans">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pb-6 border-b border-white/10">
             <div className="flex items-center gap-5">
@@ -301,70 +353,30 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* User Account Role Info */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-sans">
-            <div className="p-4 rounded-2xl bg-[#0B0D19] border border-white/10">
-              <span className="text-[10px] font-bold text-[#8C93B0] uppercase tracking-widest block mb-1">
-                Account Type
-              </span>
-              <span className="text-sm font-bold text-white flex items-center gap-2">
-                <FiShield className="size-4 text-[#FF355E]" />
-                {user.role === "admin"
-                  ? "PTSC Administrator"
-                  : user.email?.toLowerCase().endsWith("@knit.ac.in")
-                  ? "General KNIT Student"
-                  : "Executive Member"}
-              </span>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-[#0B0D19] border border-white/10">
-              <span className="text-[10px] font-bold text-[#8C93B0] uppercase tracking-widest block mb-1">
-                Admin Panel Access
-              </span>
-              <span className="text-sm font-bold">
-                {user.role === "admin" ? (
-                  <span className="text-emerald-400 flex items-center gap-1.5">
-                    <FiCheck className="size-4" /> Granted
-                  </span>
-                ) : (
-                  <span className="text-white/40">Restricted (General User)</span>
-                )}
-              </span>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-[#0B0D19] border border-white/10">
-              <span className="text-[10px] font-bold text-[#8C93B0] uppercase tracking-widest block mb-1">
-                PTSC Post / Batch
-              </span>
-              <span className="text-sm font-bold text-white flex items-center gap-1.5">
-                <FiAward className="size-4 text-[#FF355E]" />
-                {user.post || (user.batch ? `Batch ${user.batch}` : "Student")}
-              </span>
-            </div>
-          </div>
-
-          {/* Success / Error Messages */}
-          {success && (
-            <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs font-bold flex items-center gap-2 font-sans">
-              <FiCheck className="size-4" /> {success}
-            </div>
-          )}
-
+          {/* Messages */}
           {error && (
-            <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold font-sans">
+            <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold text-center">
               {error}
             </div>
           )}
 
-          {/* Profile Details & Edit Section */}
-          <div className="space-y-6 font-sans">
+          {success && (
+            <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs font-bold text-center flex items-center justify-center gap-2">
+              <FiCheck className="size-4" /> {success}
+            </div>
+          )}
+
+          {/* Account Details & Edit Form */}
+          <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold text-white tracking-tight">Personal Details</h2>
+              <h2 className="text-lg font-bold text-white font-sans uppercase tracking-wider flex items-center gap-2">
+                <FiUser className="text-[#FF355E]" /> Personal Details
+              </h2>
               {!editing && (
                 <button
                   type="button"
                   onClick={() => setEditing(true)}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-white hover:bg-white/10 transition-colors"
+                  className="px-3.5 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-white text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors"
                 >
                   <FiEdit2 className="size-3.5" /> Edit Profile
                 </button>
@@ -372,8 +384,8 @@ export default function ProfilePage() {
             </div>
 
             {editing ? (
-              <form onSubmit={handleUpdate} className="space-y-4 bg-[#0B0D19] p-6 rounded-2xl border border-white/10 font-sans">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <form onSubmit={handleUpdate} className="space-y-4 font-sans">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-[11px] font-bold text-[#8C93B0] uppercase tracking-wider block mb-1">
                       First Name
@@ -427,17 +439,31 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
-                <div>
-                  <label className="text-[11px] font-bold text-[#8C93B0] uppercase tracking-wider block mb-1">
-                    Profile Photo URL
-                  </label>
-                  <input
-                    type="url"
-                    placeholder="https://example.com/avatar.jpg"
-                    value={imageSrc}
-                    onChange={(e) => setImageSrc(e.target.value)}
-                    className="w-full bg-[#121528] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-[11px] font-bold text-[#8C93B0] uppercase tracking-wider block mb-1">
+                      Roll Number
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="24305"
+                      value={rollNo}
+                      onChange={(e) => setRollNo(e.target.value)}
+                      className="w-full bg-[#121528] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-bold text-[#8C93B0] uppercase tracking-wider block mb-1">
+                      Profile Photo URL
+                    </label>
+                    <input
+                      type="url"
+                      placeholder="https://example.com/avatar.jpg"
+                      value={imageSrc}
+                      onChange={(e) => setImageSrc(e.target.value)}
+                      className="w-full bg-[#121528] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                    />
+                  </div>
                 </div>
 
                 <div>
@@ -474,10 +500,14 @@ export default function ProfilePage() {
                 </div>
               </form>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-[#0B0D19] p-6 rounded-2xl border border-white/10 font-sans text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 bg-[#0B0D19] p-6 rounded-2xl border border-white/10 font-sans text-xs">
                 <div>
                   <span className="text-[#8C93B0] block mb-1">Email Address</span>
                   <span className="text-white font-bold">{user.email}</span>
+                </div>
+                <div>
+                  <span className="text-[#8C93B0] block mb-1">Roll Number</span>
+                  <span className="text-white font-bold">{user.rollNo || "Not set"}</span>
                 </div>
                 <div>
                   <span className="text-[#8C93B0] block mb-1">Mobile Number</span>
@@ -493,6 +523,134 @@ export default function ProfilePage() {
                 </div>
               </div>
             )}
+          </div>
+
+          {/* Interactive My Achievements Section */}
+          <div className="pt-6 border-t border-white/10 space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-bold text-white font-sans uppercase tracking-wider flex items-center gap-2">
+                  <FiAward className="text-[#FF355E]" /> My Achievements & Milestones
+                </h2>
+                <p className="text-xs text-[#8C93B0] mt-0.5 font-sans">
+                  Add your hackathons, open source contributions, and competitive programming achievements to be featured on the showcase page.
+                </p>
+              </div>
+
+              <Link
+                href="/achievements"
+                className="px-3.5 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-white text-xs font-bold uppercase tracking-wider shrink-0 transition-colors"
+              >
+                View Showcase
+              </Link>
+            </div>
+
+            {/* List of current achievements */}
+            {achievements.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {achievements.map((ach, idx) => (
+                  <div
+                    key={idx}
+                    className="p-3.5 rounded-2xl bg-[#0B0D19] border border-white/10 flex items-center justify-between group"
+                  >
+                    <div className="space-y-0.5 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-[#FF355E]/10 border border-[#FF355E]/20 text-[#FF355E]">
+                          {ach.category}
+                        </span>
+                        <h4 className="text-xs font-bold text-white truncate">{ach.event}</h4>
+                      </div>
+                      <p className="text-[11px] text-[#8C93B0] truncate pl-0.5">{ach.status}</p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveAchievement(idx)}
+                      className="size-7 grid place-items-center rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors shrink-0 ml-2"
+                      title="Remove Achievement"
+                    >
+                      <FiTrash2 className="size-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="p-6 rounded-2xl bg-[#0B0D19] border border-white/10 text-center text-xs text-[#8C93B0] font-sans">
+                You haven&apos;t added any achievements yet. Use the form below to add hackathon wins, GSoC, LFX, or CP ranks!
+              </div>
+            )}
+
+            {/* Add New Achievement Form */}
+            <div className="p-4 rounded-2xl bg-[#0B0D19] border border-white/10 space-y-4">
+              <h3 className="text-xs font-bold text-white uppercase tracking-wider">Add Achievement</h3>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="text-[10px] font-bold text-[#8C93B0] uppercase block mb-1">
+                    Event / Hackathon Name
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. SIH 2024 / GSoC '25"
+                    value={newAchEvent}
+                    onChange={(e) => setNewAchEvent(e.target.value)}
+                    className="w-full bg-[#121528] border border-white/10 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-[#FF355E]"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-bold text-[#8C93B0] uppercase block mb-1">
+                    Status / Rank / Org
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Winner / @Google / Candidate Master"
+                    value={newAchStatus}
+                    onChange={(e) => setNewAchStatus(e.target.value)}
+                    className="w-full bg-[#121528] border border-white/10 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-[#FF355E]"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-bold text-[#8C93B0] uppercase block mb-1">
+                    Category
+                  </label>
+                  <select
+                    value={newAchCategory}
+                    onChange={(e) => setNewAchCategory(e.target.value)}
+                    className="w-full bg-[#121528] border border-white/10 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-[#FF355E]"
+                  >
+                    {CATEGORY_OPTIONS.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-1">
+                <button
+                  type="button"
+                  onClick={handleAddAchievement}
+                  className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors"
+                >
+                  <FiPlus className="size-4 text-[#FF355E]" /> Add to List
+                </button>
+              </div>
+            </div>
+
+            {/* Save Achievements Button */}
+            <div className="flex justify-end pt-2">
+              <button
+                type="button"
+                onClick={handleSaveAchievements}
+                disabled={savingAch}
+                className="px-6 py-3 rounded-xl bg-[#FF355E] hover:bg-[#FF4D70] text-white text-xs font-bold uppercase tracking-wider shadow-lg flex items-center gap-2 transition-all disabled:opacity-50"
+              >
+                {savingAch ? <FiLoader className="size-4 animate-spin" /> : <><FiCheck className="size-4" /> Save Achievements</>}
+              </button>
+            </div>
           </div>
         </div>
       </div>

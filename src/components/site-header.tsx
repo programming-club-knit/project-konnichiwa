@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -12,19 +12,31 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const pathname = usePathname();
+  const hasFetchedRef = useRef(false);
 
   useEffect(() => {
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
+
+    let isMounted = true;
     fetch("/api/user/profile")
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
+        if (!isMounted) return;
         if (data?.success && data?.user) {
           setUser(data.user);
         } else {
           setUser(null);
         }
       })
-      .catch(() => setUser(null));
-  }, [pathname]);
+      .catch(() => {
+        if (isMounted) setUser(null);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";

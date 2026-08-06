@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import Image from "next/image";
-import { FiGithub, FiLinkedin, FiBriefcase, FiZap } from "react-icons/fi";
+import { FiGithub, FiLinkedin } from "react-icons/fi";
 import { Highlighter } from "@/components/ui/highlighter";
 
 export type PeopleMember = {
-  id: string;
+  _id?: string;
+  id?: string;
   name: string;
   batch: string;
   company: string;
@@ -15,9 +16,10 @@ export type PeopleMember = {
   imageSrc: string;
   github?: string;
   linkedin?: string;
+  isPTSCAlumni?: boolean;
 };
 
-export const PEOPLE_MEMBERS: PeopleMember[] = [
+export const INITIAL_PEOPLE_MEMBERS: PeopleMember[] = [
   {
     id: "aseem-srivastava",
     name: "Aseem Srivastava",
@@ -51,28 +53,51 @@ export const PEOPLE_MEMBERS: PeopleMember[] = [
     github: "https://github.com",
     linkedin: "https://linkedin.com",
   },
-
 ];
 
-export const BATCH_FILTERS = [
-  "ALL BATCHES",
-  "Batch of '25",
-  "Batch of '24",
-  "Batch of '23",
-  "Batch of '21",
-  "Batch of '17",
-];
+export function formatBatchYear(batchInput: string | number | undefined): string {
+  if (!batchInput) return "Batch of '25";
+  const str = String(batchInput).trim();
+  if (str.startsWith("Batch of")) return str;
+  const num = parseInt(str.replace(/\D/g, ""), 10);
+  if (!isNaN(num)) {
+    const shortYear = num > 2000 ? String(num).slice(-2) : String(num);
+    return `Batch of '${shortYear}`;
+  }
+  return str;
+}
 
 export function PeopleSection() {
+  const [members, setMembers] = useState<PeopleMember[]>(INITIAL_PEOPLE_MEMBERS);
   const [selectedBatch, setSelectedBatch] = useState("ALL BATCHES");
+  const hasFetchedRef = useRef(false);
 
-  const filteredPeople =
-    selectedBatch === "ALL BATCHES"
-      ? PEOPLE_MEMBERS
-      : PEOPLE_MEMBERS.filter((person) => person.batch === selectedBatch);
+  useEffect(() => {
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
+
+    fetch("/api/people")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.success && Array.isArray(data.people) && data.people.length > 0) {
+          setMembers(data.people);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const dynamicBatchFilters = useMemo(() => {
+    const batches = Array.from(new Set(members.map((m) => formatBatchYear(m.batch))));
+    return ["ALL BATCHES", ...batches];
+  }, [members]);
+
+  const filteredPeople = useMemo(() => {
+    if (selectedBatch === "ALL BATCHES") return members;
+    return members.filter((person) => formatBatchYear(person.batch) === selectedBatch);
+  }, [members, selectedBatch]);
 
   return (
-    <section id="people" className="relative bg-[#0B0D19] py-24 border-b border-white/5">
+    <section id="people" className="relative bg-[#0B0D19] py-24 border-b border-white/5 font-sans">
       {/* Vertical Dashed Guidelines Overlay */}
       <div className="pointer-events-none absolute inset-0 z-0 opacity-40">
         <div className="mx-auto h-full max-w-7xl px-6 lg:px-12 grid grid-cols-5 border-x border-dashed border-white/5">
@@ -100,14 +125,13 @@ export function PeopleSection() {
         {/* Batch Year Filter Bar */}
         <div className="flex justify-center mb-16">
           <div className="flex flex-wrap justify-center items-center gap-6 sm:gap-10 border-b border-white/10">
-            {BATCH_FILTERS.map((batch) => (
+            {dynamicBatchFilters.map((batch) => (
               <button
                 key={batch}
                 onClick={() => setSelectedBatch(batch)}
-                className={`relative pb-4 -mb-[1px] text-xs font-black uppercase tracking-widest transition-colors duration-300 ${selectedBatch === batch
-                  ? "text-white"
-                  : "text-[#8C93B0] hover:text-white/80"
-                  }`}
+                className={`relative pb-4 -mb-[1px] text-xs font-black uppercase tracking-widest transition-colors duration-300 ${
+                  selectedBatch === batch ? "text-white" : "text-[#8C93B0] hover:text-white/80"
+                }`}
               >
                 {batch}
                 {selectedBatch === batch && (
@@ -118,7 +142,7 @@ export function PeopleSection() {
           </div>
         </div>
 
-        {/* Cracked People Cards Grid */}
+        {/* Original Cracked People Cards Grid */}
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {filteredPeople.map((person) => {
             const splitName = person.name.split(" ");
@@ -127,12 +151,12 @@ export function PeopleSection() {
 
             return (
               <div
-                key={person.id}
+                key={person._id || person.id}
                 className="relative overflow-hidden rounded-xl bg-[#0B0D19] border border-white/10 aspect-[3/4.5] flex flex-col justify-between"
               >
                 {/* Background Image */}
                 <Image
-                  src={person.imageSrc}
+                  src={person.imageSrc || "/teams/pfp.jpg"}
                   alt={person.name}
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -145,10 +169,10 @@ export function PeopleSection() {
                 {/* Top Left Info: Alumni & Batch */}
                 <div className="absolute top-5 left-5 z-10 flex flex-col gap-1">
                   <span className="text-[10px] font-extrabold tracking-widest text-[#FF355E] uppercase">
-                    PTSC ALUMNI
+                    {person.isPTSCAlumni !== false ? "PTSC ALUMNI" : "ALUMNI"}
                   </span>
                   <span className="text-xs font-semibold tracking-widest text-white/80 uppercase font-sans">
-                    {person.batch.toUpperCase()}
+                    {formatBatchYear(person.batch).toUpperCase()}
                   </span>
                 </div>
 

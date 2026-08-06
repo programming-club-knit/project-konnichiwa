@@ -108,8 +108,8 @@ export function UsersTab({
           <FiLoader className="size-4 animate-spin text-white/60" /> Loading user directory...
         </div>
       ) : filteredUsers.length > 0 ? (
-        <div className="border border-white/10 rounded-xl bg-[#0E101A] overflow-hidden shadow-sm">
-          <table className="w-full text-left border-collapse">
+        <div className="w-full overflow-x-auto">
+          <table className="w-full text-left border-collapse min-w-[850px]">
             <thead>
               <tr className="border-b border-white/10 text-[10px] font-mono uppercase tracking-wider text-white/40 bg-white/[0.02]">
                 <th className="py-3 px-4">Name</th>
@@ -118,6 +118,7 @@ export function UsersTab({
                 <th className="py-3 px-4">Role / Access</th>
                 <th className="py-3 px-4">Batch</th>
                 <th className="py-3 px-4">Post</th>
+                <th className="py-3 px-4">Achievements Card</th>
                 <th className="py-3 px-4 text-right">Actions</th>
               </tr>
             </thead>
@@ -185,6 +186,22 @@ export function UsersTab({
                         <option key={p} value={p}>{p}</option>
                       ))}
                     </select>
+                  </td>
+                  <td className="py-3 px-4">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const nextVal = !u.hideAchievementsCard;
+                        setAllUsers(prev => prev.map(x => x._id === u._id ? { ...x, hideAchievementsCard: nextVal } : x));
+                      }}
+                      className={`px-2.5 py-1 rounded-md text-[10px] font-mono border transition-colors ${
+                        u.hideAchievementsCard
+                          ? "border-red-500/30 bg-red-500/10 text-red-300 hover:bg-red-500/20"
+                          : "border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
+                      }`}
+                    >
+                      {u.hideAchievementsCard ? "Hidden" : "Visible"}
+                    </button>
                   </td>
                   <td className="py-3 px-4 text-right space-x-1.5">
                     {u.status === 'pending' ? (

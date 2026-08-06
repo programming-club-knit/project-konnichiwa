@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FiArrowRight, FiCheck, FiAlertCircle, FiLoader, FiShield, FiUserCheck, FiZap } from "react-icons/fi";
+import { FiArrowRight, FiArrowLeft, FiCheck, FiAlertCircle, FiLoader, FiUserCheck, FiZap, FiBookOpen } from "react-icons/fi";
+import { parseAcademicFromEmail, computeAcademicFromRoll } from "@/lib/academic";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -12,6 +13,7 @@ export default function RegisterPage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");
+  const [rollNo, setRollNo] = useState("");
   const [password, setPassword] = useState("");
   const [batch, setBatch] = useState("");
 
@@ -20,6 +22,33 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  // Derive academic info from email (e.g. abhay.24305@knit.ac.in) or manual roll number entry
+  const parsedAcademic = useMemo(() => {
+    const fromEmail = parseAcademicFromEmail(email);
+    if (fromEmail.valid) return fromEmail;
+    
+    if (rollNo && /^\d{5,6}$/.test(rollNo.trim())) {
+      const fromRoll = computeAcademicFromRoll(rollNo);
+      if (fromRoll.valid) {
+        const batchYear = rollNo.trim().length === 6 ? fromRoll.admissionYear + 3 : fromRoll.admissionYear + 4;
+        return { ...fromRoll, rollNumber: rollNo.trim(), batchYear };
+      }
+    }
+    return { valid: false as const, reason: "No valid roll/email" };
+  }, [email, rollNo]);
+
+  // Auto-sync rollNo & batch when email or roll is entered
+  useEffect(() => {
+    if (parsedAcademic.valid) {
+      if (parsedAcademic.rollNumber && !rollNo) {
+        setRollNo(parsedAcademic.rollNumber);
+      }
+      if (parsedAcademic.batchYear) {
+        setBatch(String(parsedAcademic.batchYear));
+      }
+    }
+  }, [parsedAcademic]);
 
   useEffect(() => {
     fetch("/api/settings/public")
@@ -60,6 +89,7 @@ export default function RegisterPage() {
           username,
           email,
           mobile: Number(mobile),
+          rollNo,
           password,
           batch: batch ? Number(batch) : undefined,
           registrationType: "general",
@@ -84,8 +114,20 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#0B0D19] text-white pt-24 pb-16 flex flex-col items-center justify-center relative overflow-hidden selection:bg-[#FF355E]/30 font-sans">
+    <div className="min-h-screen w-full bg-[#0B0D19] text-white pt-12 pb-16 flex flex-col items-center justify-center relative overflow-hidden selection:bg-[#FF355E]/30 font-sans">
       <div className="relative z-10 w-full max-w-4xl lg:max-w-5xl px-6">
+        
+        {/* Back to Home Button */}
+        <div className="mb-6">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 bg-white/5 text-[#8C93B0] hover:text-white hover:border-[#FF355E]/50 hover:bg-[#FF355E]/10 text-xs font-bold uppercase tracking-wider transition-all shadow-md group"
+          >
+            <FiArrowLeft className="size-4 group-hover:-translate-x-1 transition-transform text-[#FF355E]" />
+            Back to Home
+          </Link>
+        </div>
+
         {fetchingSettings ? (
           <div className="p-16 text-center border border-white/10 rounded-3xl bg-[#121528] flex items-center justify-center gap-3 text-sm text-white/50 font-sans">
             <FiLoader className="size-6 animate-spin text-[#FF355E]" /> Checking portal status...
@@ -120,7 +162,7 @@ export default function RegisterPage() {
                 </h1>
                 
                 <p className="text-sm text-[#8C93B0] leading-relaxed">
-                  Join PTSC KNIT with your official <strong className="text-white">@knit.ac.in</strong> email address for instant access.
+                  Join PTSC KNIT with your official <strong className="text-white">@knit.ac.in</strong> email address. Your roll number, branch, and batch are managed automatically!
                 </p>
 
                 <div className="space-y-3 pt-4">
@@ -136,11 +178,11 @@ export default function RegisterPage() {
 
                   <div className="flex items-start gap-3 text-xs text-white/80">
                     <div className="grid size-6 place-items-center rounded-lg bg-[#FF355E]/10 border border-[#FF355E]/20 text-[#FF355E] shrink-0 mt-0.5">
-                      <FiZap className="size-3.5" />
+                      <FiBookOpen className="size-3.5" />
                     </div>
                     <div>
-                      <strong className="block text-white font-bold">Event & Contest Access</strong>
-                      <span>Register for hackathons, bootcamps, and track contest rankings.</span>
+                      <strong className="block text-white font-bold">Automatic Roll & Academic Parsing</strong>
+                      <span>Roll No, Branch & Batch year are parsed from roll number or email.</span>
                     </div>
                   </div>
 
@@ -150,7 +192,7 @@ export default function RegisterPage() {
                     </div>
                     <div>
                       <strong className="block text-white font-bold">Personalized Profile</strong>
-                      <span>Manage your student details and track club participation.</span>
+                      <span>Manage profile photo, view club announcements and event history.</span>
                     </div>
                   </div>
                 </div>
@@ -246,17 +288,36 @@ export default function RegisterPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="sm:col-span-2">
+                <div>
+                  <label className="text-[11px] font-bold text-[#8C93B0] uppercase tracking-wider block mb-1.5">
+                    KNIT Email (@knit.ac.in)
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="abhay.24305@knit.ac.in"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                  />
+                  {parsedAcademic.valid && (
+                    <p className="mt-1.5 text-[11px] text-emerald-400 font-sans flex items-center gap-1 font-medium">
+                      <FiCheck className="size-3.5 shrink-0" />
+                      Auto-detected: <strong>{parsedAcademic.branch}</strong> • Batch {parsedAcademic.batchYear} (Year {parsedAcademic.year})
+                    </p>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
                     <label className="text-[11px] font-bold text-[#8C93B0] uppercase tracking-wider block mb-1.5">
-                      KNIT Email (@knit.ac.in)
+                      Roll Number
                     </label>
                     <input
-                      type="email"
-                      required
-                      placeholder="student@knit.ac.in"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      type="text"
+                      placeholder="24305"
+                      value={rollNo}
+                      onChange={(e) => setRollNo(e.target.value)}
                       className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
                     />
                   </div>
@@ -266,7 +327,7 @@ export default function RegisterPage() {
                     </label>
                     <input
                       type="number"
-                      placeholder="2026"
+                      placeholder="2028"
                       value={batch}
                       onChange={(e) => setBatch(e.target.value)}
                       className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"

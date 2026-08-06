@@ -9,12 +9,13 @@ import {
   FiCheckSquare, 
   FiMail, 
   FiUsers, 
+  FiAward,
   FiUser, 
   FiLogOut 
 } from 'react-icons/fi';
 import { UserType } from './types';
 
-type TabType = 'overview' | 'events' | 'registrations' | 'attendance' | 'mail' | 'users' | 'profile';
+type TabType = 'overview' | 'events' | 'registrations' | 'attendance' | 'mail' | 'users' | 'people' | 'profile';
 
 interface AdminSidebarProps {
   activeTab: TabType;
@@ -38,11 +39,12 @@ export function AdminSidebar({
     { id: 'attendance', label: 'Attendance', icon: <FiCheckSquare className="size-4" /> },
     { id: 'mail', label: 'Mail Manager', icon: <FiMail className="size-4" /> },
     { id: 'users', label: 'Users & Roles', icon: <FiUsers className="size-4" />, badge: pendingCount },
+    { id: 'people', label: 'People / Alumni', icon: <FiAward className="size-4" /> },
     { id: 'profile', label: 'Profile', icon: <FiUser className="size-4" /> },
   ];
 
   return (
-    <aside className="w-56 border-r border-white/10 bg-[#0E101A] flex flex-col justify-between p-4 shrink-0 selection:bg-white/20">
+    <aside className="w-56 border-r border-white/10 bg-[#0E101A] flex flex-col justify-between p-4 shrink-0 selection:bg-white/20 font-sans">
       <div>
         {/* Header */}
         <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/10 px-1">

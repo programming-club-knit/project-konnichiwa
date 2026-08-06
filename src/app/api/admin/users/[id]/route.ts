@@ -15,7 +15,7 @@ export async function PATCH(request: Request, { params }: Params) {
     const { id } = await params;
     const body = await request.json();
 
-    const { role, batch, post, status, imageSrc } = body;
+    const { role, batch, post, status, imageSrc, hideAchievementsCard } = body;
     const updateData: Record<string, any> = {};
 
     if (role !== undefined) updateData.role = role;
@@ -23,6 +23,7 @@ export async function PATCH(request: Request, { params }: Params) {
     if (post !== undefined) updateData.post = post;
     if (status !== undefined) updateData.status = status;
     if (imageSrc !== undefined) updateData.imageSrc = imageSrc;
+    if (hideAchievementsCard !== undefined) updateData.hideAchievementsCard = hideAchievementsCard;
 
     const user = await User.findByIdAndUpdate(
       id,

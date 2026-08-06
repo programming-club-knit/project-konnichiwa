@@ -12,6 +12,7 @@ import { RegistrationsTab } from './tabs/registrations-tab';
 import { AttendanceTab } from './tabs/attendance-tab';
 import { MailTab } from './tabs/mail-tab';
 import { UsersTab } from './tabs/users-tab';
+import { PeopleTab } from './tabs/people-tab';
 import { ProfileTab } from './tabs/profile-tab';
 
 export function AdminDashboard() {
@@ -19,7 +20,7 @@ export function AdminDashboard() {
   const [adminUser, setAdminUser] = useState<UserType | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<
-    'overview' | 'events' | 'registrations' | 'attendance' | 'mail' | 'users' | 'profile'
+    'overview' | 'events' | 'registrations' | 'attendance' | 'mail' | 'users' | 'people' | 'profile'
   >('overview');
   
   // Data States
@@ -81,8 +82,12 @@ export function AdminDashboard() {
     routerRef.current = router;
   }, [router]);
 
+  const hasFetchedRef = useRef(false);
+
   // Verify Admin Auth (runs once on mount)
   useEffect(() => {
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
     let isMounted = true;
 
     const checkAuth = async () => {
@@ -313,6 +318,8 @@ export function AdminDashboard() {
           role: user.role,
           batch: user.batch ?? null,
           post: user.post || '',
+          rollNo: user.rollNo || '',
+          hideAchievementsCard: user.hideAchievementsCard,
           status: user.status
         }),
       });
@@ -600,6 +607,11 @@ export function AdminDashboard() {
             onDenyUser={handleDenyUser}
             onUpdateUser={handleUpdateUser}
           />
+        )}
+
+        {/* People & Alumni Manager Tab */}
+        {activeTab === 'people' && (
+          <PeopleTab />
         )}
 
         {/* Profile Tab */}
