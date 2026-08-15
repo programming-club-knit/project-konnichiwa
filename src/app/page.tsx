@@ -1,4 +1,4 @@
-import { HeroSection } from "@/components/landing/hero-section";
+import { PrismaHero } from "@/components/landing/newHero";
 import { MarqueeSection } from "@/components/landing/marquee-section";
 import { UpcomingEventSection } from "@/components/landing/upcoming-event-section";
 import { EventsSection } from "@/components/landing/events-section";

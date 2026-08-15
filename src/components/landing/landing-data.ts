@@ -61,9 +61,9 @@ export const NAV: NavItem[] = [
   // { label: "OSS", href: "/oss" },
   // { label: "CP", href: "/cp" },
   { label: "Team", href: "/team" },
-  { label: "Our Peoples", href: "/people" },
+  { label: "Alumni", href: "/people" },
   { label: "Achievements", href: "/achievements" },
-  { label: "Support Us", href: "/support-us" },
+  { label: "Support", href: "/support-us" },
   { label: "Hire Us", href: "/hire-us" },
 ];
 
