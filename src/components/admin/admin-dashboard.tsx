@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { FiLoader, FiCheck, FiAlertCircle } from 'react-icons/fi';
+import { FiLoader, FiCheck, FiAlertCircle, FiMenu } from 'react-icons/fi';
 
 import { UserType, EventType, RegistrationType } from './types';
 import { AdminSidebar } from './admin-sidebar';
@@ -19,17 +19,18 @@ export function AdminDashboard() {
   const router = useRouter();
   const [adminUser, setAdminUser] = useState<UserType | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<
     'overview' | 'events' | 'registrations' | 'attendance' | 'mail' | 'users' | 'people' | 'profile'
   >('overview');
-  
+
   // Data States
   const [allUsers, setAllUsers] = useState<UserType[]>([]);
   const [pendingUsers, setPendingUsers] = useState<UserType[]>([]);
   const [events, setEvents] = useState<EventType[]>([]);
   const [registrations, setRegistrations] = useState<RegistrationType[]>([]);
   const [selectedEventId, setSelectedEventId] = useState<string>('');
-  
+
   const [dataLoading, setDataLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -50,12 +51,17 @@ export function AdminDashboard() {
   // Event Form State
   const [eventFormMode, setEventFormMode] = useState<'list' | 'create' | 'edit'>('list');
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
-  
+
   const [eventForm, setEventForm] = useState({
     title: '',
     description: '',
     date: '',
     time: '',
+    venue: '',
+    eventType: 'offline' as 'offline' | 'online',
+    platform: '',
+    meetLink: '',
+    registrationDeadline: '',
     status: 'upcoming',
     coverImageUrl: '',
     googleFormLink: '',
@@ -95,11 +101,11 @@ export function AdminDashboard() {
         const res = await fetch('/api/auth/me');
         if (!res.ok) throw new Error("Unauthorized");
         const data = await res.json();
-        
+
         if (!data.success || data.user.role !== 'admin') {
           throw new Error("Access denied. Admin required.");
         }
-        
+
         if (isMounted) {
           setAdminUser(data.user);
           setAuthLoading(false);
@@ -264,9 +270,9 @@ export function AdminDashboard() {
       r.createdAt ? new Date(r.createdAt).toLocaleDateString() : ''
     ]);
 
-    const csvContent = "data:text/csv;charset=utf-8," 
+    const csvContent = "data:text/csv;charset=utf-8,"
       + [headers.join(","), ...rows.map(e => e.map(x => `"${x}"`).join(","))].join("\n");
-    
+
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -341,12 +347,20 @@ export function AdminDashboard() {
   const handleEditEventClick = (event: EventType) => {
     setEditingEventId(event._id);
     const formattedDate = event.date ? new Date(event.date).toISOString().split('T')[0] : '';
+    const formattedDeadline = event.registrationDeadline
+      ? new Date(event.registrationDeadline).toISOString().slice(0, 16)
+      : '';
 
     setEventForm({
       title: event.title || '',
       description: event.description || '',
       date: formattedDate,
       time: event.time || '',
+      venue: event.venue || '',
+      eventType: event.eventType || 'offline',
+      platform: event.platform || '',
+      meetLink: event.meetLink || '',
+      registrationDeadline: formattedDeadline,
       status: event.status || 'upcoming',
       coverImageUrl: event.coverImageUrl || '',
       googleFormLink: event.googleFormLink || '',
@@ -373,6 +387,11 @@ export function AdminDashboard() {
       description: '',
       date: '',
       time: '',
+      venue: '',
+      eventType: 'offline',
+      platform: '',
+      meetLink: '',
+      registrationDeadline: '',
       status: 'upcoming',
       coverImageUrl: '',
       googleFormLink: '',
@@ -403,8 +422,42 @@ export function AdminDashboard() {
       } else {
         alert(data.message || "Failed to delete event.");
       }
+    } catch {
+      showNotification("Error deleting event.");
+    }
+  };
+
+  const handleToggleEventComplete = async (event: EventType) => {
+    const isCurrentlyDone = Boolean(event.completed || event.status === 'past');
+    const nextCompleted = !isCurrentlyDone;
+    const confirmPrompt = nextCompleted
+      ? `Mark "${event.title}" as Completed? This marks the event as concluded and ready for participation email & certificate dispatch.`
+      : `Re-open "${event.title}" as an active competition?`;
+
+    if (!window.confirm(confirmPrompt)) return;
+
+    try {
+      setDataLoading(true);
+      const res = await fetch(`/api/events/${event._id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          completed: nextCompleted,
+          status: nextCompleted ? 'past' : 'upcoming',
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showNotification(nextCompleted ? "Event marked as completed!" : "Event re-opened as active!");
+        fetchInitialData();
+      } else {
+        alert(data.message || "Failed to update event status");
+      }
     } catch (err) {
-      console.error("Error deleting event:", err);
+      console.error("Error toggling event completion:", err);
+      showNotification("Error updating event status");
+    } finally {
+      setDataLoading(false);
     }
   };
 
@@ -480,145 +533,198 @@ export function AdminDashboard() {
     }
   };
 
+  const tabTitles: Record<typeof activeTab, string> = {
+    overview: 'System Overview',
+    events: 'Events Management',
+    registrations: 'Participant Registrations',
+    attendance: 'Live Attendance Tracker',
+    mail: 'Mail Broadcast Console',
+    users: 'User & Role Permissions',
+    people: 'People & Alumni Directory',
+    profile: 'Admin Profile Settings',
+  };
+
   if (authLoading) {
     return (
-      <div className="min-h-screen w-full flex items-center justify-center bg-[#080910] text-white/60 text-xs font-mono">
-        <FiLoader className="size-4 animate-spin mr-2" /> Authenticating...
+      <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[#090B14] text-slate-300 font-sans gap-3">
+        <FiLoader className="size-8 animate-spin text-[#FF355E]" />
+        <span className="text-sm font-semibold tracking-wide text-white">Authenticating Administrative Access...</span>
+        <span className="text-xs text-slate-500 font-mono">PTSC Security Gateway</span>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex bg-[#080910] text-white font-sans text-xs">
+    <div data-admin-panel="true" className="min-h-screen flex bg-[#090B14] text-slate-100 font-sans selection:bg-[#FF355E]/30">
       {/* Toast Notification Banner */}
       {toastMessage && (
-        <div className="fixed top-5 right-5 z-50 px-4 py-2.5 bg-white text-black text-xs font-mono font-semibold rounded-lg border border-white/20 shadow-2xl flex items-center gap-2 animate-bounce">
-          <FiCheck className="size-4" /> {toastMessage}
+        <div className="fixed top-6 right-6 z-50 px-4 py-3 bg-[#13172B] text-white text-sm font-semibold rounded-md border border-emerald-500/30 shadow-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="size-6 rounded bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+            <FiCheck className="size-3.5" />
+          </div>
+          <span>{toastMessage}</span>
         </div>
       )}
 
-      {/* Modern Monochrome Sidebar */}
+      {/* Professional Sidebar */}
       <AdminSidebar
         activeTab={activeTab}
         setActiveTab={(tab) => { setActiveTab(tab); setEventFormMode('list'); }}
         pendingCount={pendingUsers.length}
         adminUser={adminUser}
         onLogout={handleLogout}
+        mobileOpen={mobileMenuOpen}
+        setMobileOpen={setMobileMenuOpen}
       />
 
-      {/* Main Content Area */}
-      <main className="flex-1 p-8 overflow-y-auto max-w-6xl">
-        {error && (
-          <div className="mb-5 p-3.5 rounded-lg border border-red-500/30 bg-red-500/10 text-red-300 text-xs font-mono flex items-center gap-2.5">
-            <FiAlertCircle className="size-4 shrink-0" /> {error}
+      {/* Main Content Viewport */}
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto bg-[#090B14]">
+        {/* Top Header Bar */}
+        <header className="sticky top-0 z-10 h-16 border-b border-white/10 bg-[#090B14]/90 backdrop-blur-md px-4 sm:px-8 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-3">
+            {/* Hamburger Button on Mobile */}
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(true)}
+              className="p-2 rounded-md border border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 transition-colors lg:hidden"
+              aria-label="Open sidebar menu"
+            >
+              <FiMenu className="size-5" />
+            </button>
+
+            <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
+              <span className="hidden sm:inline">Console</span>
+              <span className="text-white/20 hidden sm:inline">/</span>
+              <span className="text-white font-semibold truncate max-w-[200px] sm:max-w-none">
+                {tabTitles[activeTab]}
+              </span>
+            </div>
           </div>
-        )}
 
-        {/* Overview Tab */}
-        {activeTab === 'overview' && (
-          <OverviewTab
-            adminUser={adminUser}
-            allUsersCount={allUsers.length}
-            pendingUsersCount={pendingUsers.length}
-            eventsCount={events.length}
-            onNavigateToUsers={() => setActiveTab('users')}
-            onNavigateToNewEvent={() => { setActiveTab('events'); handleCreateEventClick(); }}
-          />
-        )}
+          <div className="flex items-center gap-4">
+            <span className="text-xs text-slate-400 font-mono hidden md:inline-block">
+              {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+            </span>
+          </div>
+        </header>
 
-        {/* Events Tab */}
-        {activeTab === 'events' && (
-          <EventsTab
-            eventFormMode={eventFormMode}
-            setEventFormMode={setEventFormMode}
-            filteredEvents={filteredEvents}
-            eventSearch={eventSearch}
-            setEventSearch={setEventSearch}
-            dataLoading={dataLoading}
-            onEditClick={handleEditEventClick}
-            onCreateClick={handleCreateEventClick}
-            onDeleteClick={handleDeleteEvent}
-            eventForm={eventForm}
-            setEventForm={setEventForm}
-            registrationFields={registrationFields}
-            setRegistrationFields={setRegistrationFields}
-            participantFields={participantFields}
-            setParticipantFields={setParticipantFields}
-            resources={resources}
-            setResources={setResources}
-            onFormSubmit={handleEventFormSubmit}
-          />
-        )}
+        {/* Tab Body */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
+          {error && (
+            <div className="p-3.5 rounded-md border border-red-500/30 bg-red-500/10 text-red-300 text-sm font-medium flex items-center gap-3">
+              <FiAlertCircle className="size-4 shrink-0 text-red-400" />
+              <span>{error}</span>
+            </div>
+          )}
 
-        {/* Registrations Tab */}
-        {activeTab === 'registrations' && (
-          <RegistrationsTab
-            events={events}
-            selectedEventId={selectedEventId}
-            setSelectedEventId={setSelectedEventId}
-            filteredRegistrations={filteredRegistrations}
-            registrationSearch={registrationSearch}
-            setRegistrationSearch={setRegistrationSearch}
-            dataLoading={dataLoading}
-            onExportCSV={handleExportCSV}
-          />
-        )}
+          {/* Overview Tab */}
+          {activeTab === 'overview' && (
+            <OverviewTab
+              adminUser={adminUser}
+              allUsersCount={allUsers.length}
+              pendingUsersCount={pendingUsers.length}
+              eventsCount={events.length}
+              onNavigateToUsers={() => setActiveTab('users')}
+              onNavigateToNewEvent={() => { setActiveTab('events'); handleCreateEventClick(); }}
+            />
+          )}
 
-        {/* Attendance Tab */}
-        {activeTab === 'attendance' && (
-          <AttendanceTab
-            events={events}
-            selectedEventId={selectedEventId}
-            setSelectedEventId={setSelectedEventId}
-            registrations={registrations}
-          />
-        )}
+          {/* Events Tab */}
+          {activeTab === 'events' && (
+            <EventsTab
+              eventFormMode={eventFormMode}
+              setEventFormMode={setEventFormMode}
+              filteredEvents={filteredEvents}
+              eventSearch={eventSearch}
+              setEventSearch={setEventSearch}
+              dataLoading={dataLoading}
+              onEditClick={handleEditEventClick}
+              onCreateClick={handleCreateEventClick}
+              onDeleteClick={handleDeleteEvent}
+              onToggleComplete={handleToggleEventComplete}
+              eventForm={eventForm}
+              setEventForm={setEventForm}
+              registrationFields={registrationFields}
+              setRegistrationFields={setRegistrationFields}
+              participantFields={participantFields}
+              setParticipantFields={setParticipantFields}
+              resources={resources}
+              setResources={setResources}
+              onFormSubmit={handleEventFormSubmit}
+            />
+          )}
 
-        {/* Mail Manager Tab */}
-        {activeTab === 'mail' && (
-          <MailTab
-            events={events}
-            selectedEventId={selectedEventId}
-            setSelectedEventId={setSelectedEventId}
-            mailSubject={mailSubject}
-            setMailSubject={setMailSubject}
-            mailBody={mailBody}
-            setMailBody={setMailBody}
-            mailSending={mailSending}
-            mailMessage={mailMessage}
-            onSendMail={handleSendMail}
-          />
-        )}
+          {/* Registrations Tab */}
+          {activeTab === 'registrations' && (
+            <RegistrationsTab
+              events={events}
+              selectedEventId={selectedEventId}
+              setSelectedEventId={setSelectedEventId}
+              filteredRegistrations={filteredRegistrations}
+              registrationSearch={registrationSearch}
+              setRegistrationSearch={setRegistrationSearch}
+              dataLoading={dataLoading}
+              onExportCSV={handleExportCSV}
+            />
+          )}
 
-        {/* Users & Roles Tab */}
-        {activeTab === 'users' && (
-          <UsersTab
-            filteredUsers={filteredUsers}
-            setAllUsers={setAllUsers}
-            userSearch={userSearch}
-            setUserSearch={setUserSearch}
-            userRoleFilter={userRoleFilter}
-            setUserRoleFilter={setUserRoleFilter}
-            dataLoading={dataLoading}
-            updatingUserId={updatingUserId}
-            allowSignup={allowSignup}
-            onToggleSignup={handleToggleSignup}
-            onApproveUser={handleApproveUser}
-            onDenyUser={handleDenyUser}
-            onUpdateUser={handleUpdateUser}
-          />
-        )}
+          {/* Attendance Tab */}
+          {activeTab === 'attendance' && (
+            <AttendanceTab
+              events={events}
+              selectedEventId={selectedEventId}
+              setSelectedEventId={setSelectedEventId}
+              registrations={registrations}
+            />
+          )}
 
-        {/* People & Alumni Manager Tab */}
-        {activeTab === 'people' && (
-          <PeopleTab />
-        )}
+          {/* Mail Broadcast Tab */}
+          {activeTab === 'mail' && (
+            <MailTab
+              events={events}
+              selectedEventId={selectedEventId}
+              setSelectedEventId={setSelectedEventId}
+              mailSubject={mailSubject}
+              setMailSubject={setMailSubject}
+              mailBody={mailBody}
+              setMailBody={setMailBody}
+              mailSending={mailSending}
+              mailMessage={mailMessage}
+              onSendMail={handleSendMail}
+            />
+          )}
 
-        {/* Profile Tab */}
-        {activeTab === 'profile' && (
-          <ProfileTab adminUser={adminUser} />
-        )}
-      </main>
+          {/* Users & Roles Tab */}
+          {activeTab === 'users' && (
+            <UsersTab
+              filteredUsers={filteredUsers}
+              setAllUsers={setAllUsers}
+              userSearch={userSearch}
+              setUserSearch={setUserSearch}
+              userRoleFilter={userRoleFilter}
+              setUserRoleFilter={setUserRoleFilter}
+              dataLoading={dataLoading}
+              updatingUserId={updatingUserId}
+              allowSignup={allowSignup}
+              onToggleSignup={handleToggleSignup}
+              onApproveUser={handleApproveUser}
+              onDenyUser={handleDenyUser}
+              onUpdateUser={handleUpdateUser}
+              onRefresh={fetchInitialData}
+            />
+          )}
+
+          {/* People & Alumni Manager Tab */}
+          {activeTab === 'people' && (
+            <PeopleTab />
+          )}
+
+          {/* Profile Tab */}
+          {activeTab === 'profile' && (
+            <ProfileTab adminUser={adminUser} />
+          )}
+        </main>
+      </div>
     </div>
   );
 }

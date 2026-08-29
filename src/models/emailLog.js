@@ -15,7 +15,7 @@ const emailLogSchema = new mongoose.Schema({
   },
   emailType: { 
     type: String, 
-    enum: ['registration', 'participation', 'certificate'], 
+    enum: ['registration', 'participation', 'certificate', 'broadcast'], 
     required: true,
     index: true
   },

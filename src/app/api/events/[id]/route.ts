@@ -46,6 +46,11 @@ export async function PATCH(request: NextRequest, { params }: Params) {
       whatsappGroupLink,
       coverImageUrl,
       time,
+      venue,
+      eventType,
+      platform,
+      meetLink,
+      registrationDeadline,
       useCustomForm,
       forceGoogleForm,
       registrationFields,
@@ -55,6 +60,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
       participantFields,
       resources,
       ruleBookUrl,
+      completed,
     } = body;
 
     let newSlug: string | undefined;
@@ -69,11 +75,17 @@ export async function PATCH(request: NextRequest, { params }: Params) {
         slug: newSlug,
         description,
         date,
-        status,
+        status: completed ? 'past' : status,
+        ...(completed !== undefined ? { completed: Boolean(completed), completedAt: completed ? new Date() : null } : {}),
         googleFormLink,
         whatsappGroupLink,
         coverImageUrl,
         time,
+        venue,
+        ...(eventType !== undefined ? { eventType: eventType === 'online' ? 'online' : 'offline' } : {}),
+        platform: eventType === 'online' ? platform : '',
+        meetLink: eventType === 'online' ? meetLink : '',
+        registrationDeadline: registrationDeadline || null,
         ruleBookUrl,
         useCustomForm: Boolean(useCustomForm),
         ...(forceGoogleForm !== undefined

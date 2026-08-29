@@ -43,22 +43,9 @@ export function SiteHeader() {
     return pathname.startsWith(href);
   };
 
-  if (pathname.startsWith('/admin')) {
-    if (pathname !== '/admin') return null;
-    return (
-      <header className="absolute top-0 inset-x-0 z-50 bg-transparent font-sans">
-        <nav className="mx-auto flex h-24 max-w-7xl items-center px-6 lg:px-12">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="grid size-10 place-items-center rounded-xl border border-white/10 bg-white/5 text-[#8C93B0] transition-all group-hover:border-[#FF355E]/50 group-hover:bg-[#FF355E]/10 group-hover:text-white">
-              <FiArrowLeft className="size-5" />
-            </div>
-            <span className="font-sans font-medium text-sm text-[#8C93B0] transition-colors group-hover:text-white">
-              Back to Home
-            </span>
-          </Link>
-        </nav>
-      </header>
-    );
+  // Hide the global site header on admin and standalone auth pages (they have their own top nav / back button)
+  if (pathname.startsWith('/admin') || pathname === '/login' || pathname === '/register') {
+    return null;
   }
 
   return (
