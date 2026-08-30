@@ -43,7 +43,13 @@ export async function POST(request: NextRequest) {
 
     // Deadline check — skip for authenticated users
     const user = await getCurrentUser();
-    if (!user && event.date && new Date() > new Date(event.date)) {
+    const deadline = event.registrationDeadline
+      ? new Date(event.registrationDeadline)
+      : event.date
+      ? new Date(event.date)
+      : null;
+
+    if (!user && deadline && new Date() > deadline) {
       return NextResponse.json(
         { success: false, message: "Registration deadline has passed" },
         { status: 400 }

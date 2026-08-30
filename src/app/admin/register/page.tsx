@@ -133,99 +133,99 @@ export default function AdminRegisterPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#0B0D19] text-white pt-12 pb-16 flex flex-col items-center justify-center relative overflow-hidden selection:bg-[#FF355E]/30 font-sans">
+    <div data-admin-panel="true" className="min-h-screen w-full bg-[#090B14] text-white pt-12 pb-16 flex flex-col items-center justify-center relative overflow-hidden font-sans">
       <div className="relative z-10 w-full max-w-4xl lg:max-w-5xl px-6">
         
         {/* Back to Home Button */}
         <div className="mb-6">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 bg-white/5 text-[#8C93B0] hover:text-white hover:border-[#FF355E]/50 hover:bg-[#FF355E]/10 text-xs font-bold uppercase tracking-wider transition-all shadow-md group"
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md border border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 text-xs font-semibold tracking-wide transition-all group"
           >
-            <FiArrowLeft className="size-4 group-hover:-translate-x-1 transition-transform text-[#FF355E]" />
+            <FiArrowLeft className="size-3.5 group-hover:-translate-x-0.5 transition-transform" />
             Back to Home
           </Link>
         </div>
 
         {fetchingSettings ? (
-          <div className="p-16 text-center border border-white/10 rounded-3xl bg-[#121528] flex items-center justify-center gap-3 text-sm text-white/50 font-sans">
-            <FiLoader className="size-6 animate-spin text-[#FF355E]" /> Checking portal status...
+          <div className="p-16 text-center border border-white/10 rounded-lg bg-[#121626] flex items-center justify-center gap-3 text-xs text-slate-400 font-sans">
+            <FiLoader className="size-5 animate-spin text-white/60" /> Checking portal status...
           </div>
         ) : !allowSignup ? (
-          <div className="p-10 rounded-3xl border border-red-500/20 bg-red-500/10 text-center space-y-4 font-sans max-w-xl mx-auto">
-            <FiAlertCircle className="size-12 text-red-400 mx-auto" />
-            <h2 className="text-xl font-bold text-red-300 uppercase tracking-wider">Registrations Closed</h2>
+          <div className="p-8 rounded-lg border border-red-500/20 bg-red-500/10 text-center space-y-4 font-sans max-w-md mx-auto">
+            <FiAlertCircle className="size-10 text-red-400 mx-auto" />
+            <h2 className="text-lg font-bold text-red-300 tracking-tight">Registrations Closed</h2>
             <p className="text-xs text-red-300/80 leading-relaxed font-sans">
               Executive member signups are currently disabled by administrator.
             </p>
-            <div className="pt-4">
-              <Link href="/admin" className="inline-flex items-center gap-2 text-xs font-sans text-white underline hover:text-[#FF355E]">
+            <div className="pt-2">
+              <Link href="/admin" className="inline-flex items-center gap-1.5 text-xs font-sans text-white underline hover:text-slate-200">
                 Go to Admin Login <FiArrowRight className="size-3.5" />
               </Link>
             </div>
           </div>
         ) : (
           /* Main Card: Landscape on Desktop (lg:flex-row), Portrait on Mobile (flex-col) */
-          <div className="rounded-3xl border border-white/10 bg-[#121528] p-6 sm:p-10 shadow-2xl flex flex-col lg:flex-row gap-8 lg:gap-12 items-stretch font-sans">
+          <div className="rounded-lg border border-white/10 bg-[#121626] p-6 sm:p-8 flex flex-col lg:flex-row gap-8 lg:gap-10 items-stretch font-sans">
             
             {/* Left Column: Executive Info & Branding */}
-            <div className="flex-1 flex flex-col justify-between space-y-6 lg:border-r lg:border-white/10 lg:pr-10">
-              <div className="space-y-4">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FF355E]/10 border border-[#FF355E]/20 text-[#FF355E] text-xs font-bold uppercase tracking-wider">
-                  <FiShield className="size-3.5" /> Executive Portal
+            <div className="flex-1 flex flex-col justify-between space-y-5 lg:border-r lg:border-white/10 lg:pr-8">
+              <div className="space-y-3">
+                <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-white/5 border border-white/10 text-slate-300 text-xs font-mono">
+                  <FiShield className="size-3" /> Executive Portal
                 </div>
                 
-                <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white uppercase font-sans leading-tight">
+                <h1 className="text-2xl font-bold tracking-tight text-white leading-tight">
                   Executive Registration
                 </h1>
                 
-                <p className="text-sm text-[#8C93B0] leading-relaxed">
+                <p className="text-xs text-slate-400 leading-relaxed">
                   Register as a PTSC Executive Member. Your roll number, branch, and batch year are managed automatically from your email or roll number.
                 </p>
 
-                <div className="space-y-3 pt-4">
-                  <div className="flex items-start gap-3 text-xs text-white/80">
-                    <div className="grid size-6 place-items-center rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 shrink-0 mt-0.5">
+                <div className="space-y-3 pt-2">
+                  <div className="flex items-start gap-3 text-xs text-slate-300">
+                    <div className="grid size-6 place-items-center rounded bg-amber-500/10 border border-amber-500/20 text-amber-400 shrink-0 mt-0.5">
                       <FiAlertCircle className="size-3.5" />
                     </div>
                     <div>
-                      <strong className="block text-white font-bold">Admin Verification Required</strong>
-                      <span>Executive applications are reviewed by PTSC admins before granting dashboard access.</span>
+                      <strong className="block text-white font-semibold">Admin Verification Required</strong>
+                      <span className="text-slate-400">Applications are reviewed by PTSC admins before granting access.</span>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3 text-xs text-white/80">
-                    <div className="grid size-6 place-items-center rounded-lg bg-[#FF355E]/10 border border-[#FF355E]/20 text-[#FF355E] shrink-0 mt-0.5">
+                  <div className="flex items-start gap-3 text-xs text-slate-300">
+                    <div className="grid size-6 place-items-center rounded bg-white/5 border border-white/10 text-slate-300 shrink-0 mt-0.5">
                       <FiAward className="size-3.5" />
                     </div>
                     <div>
-                      <strong className="block text-white font-bold">Executive Position Assignment</strong>
-                      <span>Select your official PTSC domain head or mentor post during registration.</span>
+                      <strong className="block text-white font-semibold">Executive Position Assignment</strong>
+                      <span className="text-slate-400">Select your official PTSC domain head or mentor post.</span>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3 text-xs text-white/80">
-                    <div className="grid size-6 place-items-center rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 shrink-0 mt-0.5">
+                  <div className="flex items-start gap-3 text-xs text-slate-300">
+                    <div className="grid size-6 place-items-center rounded bg-white/5 border border-white/10 text-slate-300 shrink-0 mt-0.5">
                       <FiBookOpen className="size-3.5" />
                     </div>
                     <div>
-                      <strong className="block text-white font-bold">Automatic Academic Detection</strong>
-                      <span>Branch & Batch year are parsed from roll number or email.</span>
+                      <strong className="block text-white font-semibold">Automatic Academic Detection</strong>
+                      <span className="text-slate-400">Branch & Batch year are parsed from roll number or email.</span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-6 border-t border-white/10 space-y-2">
-                <p className="text-xs text-[#8C93B0]">
+              <div className="pt-4 border-t border-white/10 space-y-1 text-xs">
+                <p className="text-slate-400">
                   Already have an admin account?{" "}
-                  <Link href="/admin" className="text-[#FF355E] font-bold hover:underline">
+                  <Link href="/admin" className="text-white font-semibold hover:underline">
                     Admin Login
                   </Link>
                 </p>
-                <p className="text-xs text-[#8C93B0]">
+                <p className="text-slate-400">
                   General KNIT Student?{" "}
-                  <Link href="/register" className="text-white/80 font-bold hover:underline">
+                  <Link href="/register" className="text-slate-300 font-medium hover:underline">
                     Student Registration
                   </Link>
                 </p>
@@ -233,135 +233,135 @@ export default function AdminRegisterPage() {
             </div>
 
             {/* Right Column: Executive Form Inputs */}
-            <div className="flex-1 flex flex-col justify-center space-y-5">
+            <div className="flex-1 flex flex-col justify-center space-y-4">
               {error && (
-                <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold text-center">
+                <div className="p-3 rounded-md bg-red-500/10 border border-red-500/20 text-red-300 text-xs font-medium text-center">
                   {error}
                 </div>
               )}
 
               {success && (
-                <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs font-bold text-center flex items-center justify-center gap-2">
-                  <FiCheck className="size-4" /> {success}
+                <div className="p-3 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs font-medium text-center flex items-center justify-center gap-2">
+                  <FiCheck className="size-3.5" /> {success}
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+              <form onSubmit={handleSubmit} className="space-y-3.5">
+                <div className="grid grid-cols-2 gap-3.5">
                   <div>
-                    <label className="text-[11px] font-bold text-[#8C93B0] uppercase tracking-wider block mb-1.5">
-                      First Name
+                    <label className="text-xs font-semibold text-slate-300 block mb-1">
+                      First Name *
                     </label>
                     <input
                       type="text"
                       required
-                      placeholder="Ankit"
+                      placeholder="e.g. Ankit"
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
-                      className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                      className="w-full bg-[#090B14] border border-white/15 rounded-md py-2.5 px-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30"
                     />
                   </div>
                   <div>
-                    <label className="text-[11px] font-bold text-[#8C93B0] uppercase tracking-wider block mb-1.5">
-                      Last Name
+                    <label className="text-xs font-semibold text-slate-300 block mb-1">
+                      Last Name *
                     </label>
                     <input
                       type="text"
                       required
-                      placeholder="Singh"
+                      placeholder="e.g. Singh"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
-                      className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                      className="w-full bg-[#090B14] border border-white/15 rounded-md py-2.5 px-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30"
                     />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   <div>
-                    <label className="text-[11px] font-bold text-[#8C93B0] uppercase tracking-wider block mb-1.5">
-                      Username
+                    <label className="text-xs font-semibold text-slate-300 block mb-1">
+                      Username *
                     </label>
                     <input
                       type="text"
                       required
-                      placeholder="ankit_ptsc"
+                      placeholder="e.g. ankit_ptsc"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
-                      className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                      className="w-full bg-[#090B14] border border-white/15 rounded-md py-2.5 px-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30"
                     />
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-bold text-[#8C93B0] uppercase tracking-wider block mb-1.5">
-                      Mobile Number
+                    <label className="text-xs font-semibold text-slate-300 block mb-1">
+                      Mobile Number *
                     </label>
                     <input
                       type="tel"
                       required
-                      placeholder="9876543210"
+                      placeholder="e.g. 9876543210"
                       value={mobile}
                       onChange={(e) => setMobile(e.target.value)}
-                      className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                      className="w-full bg-[#090B14] border border-white/15 rounded-md py-2.5 px-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-[11px] font-bold text-[#8C93B0] uppercase tracking-wider block mb-1.5">
-                    Email Address
+                  <label className="text-xs font-semibold text-slate-300 block mb-1">
+                    Email Address *
                   </label>
                   <input
                     type="email"
                     required
-                    placeholder="executive.23201@knit.ac.in"
+                    placeholder="e.g. executive.23201@knit.ac.in"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                    className="w-full bg-[#090B14] border border-white/15 rounded-md py-2.5 px-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30"
                   />
                   {parsedAcademic.valid && (
-                    <p className="mt-1.5 text-[11px] text-emerald-400 font-sans flex items-center gap-1 font-medium">
-                      <FiCheck className="size-3.5 shrink-0" />
+                    <p className="mt-1 text-xs text-emerald-400 font-sans flex items-center gap-1 font-medium">
+                      <FiCheck className="size-3 shrink-0" />
                       Auto-detected: <strong>{parsedAcademic.branch}</strong> • Batch {parsedAcademic.batchYear} (Year {parsedAcademic.year})
                     </p>
                   )}
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   <div>
-                    <label className="text-[11px] font-bold text-[#8C93B0] uppercase tracking-wider block mb-1.5">
+                    <label className="text-xs font-semibold text-slate-300 block mb-1">
                       Roll Number
                     </label>
                     <input
                       type="text"
-                      placeholder="23201"
+                      placeholder="e.g. 23201"
                       value={rollNo}
                       onChange={(e) => setRollNo(e.target.value)}
-                      className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                      className="w-full bg-[#090B14] border border-white/15 rounded-md py-2.5 px-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30"
                     />
                   </div>
                   <div>
-                    <label className="text-[11px] font-bold text-[#8C93B0] uppercase tracking-wider block mb-1.5">
+                    <label className="text-xs font-semibold text-slate-300 block mb-1">
                       Batch Year
                     </label>
                     <input
                       type="number"
-                      placeholder="2027"
+                      placeholder="e.g. 2027"
                       value={batch}
                       onChange={(e) => setBatch(e.target.value)}
-                      className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                      className="w-full bg-[#090B14] border border-white/15 rounded-md py-2.5 px-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-[11px] font-bold text-[#8C93B0] uppercase tracking-wider block mb-1.5">
-                    PTSC Executive Post
+                  <label className="text-xs font-semibold text-slate-300 block mb-1">
+                    PTSC Executive Post *
                   </label>
                   <select
                     required
                     value={post}
                     onChange={(e) => setPost(e.target.value)}
-                    className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                    className="w-full bg-[#090B14] border border-white/15 rounded-md py-2.5 px-3 text-sm text-white focus:outline-none focus:border-white/30"
                   >
                     <option value="">Select Post...</option>
                     {POSTS.map((p) => (
@@ -373,8 +373,8 @@ export default function AdminRegisterPage() {
                 </div>
 
                 <div>
-                  <label className="text-[11px] font-bold text-[#8C93B0] uppercase tracking-wider block mb-1.5">
-                    Password
+                  <label className="text-xs font-semibold text-slate-300 block mb-1">
+                    Password *
                   </label>
                   <input
                     type="password"
@@ -383,22 +383,22 @@ export default function AdminRegisterPage() {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                    className="w-full bg-[#090B14] border border-white/15 rounded-md py-2.5 px-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full mt-4 py-3.5 rounded-xl bg-[#FF355E] text-white font-bold text-xs uppercase tracking-wider shadow-lg flex items-center justify-center gap-2 hover:bg-[#FF4D70] transition-colors disabled:opacity-50"
+                  className="w-full mt-3 py-2.5 rounded-md bg-white text-black font-semibold text-xs hover:bg-slate-200 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
                 >
                   {loading ? (
                     <>
-                      <FiLoader className="size-4 animate-spin" /> Submitting...
+                      <FiLoader className="size-3.5 animate-spin" /> Submitting Application...
                     </>
                   ) : (
                     <>
-                      Submit Executive Application <FiArrowRight className="size-4" />
+                      Submit Application <FiArrowRight className="size-3.5" />
                     </>
                   )}
                 </button>

@@ -5,7 +5,7 @@ import EventRegistration from "@/models/eventRegistration";
 
 type Params = { params: Promise<{ id: string }> };
 
-// PATCH /api/registrations/[id]/restore — admin only, restore soft-deleted registration
+// PATCH /api/registrations/[id]/restore — restore soft-deleted registration
 export async function PATCH(_request: NextRequest, { params }: Params) {
   const { response } = await requireAuth(["admin"]);
   if (response) return response;
@@ -18,21 +18,23 @@ export async function PATCH(_request: NextRequest, { params }: Params) {
       { $set: { deleted: false, deletedAt: null } },
       { new: true }
     );
+
     if (!reg) {
       return NextResponse.json(
         { success: false, message: "Registration not found" },
         { status: 404 }
       );
     }
+
     return NextResponse.json({
       success: true,
-      message: "Registration restored",
+      message: "Registration restored successfully",
       registration: reg,
     });
   } catch (error) {
     console.error("restoreRegistration error:", error);
     return NextResponse.json(
-      { success: false, message: "internal server error" },
+      { success: false, message: "Internal server error" },
       { status: 500 }
     );
   }

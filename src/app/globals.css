@@ -122,18 +122,44 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-/* Ensure custom pointer remains active on all interactive elements */
-html,
-body,
-a,
-button,
-input,
-select,
-textarea,
-[role="button"],
-.cursor-pointer,
-[class*="cursor-pointer"] {
+/* Custom pointer scoped strictly to public pages when has-custom-pointer class is present */
+body.has-custom-pointer,
+body.has-custom-pointer a,
+body.has-custom-pointer button,
+body.has-custom-pointer input,
+body.has-custom-pointer select,
+body.has-custom-pointer textarea,
+body.has-custom-pointer [role="button"],
+body.has-custom-pointer .cursor-pointer,
+body.has-custom-pointer [class*="cursor-pointer"] {
   cursor: none !important;
+}
+
+/* Explicit native desktop cursors for Admin Portal */
+[data-admin-panel],
+[data-admin-panel] * {
+  cursor: auto !important;
+}
+
+[data-admin-panel] button,
+[data-admin-panel] a,
+[data-admin-panel] [role="button"],
+[data-admin-panel] select,
+[data-admin-panel] label,
+[data-admin-panel] .cursor-pointer,
+[data-admin-panel] [class*="cursor-pointer"] {
+  cursor: pointer !important;
+}
+
+[data-admin-panel] input,
+[data-admin-panel] textarea {
+  cursor: text !important;
+}
+
+[data-admin-panel] button:disabled,
+[data-admin-panel] input:disabled,
+[data-admin-panel] select:disabled {
+  cursor: not-allowed !important;
 }
 
 @layer base {

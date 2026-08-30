@@ -48,6 +48,23 @@ const eventSchema = new mongoose.Schema({
   time: {
     type: String,
   },
+  venue: {
+    type: String,
+  },
+  eventType: {
+    type: String,
+    enum: ['offline', 'online'],
+    default: 'offline',
+  },
+  platform: {
+    type: String,
+  },
+  meetLink: {
+    type: String,
+  },
+  registrationDeadline: {
+    type: Date,
+  },
   status: {
     type: String,
     index: true,
