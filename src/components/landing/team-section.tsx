@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { FiGithub, FiLinkedin, FiTwitter } from "react-icons/fi";
 import { Highlighter } from "@/components/ui/highlighter";
-import { useScroll, useTransform, useSpring, motion } from "motion/react";
 import gsap from "gsap";
 
 export type PositionHolder = {
@@ -87,52 +86,41 @@ export function TeamSection() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(0);
   const targetRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
-  const [scrollRange, setScrollRange] = useState(0);
-
-  // Scroll Progress configured with custom offset to align when target enters viewport center
-  const { scrollYProgress } = useScroll({
-    target: targetRef,
-    offset: ["start start", "end end"]
-  });
-
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 70,
-    damping: 24,
-    restDelta: 0.0001,
-  });
-
-  // Calculate horizontal scroll limits dynamically on mount/resize
-  useEffect(() => {
-    const calculateRange = () => {
-      if (trackRef.current) {
-        const trackWidth = trackRef.current.scrollWidth;
-        const viewportWidth = window.innerWidth;
-        setScrollRange(Math.max(0, trackWidth - viewportWidth + 96));
-      }
-    };
-
-    calculateRange();
-    window.addEventListener("resize", calculateRange);
-    const timer = setTimeout(calculateRange, 500);
-
-    return () => {
-      window.removeEventListener("resize", calculateRange);
-      clearTimeout(timer);
-    };
-  }, []);
-
-  const x = useTransform(smoothProgress, [0, 1], [0, -scrollRange]);
 
   useEffect(() => {
-    return smoothProgress.on("change", (latest) => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      if (e.deltaY === 0) return;
+      e.preventDefault();
+      container.scrollLeft += e.deltaY;
+    };
+
+    const handleScroll = () => {
+      const maxScroll = container.scrollWidth - container.clientWidth;
+      if (maxScroll <= 0) return;
+      const progress = container.scrollLeft / maxScroll;
       const activeIdx = Math.min(
         POSITION_HOLDERS.length - 1,
-        Math.max(0, Math.round(latest * (POSITION_HOLDERS.length - 1)))
+        Math.max(0, Math.round(progress * (POSITION_HOLDERS.length - 1)))
       );
       setHoveredIndex(activeIdx);
-    });
-  }, [smoothProgress]);
+    };
+
+    container.addEventListener("wheel", handleWheel, { passive: false });
+    container.addEventListener("scroll", handleScroll);
+
+    // Initial check
+    handleScroll();
+
+    return () => {
+      container.removeEventListener("wheel", handleWheel);
+      container.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   useEffect(() => {
     cardsRef.current.forEach((card, idx) => {
@@ -173,24 +161,23 @@ export function TeamSection() {
   }, [hoveredIndex]);
 
   return (
-    <div ref={targetRef} id="team" className="relative h-[300vh] bg-transparent">
-      {/* Reduced padding and flex layout to maximize height for cards */}
-      <div className="sticky top-0 flex h-screen flex-col justify-between py-12 overflow-hidden border-b border-white/5 bg-transparent">
-        
-        {/* Background elements */}
-        <div className="pointer-events-none absolute inset-0 z-0 opacity-40">
-          <div className="absolute top-0 right-0 w-[50%] h-[50%] bg-[#FF355E]/10 blur-[150px] rounded-full" />
-          <div className="absolute bottom-0 left-0 w-[50%] h-[50%] bg-[#00F0FF]/10 blur-[150px] rounded-full" />
-          <div className="mx-auto h-full max-w-7xl px-6 lg:px-12 grid grid-cols-5 border-x border-dashed border-white/5">
-            <div className="border-r border-dashed border-white/5 h-full" />
-            <div className="border-r border-dashed border-white/5 h-full" />
-            <div className="border-r border-dashed border-white/5 h-full" />
-            <div className="border-r border-dashed border-white/5 h-full" />
-          </div>
+    <div ref={targetRef} id="team" className="relative bg-transparent py-24 border-b border-white/5 overflow-hidden">
+      
+      {/* Background elements */}
+      <div className="pointer-events-none absolute inset-0 z-0 opacity-40">
+        <div className="absolute top-0 right-0 w-[50%] h-[50%] bg-[#FF355E]/10 blur-[150px] rounded-full" />
+        <div className="absolute bottom-0 left-0 w-[50%] h-[50%] bg-[#00F0FF]/10 blur-[150px] rounded-full" />
+        <div className="mx-auto h-full max-w-7xl px-6 lg:px-12 grid grid-cols-5 border-x border-dashed border-white/5">
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
         </div>
+      </div>
 
+      <div className="relative z-10 flex flex-col gap-12">
         {/* Section Header with tighter spacing */}
-        <div className="relative z-10 mx-auto max-w-6xl px-6 text-center">
+        <div className="mx-auto max-w-6xl px-6 text-center">
           <p className="text-xs font-mono font-bold text-[#FF355E] uppercase tracking-widest mb-1.5">
             Character Select
           </p>
@@ -207,12 +194,14 @@ export function TeamSection() {
           </p>
         </div>
 
-        {/* Pinned Horizontal Scrolling Track with reduced gap/padding to fit nicely */}
-        <div className="relative z-10 w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)] my-auto py-6">
-          <motion.div 
+        {/* Scrollable Horizontal Scrolling Track */}
+        <div 
+          ref={scrollContainerRef}
+          className="relative z-10 w-full overflow-x-auto scrollbar-none [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)] py-6 select-none"
+        >
+          <div 
             ref={trackRef}
-            style={{ x }} 
-            className="flex items-center gap-8 py-6 px-12 w-max transform-gpu will-change-transform"
+            className="flex items-center gap-8 py-6 px-12 w-max transform-gpu"
           >
             {POSITION_HOLDERS.map((member, index) => (
               <div
@@ -221,7 +210,6 @@ export function TeamSection() {
                   cardsRef.current[index] = el;
                 }}
                 onMouseEnter={() => setHoveredIndex(index)}
-                className="group relative shrink-0 w-56 sm:w-64 rounded-[2rem] bg-gradient-to-br from-[#1A1033] to-[#0B0D19] border-2 border-white/10 p-2.5 transition-colors duration-300 hover:border-[#FF355E]/60 cursor-pointer select-none transform-gpu shadow-2xl shadow-black/50"
               >
                 {/* Anime Sticker/Badge overlay */}
                 <div className="absolute -top-3 -right-3 z-20 size-10 rounded-full bg-[#FF355E] text-white flex items-center justify-center font-black text-lg shadow-lg border-2 border-[#1A1033] transform rotate-12 group-hover:scale-110 transition-transform">
@@ -270,13 +258,10 @@ export function TeamSection() {
                 </div>
               </div>
             ))}
-          </motion.div>
+          </div>
         </div>
-
-        {/* Empty placeholder div at bottom to keep flex layout balanced */}
-        <div className="h-2" />
-
       </div>
     </div>
   );
 }
+
