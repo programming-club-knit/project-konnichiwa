@@ -14,19 +14,22 @@ export default async function Home() {
   const landingEvents = allEvents.slice(0, 4);
 
   return (
-    <div 
+    <div
       className="relative overflow-x-clip min-h-screen bg-cover bg-center bg-no-repeat bg-fixed"
-      style={{ color: "#050505" }}
+      style={{ color: "zinc-950" }}
     >
       {/* Global Noise Texture Overlay */}
-      <NoiseTexture className="opacity-[0.22] mix-blend-overlay" noiseOpacity={0.5} />
-      
+      <NoiseTexture
+        className="opacity-[0.22] mix-blend-overlay"
+        noiseOpacity={0.5}
+      />
+
       <PrismaHero />
       <EventsSection events={landingEvents} />
       <GallerySection />
       <TestimonialsSection />
       <FreelanceSection />
-      <TeamSection/>
+      <TeamSection />
       <ContactSection />
     </div>
   );
