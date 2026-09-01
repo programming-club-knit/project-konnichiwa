@@ -62,7 +62,7 @@ export function OpenToWorkSection({ user, onSuccess, onError }: OpenToWorkSectio
       {/* Top Banner Box */}
       <div className="p-5 rounded-2xl bg-[#0B0D19] border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="size-12 rounded-xl bg-[#FF355E]/10 border border-[#FF355E]/20 text-[#FF355E] grid place-items-center shrink-0">
+          <div className="size-12 rounded-xl bg-[#F47174]/10 border border-[#F47174]/20 text-[#F47174] grid place-items-center shrink-0">
             <FiBriefcase className="size-6" />
           </div>
           <div>
@@ -101,7 +101,7 @@ export function OpenToWorkSection({ user, onSuccess, onError }: OpenToWorkSectio
             onChange={(e) => setShowInHireUs(e.target.checked)}
             className="sr-only peer"
           />
-          <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF355E]"></div>
+          <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#F47174]"></div>
         </label>
       </div>
 
@@ -117,7 +117,7 @@ export function OpenToWorkSection({ user, onSuccess, onError }: OpenToWorkSectio
             placeholder="e.g. Frontend Engineer / Full Stack Developer"
             value={headlineRole}
             onChange={(e) => setHeadlineRole(e.target.value)}
-            className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#FF355E]"
+            className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#F47174]"
           />
         </div>
 
@@ -128,7 +128,7 @@ export function OpenToWorkSection({ user, onSuccess, onError }: OpenToWorkSectio
           <select
             value={availability}
             onChange={(e) => setAvailability(e.target.value)}
-            className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#FF355E]"
+            className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#F47174]"
           >
             <option value="Internship">Internship</option>
             <option value="Full-time">Full-time</option>
@@ -148,7 +148,7 @@ export function OpenToWorkSection({ user, onSuccess, onError }: OpenToWorkSectio
             placeholder="e.g. Web Development / Machine Learning"
             value={domain}
             onChange={(e) => setDomain(e.target.value)}
-            className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#FF355E]"
+            className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#F47174]"
           />
         </div>
 
@@ -161,7 +161,7 @@ export function OpenToWorkSection({ user, onSuccess, onError }: OpenToWorkSectio
             placeholder="e.g. React, Next.js, Node.js, TypeScript"
             value={skillsInput}
             onChange={(e) => setSkillsInput(e.target.value)}
-            className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#FF355E]"
+            className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#F47174]"
           />
         </div>
       </div>
@@ -175,27 +175,27 @@ export function OpenToWorkSection({ user, onSuccess, onError }: OpenToWorkSectio
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="text-[11px] font-bold text-[#8C93B0] uppercase block mb-1 flex items-center gap-1.5">
-              <FiFileText className="size-3.5 text-[#FF355E]" /> Resume URL / Drive Link
+              <FiFileText className="size-3.5 text-[#F47174]" /> Resume URL / Drive Link
             </label>
             <input
               type="text"
               placeholder="https://drive.google.com/..."
               value={resume}
               onChange={(e) => setResume(e.target.value)}
-              className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#FF355E]"
+              className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#F47174]"
             />
           </div>
 
           <div>
             <label className="text-[11px] font-bold text-[#8C93B0] uppercase block mb-1 flex items-center gap-1.5">
-              <FiGlobe className="size-3.5 text-[#FF355E]" /> Personal Portfolio Website
+              <FiGlobe className="size-3.5 text-[#F47174]" /> Personal Portfolio Website
             </label>
             <input
               type="text"
               placeholder="https://yourname.dev"
               value={portfolio}
               onChange={(e) => setPortfolio(e.target.value)}
-              className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#FF355E]"
+              className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#F47174]"
             />
           </div>
         </div>
@@ -203,27 +203,27 @@ export function OpenToWorkSection({ user, onSuccess, onError }: OpenToWorkSectio
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="text-[11px] font-bold text-[#8C93B0] uppercase block mb-1 flex items-center gap-1.5">
-              <FiGithub className="size-3.5 text-[#FF355E]" /> GitHub Profile
+              <FiGithub className="size-3.5 text-[#F47174]" /> GitHub Profile
             </label>
             <input
               type="text"
               placeholder="https://github.com/..."
               value={github}
               onChange={(e) => setGithub(e.target.value)}
-              className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#FF355E]"
+              className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#F47174]"
             />
           </div>
 
           <div>
             <label className="text-[11px] font-bold text-[#8C93B0] uppercase block mb-1 flex items-center gap-1.5">
-              <FiLinkedin className="size-3.5 text-[#FF355E]" /> LinkedIn Profile
+              <FiLinkedin className="size-3.5 text-[#F47174]" /> LinkedIn Profile
             </label>
             <input
               type="text"
               placeholder="https://linkedin.com/in/..."
               value={linkedin}
               onChange={(e) => setLinkedin(e.target.value)}
-              className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#FF355E]"
+              className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#F47174]"
             />
           </div>
         </div>
@@ -233,7 +233,7 @@ export function OpenToWorkSection({ user, onSuccess, onError }: OpenToWorkSectio
         <button
           type="submit"
           disabled={saving}
-          className="px-6 py-3 rounded-xl bg-[#FF355E] hover:bg-[#FF4D70] text-white text-xs font-bold uppercase tracking-wider shadow-lg flex items-center gap-2 transition-all disabled:opacity-50"
+          className="px-6 py-3 rounded-xl bg-[#F47174] hover:bg-[#FF4D70] text-white text-xs font-bold uppercase tracking-wider shadow-lg flex items-center gap-2 transition-all disabled:opacity-50"
         >
           {saving ? <FiLoader className="size-4 animate-spin" /> : <><FiCheck className="size-4" /> Save Open To Work Profile</>}
         </button>

@@ -1,4 +1,3 @@
-
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, BookOpen } from "lucide-react";
@@ -91,7 +90,7 @@ export function BlogSection({
     <section className="pt-32 pb-24 container mx-auto min-w-screen flex flex-col p-10 relative bg-[#090A14] overflow-hidden">
       {/* Background elements */}
       <div className="absolute inset-0 z-0 opacity-30 pointer-events-none">
-        <div className="absolute top-[20%] left-[5%] w-[40%] h-[30%] bg-[#FF355E]/10 blur-[150px] rounded-full" />
+        <div className="absolute top-[20%] left-[5%] w-[40%] h-[30%] bg-[#F47174]/10 blur-[150px] rounded-full" />
         <div className="absolute bottom-[20%] right-[5%] w-[40%] h-[30%] bg-[#8C52FF]/10 blur-[150px] rounded-full" />
       </div>
 
@@ -99,14 +98,16 @@ export function BlogSection({
         {/* Section Header */}
         <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-16">
           <div className="max-w-2xl">
-            <p className="text-xs font-mono font-bold text-[#FF355E] uppercase tracking-widest mb-3 flex items-center gap-2">
-              <span className="w-6 h-0.5 bg-[#FF355E]" />
+            <p className="text-xs font-mono font-bold text-[#F47174] uppercase tracking-widest mb-3 flex items-center gap-2">
+              <span className="w-6 h-0.5 bg-[#F47174]" />
               {tagline}
             </p>
             <h2 className="text-4xl sm:text-5xl font-black tracking-tight text-white font-sans">
               {heading.split(" ").slice(0, -1).join(" ")}{" "}
-              <Highlighter action="underline" color="#FF355E" strokeWidth={4}>
-                <span className="text-white">{heading.split(" ").slice(-1)}</span>
+              <Highlighter action="underline" color="#F47174" strokeWidth={4}>
+                <span className="text-white">
+                  {heading.split(" ").slice(-1)}
+                </span>
               </Highlighter>
             </h2>
             <p className="mt-4 text-base text-[#8C93B0] font-sans leading-relaxed">
@@ -118,7 +119,7 @@ export function BlogSection({
             <Link
               href={buttonUrl}
               target={buttonUrl.startsWith("http") ? "_blank" : undefined}
-              className="inline-flex items-center gap-2 rounded-full bg-white/5 border border-white/10 px-6 py-3 text-xs font-bold uppercase tracking-widest text-white shadow-lg hover:border-[#FF355E]/50 hover:bg-[#FF355E]/10 hover:text-[#FF355E] transition-all duration-300"
+              className="inline-flex items-center gap-2 rounded-full bg-white/5 border border-white/10 px-6 py-3 text-xs font-bold uppercase tracking-widest text-white shadow-lg hover:border-[#F47174]/50 hover:bg-[#F47174]/10 hover:text-[#F47174] transition-all duration-300"
             >
               {buttonText}
               <ArrowRight className="size-4" />
@@ -128,7 +129,7 @@ export function BlogSection({
 
         {/* Featured Post */}
         {featuredPost && (
-          <div className="mb-12 group relative rounded-[2rem] bg-[#140D26]/80 backdrop-blur-md border border-white/10 p-4 transition-all duration-500 hover:border-[#FF355E]/40 hover:shadow-[0_10px_40px_rgba(255,53,94,0.15)] flex flex-col md:flex-row gap-8">
+          <div className="mb-12 group relative rounded-[2rem] bg-[#140D26]/80 backdrop-blur-md border border-white/10 p-4 transition-all duration-500 hover:border-[#F47174]/40 hover:shadow-[0_10px_40px_rgba(244,113,116,0.15)] flex flex-col md:flex-row gap-8">
             <Link
               href={featuredPost.url}
               className="relative w-full md:w-1/2 aspect-video md:aspect-[4/3] rounded-3xl overflow-hidden"
@@ -140,7 +141,7 @@ export function BlogSection({
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
               />
               <div className="absolute top-4 left-4 z-10">
-                <span className="rounded-full bg-[#FF355E] px-3 py-1.5 text-xs font-black uppercase tracking-widest text-white shadow-[0_4px_10px_rgba(255,53,94,0.4)] border border-white/20 backdrop-blur-md">
+                <span className="rounded-full bg-[#F47174] px-3 py-1.5 text-xs font-black uppercase tracking-widest text-white shadow-[0_4px_10px_rgba(244,113,116,0.4)] border border-white/20 backdrop-blur-md">
                   {featuredPost.label}
                 </span>
               </div>
@@ -150,29 +151,35 @@ export function BlogSection({
               <div className="flex items-center gap-3 text-xs font-mono text-[#8C93B0] mb-4">
                 <span>{featuredPost.published}</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
-                <span className="flex items-center gap-1.5"><BookOpen className="size-3.5" /> {featuredPost.readTime}</span>
+                <span className="flex items-center gap-1.5">
+                  <BookOpen className="size-3.5" /> {featuredPost.readTime}
+                </span>
               </div>
               <Link href={featuredPost.url}>
-                <h3 className="text-3xl md:text-4xl font-black text-white leading-tight mb-4 group-hover:text-[#FF355E] transition-colors">
+                <h3 className="text-3xl md:text-4xl font-black text-white leading-tight mb-4 group-hover:text-[#F47174] transition-colors">
                   {featuredPost.title}
                 </h3>
               </Link>
               <p className="text-[#A0A8C0] text-base leading-relaxed mb-8">
                 {featuredPost.summary}
               </p>
-              
+
               <div className="mt-auto flex items-center justify-between pt-6 border-t border-white/10">
                 <div className="flex items-center gap-3">
-                  <div className="size-10 rounded-full bg-gradient-to-br from-[#FF355E] to-[#8C52FF] p-0.5">
+                  <div className="size-10 rounded-full bg-gradient-to-br from-[#F47174] to-[#8C52FF] p-0.5">
                     <div className="size-full rounded-full bg-[#140D26] flex items-center justify-center">
-                      <span className="text-xs font-bold text-white">{featuredPost.author?.charAt(0)}</span>
+                      <span className="text-xs font-bold text-white">
+                        {featuredPost.author?.charAt(0)}
+                      </span>
                     </div>
                   </div>
-                  <span className="text-sm font-bold text-white">{featuredPost.author}</span>
+                  <span className="text-sm font-bold text-white">
+                    {featuredPost.author}
+                  </span>
                 </div>
                 <Link
                   href={featuredPost.url}
-                  className="flex items-center gap-2 text-sm font-bold text-white group-hover:text-[#FF355E] transition-colors"
+                  className="flex items-center gap-2 text-sm font-bold text-white group-hover:text-[#F47174] transition-colors"
                 >
                   Read Story <ArrowRight className="size-4" />
                 </Link>
@@ -211,13 +218,11 @@ export function BlogSection({
                   <span className="w-1 h-1 rounded-full bg-white/20" />
                   <span>{post.readTime}</span>
                 </div>
-                
+
                 <h3 className="text-xl font-bold text-white tracking-tight font-sans leading-snug mb-3 group-hover:text-[#8C52FF] transition-colors line-clamp-2">
-                  <Link href={post.url}>
-                    {post.title}
-                  </Link>
+                  <Link href={post.url}>{post.title}</Link>
                 </h3>
-                
+
                 <p className="text-sm leading-relaxed text-[#8C93B0] font-sans line-clamp-3 mb-6">
                   {post.summary}
                 </p>
@@ -228,7 +233,7 @@ export function BlogSection({
                   </span>
                   <Link
                     href={post.url}
-                    className="flex items-center gap-1.5 text-xs font-bold text-[#8C52FF] hover:text-[#FF355E] transition-colors"
+                    className="flex items-center gap-1.5 text-xs font-bold text-[#8C52FF] hover:text-[#F47174] transition-colors"
                   >
                     Read more
                     <ArrowRight className="size-3.5" />

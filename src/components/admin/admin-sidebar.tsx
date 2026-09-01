@@ -63,7 +63,7 @@ export function AdminSidebar({
         {/* Brand Header */}
         <div className="flex items-center justify-between pb-4 border-b border-white/10">
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="size-9 rounded-md bg-white/5 border border-white/10 flex items-center justify-center p-1.5 shrink-0 group-hover:border-[#FF355E]/50 transition-all">
+            <div className="size-9 rounded-md bg-white/5 border border-white/10 flex items-center justify-center p-1.5 shrink-0 group-hover:border-[#F47174]/50 transition-all">
               <Image
                 src="/logo.png"
                 alt="PTSC logo"
@@ -74,7 +74,7 @@ export function AdminSidebar({
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-bold text-white tracking-tight flex items-center gap-1 font-sans">
-                PTSC<span className="text-[#FF355E] font-black">.</span>
+                PTSC<span className="text-[#F47174] font-black">.</span>
               </span>
               <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider font-mono">
                 Admin Console
@@ -124,7 +124,7 @@ export function AdminSidebar({
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <span className={isActive ? 'text-[#FF355E]' : 'text-slate-400'}>
+                    <span className={isActive ? 'text-[#F47174]' : 'text-slate-400'}>
                       {item.icon}
                     </span>
                     <span className="tracking-tight">{item.label}</span>
@@ -171,7 +171,7 @@ export function AdminSidebar({
   return (
     <>
       {/* Desktop Static Sidebar */}
-      <aside className="hidden lg:flex w-64 border-r border-white/10 bg-[#0B0E17] flex-col justify-between p-4 shrink-0 selection:bg-[#FF355E]/30 font-sans z-20 h-screen sticky top-0">
+      <aside className="hidden lg:flex w-64 border-r border-white/10 bg-[#0B0E17] flex-col justify-between p-4 shrink-0 selection:bg-[#F47174]/30 font-sans z-20 h-screen sticky top-0">
         {sidebarContent}
       </aside>
 

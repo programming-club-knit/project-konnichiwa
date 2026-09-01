@@ -11,18 +11,18 @@ interface EventsPageContentProps {
 
 export function EventsPageContent({ upcomingEvents, pastEvents }: EventsPageContentProps) {
   return (
-    <div className="relative min-h-screen bg-[#0B0D19] pt-24 pb-20 flex flex-col selection:bg-[#FF355E]/30">
+    <div className="relative min-h-screen bg-[#0f0f0f] pt-24 pb-20 flex flex-col selection:bg-[#F47174]/30">
       {/* Hero Header */}
       <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-12 pt-12 pb-10 w-full text-center">
-
         <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white font-sans leading-tight">
           Our{" "}
-          <Highlighter action="underline" color="#FF355E" strokeWidth={4}>
-            <span className="text-[#FF355E]">Events.</span>
+          <Highlighter action="underline" color="#F47174" strokeWidth={4}>
+            <span className="text-[#F47174]">Events.</span>
           </Highlighter>
         </h1>
         <p className="mt-6 text-base sm:text-lg text-[#8C93B0] max-w-2xl mx-auto font-sans leading-relaxed">
-          Discover upcoming flagship hackathons, technical bootcamps, and networking summits — or explore the legacy of our past events.
+          Discover upcoming flagship hackathons, technical bootcamps, and
+          networking summits — or explore the legacy of our past events.
         </p>
       </div>
 
@@ -31,7 +31,6 @@ export function EventsPageContent({ upcomingEvents, pastEvents }: EventsPageCont
         <div className="mx-auto max-w-7xl px-6 lg:px-12 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h2 className="text-2xl sm:text-3xl font-black text-white flex items-center gap-3">
-              <span className="h-3 w-3 rounded-full bg-[#FF355E]" />
               Currently Upcoming & Active
             </h2>
             <p className="text-xs font-mono text-[#8C93B0] mt-1">
@@ -39,7 +38,8 @@ export function EventsPageContent({ upcomingEvents, pastEvents }: EventsPageCont
             </p>
           </div>
           <span className="self-start sm:self-auto text-xs font-mono font-bold px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/70">
-            {upcomingEvents.length} {upcomingEvents.length === 1 ? "Event" : "Events"}
+            {upcomingEvents.length}{" "}
+            {upcomingEvents.length === 1 ? "Event" : "Events"}
           </span>
         </div>
 
@@ -64,7 +64,7 @@ export function EventsPageContent({ upcomingEvents, pastEvents }: EventsPageCont
                   ) : (
                     <div className="size-full flex flex-col items-center justify-center p-4 text-center bg-[#0E101D]">
                       <div className="grid size-12 place-items-center rounded-xl bg-white/5 border border-white/10">
-                        <FiImage className="size-6 text-[#FF355E]/70" />
+                        <FiImage className="size-6 text-[#F47174]/70" />
                       </div>
                       <span className="mt-2 text-[10px] font-mono font-bold tracking-widest text-white/40 uppercase">
                         PTSC Event Poster
@@ -74,13 +74,17 @@ export function EventsPageContent({ upcomingEvents, pastEvents }: EventsPageCont
 
                   {/* Top Badges */}
                   <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 pointer-events-none">
-                    <span className="rounded bg-[#FF355E] px-2.5 py-1 text-[11px] font-mono font-bold uppercase tracking-wider text-white shadow-md">
+                    <span className="rounded bg-[#F47174] px-2.5 py-1 text-[11px] font-mono font-bold uppercase tracking-wider text-white shadow-md">
                       {event.status || "Upcoming"}
                     </span>
                     <span className="rounded bg-[#07080F]/90 border border-white/20 px-2.5 py-1 text-xs font-mono text-white flex items-center gap-1.5">
-                      <FiCalendar className="size-3 text-[#FF355E]" />
+                      <FiCalendar className="size-3 text-[#F47174]" />
                       {event.date
-                        ? new Date(event.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+                        ? new Date(event.date).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })
                         : "TBA"}
                     </span>
                   </div>
@@ -93,11 +97,13 @@ export function EventsPageContent({ upcomingEvents, pastEvents }: EventsPageCont
                       <span className="inline-flex items-center gap-1 text-[11px] font-mono text-white/70 bg-white/5 border border-white/10 px-2.5 py-0.5 rounded uppercase tracking-wider">
                         {event.registrationType === "team" ? (
                           <>
-                            <FiUsers className="size-3 text-[#FF355E]" /> Team Event
+                            <FiUsers className="size-3 text-[#F47174]" /> Team
+                            Event
                           </>
                         ) : (
                           <>
-                            <FiUser className="size-3 text-[#FF355E]" /> Individual Entry
+                            <FiUser className="size-3 text-[#F47174]" />{" "}
+                            Individual Entry
                           </>
                         )}
                       </span>
@@ -115,9 +121,10 @@ export function EventsPageContent({ upcomingEvents, pastEvents }: EventsPageCont
                   <div className="pt-4 border-t border-white/10">
                     <Link
                       href={`/events/${event.slug || event._id}`}
-                      className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#FF355E] py-2.5 px-4 text-xs font-mono font-bold uppercase tracking-wider text-white shadow-sm"
+                      className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#F47174] py-2.5 px-4 text-xs font-mono font-bold uppercase tracking-wider text-white shadow-sm"
                     >
-                      View Details & Register <FiArrowRight className="size-3.5" />
+                      View Details & Register{" "}
+                      <FiArrowRight className="size-3.5" />
                     </Link>
                   </div>
                 </div>
@@ -126,7 +133,8 @@ export function EventsPageContent({ upcomingEvents, pastEvents }: EventsPageCont
           </div>
         ) : (
           <div className="mx-auto max-w-7xl px-6 lg:px-12 py-16 text-center text-white/40 font-mono text-sm border border-white/10 rounded-2xl bg-[#121528]">
-            No upcoming events currently scheduled. Check back soon for exciting announcements!
+            No upcoming events currently scheduled. Check back soon for exciting
+            announcements!
           </div>
         )}
       </div>
@@ -173,9 +181,13 @@ export function EventsPageContent({ upcomingEvents, pastEvents }: EventsPageCont
                       Past Event
                     </span>
                     <span className="flex items-center gap-1.5 text-xs font-mono text-[#8C93B0]">
-                      <FiCalendar className="size-3 shrink-0 text-[#FF355E]" />
+                      <FiCalendar className="size-3 shrink-0 text-[#F47174]" />
                       {event.date
-                        ? new Date(event.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+                        ? new Date(event.date).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })
                         : "N/A"}
                     </span>
                   </div>

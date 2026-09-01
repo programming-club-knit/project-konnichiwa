@@ -547,7 +547,7 @@ export function AdminDashboard() {
   if (authLoading) {
     return (
       <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[#090B14] text-slate-300 font-sans gap-3">
-        <FiLoader className="size-8 animate-spin text-[#FF355E]" />
+        <FiLoader className="size-8 animate-spin text-[#F47174]" />
         <span className="text-sm font-semibold tracking-wide text-white">Authenticating Administrative Access...</span>
         <span className="text-xs text-slate-500 font-mono">PTSC Security Gateway</span>
       </div>
@@ -555,7 +555,7 @@ export function AdminDashboard() {
   }
 
   return (
-    <div data-admin-panel="true" className="min-h-screen flex bg-[#090B14] text-slate-100 font-sans selection:bg-[#FF355E]/30">
+    <div data-admin-panel="true" className="min-h-screen flex bg-[#090B14] text-slate-100 font-sans selection:bg-[#F47174]/30">
       {/* Toast Notification Banner */}
       {toastMessage && (
         <div className="fixed top-6 right-6 z-50 px-4 py-3 bg-[#13172B] text-white text-sm font-semibold rounded-md border border-emerald-500/30 shadow-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300">

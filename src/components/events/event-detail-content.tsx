@@ -19,7 +19,7 @@ export function EventDetailContent({ event }: EventDetailContentProps) {
   const isUpcoming = event.status === "upcoming" || event.status === "ongoing";
 
   return (
-    <div className="min-h-screen bg-[#0B0D19] text-white pt-24 pb-16 selection:bg-[#FF355E]/30">
+    <div className="min-h-screen bg-[#0B0D19] text-white pt-24 pb-16 selection:bg-[#F47174]/30">
       <div className="max-w-5xl mx-auto px-6 lg:px-8 pt-8">
         {/* Back Link */}
         <Link
@@ -46,7 +46,7 @@ export function EventDetailContent({ event }: EventDetailContentProps) {
         {/* Event Header */}
         <div className="space-y-4 border-b border-white/10 pb-8">
           <div className="flex flex-wrap items-center gap-3">
-            <span className="px-3 py-1 rounded-md text-xs font-bold font-mono uppercase tracking-wider bg-[#FF355E] text-white">
+            <span className="px-3 py-1 rounded-md text-xs font-bold font-mono uppercase tracking-wider bg-[#F47174] text-white">
               {event.status}
             </span>
             <span className="px-3 py-1 rounded-md text-xs font-mono uppercase tracking-wider bg-white/10 border border-white/10 text-white/80">
@@ -63,7 +63,7 @@ export function EventDetailContent({ event }: EventDetailContentProps) {
           <div className="flex flex-wrap gap-6 pt-2 text-sm text-[#8C93B0] font-mono">
             {event.date && (
               <span className="flex items-center gap-2">
-                <FiCalendar className="size-4 text-[#FF355E]" />
+                <FiCalendar className="size-4 text-[#F47174]" />
                 {new Date(event.date).toLocaleDateString("en-US", {
                   weekday: "long", year: "numeric", month: "long", day: "numeric",
                 })}
@@ -71,12 +71,12 @@ export function EventDetailContent({ event }: EventDetailContentProps) {
             )}
             {event.time && (
               <span className="flex items-center gap-2">
-                <FiClock className="size-4 text-[#FF355E]" />
+                <FiClock className="size-4 text-[#F47174]" />
                 {event.time}
               </span>
             )}
             <span className="flex items-center gap-2">
-              <FiMapPin className="size-4 text-[#FF355E]" />
+              <FiMapPin className="size-4 text-[#F47174]" />
               KNIT Sultanpur Campus
             </span>
           </div>
@@ -122,10 +122,10 @@ export function EventDetailContent({ event }: EventDetailContentProps) {
                       rel="noopener noreferrer"
                       className="p-3 border border-white/10 rounded-xl bg-[#121528] hover:border-white/20 transition-all flex items-center justify-between group"
                     >
-                      <span className="text-xs font-mono font-medium text-white group-hover:text-[#FF355E] transition-colors">
+                      <span className="text-xs font-mono font-medium text-white group-hover:text-[#F47174] transition-colors">
                         {res.label || `Resource #${idx + 1}`}
                       </span>
-                      <FiLink className="size-3.5 text-white/40 group-hover:text-[#FF355E] transition-colors" />
+                      <FiLink className="size-3.5 text-white/40 group-hover:text-[#F47174] transition-colors" />
                     </a>
                   ))}
                 </div>
@@ -162,12 +162,12 @@ export function EventDetailContent({ event }: EventDetailContentProps) {
                       href={event.googleFormLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full py-3 bg-[#FF355E] hover:bg-[#FF4D70] text-white font-mono font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-lg shadow-[#FF355E]/20 flex items-center justify-center gap-2"
+                      className="w-full py-3 bg-[#F47174] hover:bg-[#FF4D70] text-white font-mono font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-lg shadow-[#F47174]/20 flex items-center justify-center gap-2"
                     >
                       Register Now <FiExternalLink className="size-4" />
                     </a>
                   ) : (
-                    <div className="w-full py-3 bg-[#FF355E]/20 border border-[#FF355E]/30 text-[#FF355E] font-mono font-bold text-xs uppercase tracking-wider rounded-xl flex items-center justify-center gap-2">
+                    <div className="w-full py-3 bg-[#F47174]/20 border border-[#F47174]/30 text-[#F47174] font-mono font-bold text-xs uppercase tracking-wider rounded-xl flex items-center justify-center gap-2">
                       <FiCheckCircle className="size-4" /> Registration Opening Soon
                     </div>
                   )}

@@ -202,7 +202,7 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="min-h-screen w-full bg-[#0B0D19] flex items-center justify-center text-white/50 text-xs font-mono">
-        <FiLoader className="size-6 animate-spin text-[#FF355E] mr-3" /> Loading profile...
+        <FiLoader className="size-6 animate-spin text-[#F47174] mr-3" /> Loading profile...
       </div>
     );
   }
@@ -210,7 +210,7 @@ export default function ProfilePage() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen w-full bg-[#0B0D19] text-white pt-24 pb-16 font-sans selection:bg-[#FF355E]/30">
+    <div className="min-h-screen w-full bg-[#0B0D19] text-white pt-24 pb-16 font-sans selection:bg-[#F47174]/30">
       <div className="max-w-6xl mx-auto px-6 font-sans">
         
         {/* Hidden File Picker Input */}
@@ -233,9 +233,9 @@ export default function ProfilePage() {
             
             {/* User Profile Card Header */}
             <div className="flex flex-col items-center text-center pb-6 border-b border-white/10 space-y-3">
-              <div className="relative group size-20 rounded-2xl bg-[#FF355E]/10 border border-[#FF355E]/30 overflow-hidden shrink-0 flex items-center justify-center shadow-inner">
+              <div className="relative group size-20 rounded-2xl bg-[#F47174]/10 border border-[#F47174]/30 overflow-hidden shrink-0 flex items-center justify-center shadow-inner">
                 {uploadingPhoto ? (
-                  <FiLoader className="size-6 text-[#FF355E] animate-spin" />
+                  <FiLoader className="size-6 text-[#F47174] animate-spin" />
                 ) : user.imageSrc || imageSrc ? (
                   <Image
                     src={user.imageSrc || imageSrc}
@@ -245,7 +245,7 @@ export default function ProfilePage() {
                     className="object-cover"
                   />
                 ) : (
-                  <span className="text-xl font-black text-[#FF355E] uppercase font-sans">
+                  <span className="text-xl font-black text-[#F47174] uppercase font-sans">
                     {user.firstName?.[0]}{user.lastName?.[0]}
                   </span>
                 )}
@@ -278,7 +278,7 @@ export default function ProfilePage() {
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploadingPhoto}
-                  className="text-[11px] font-bold text-[#FF355E] hover:underline flex items-center gap-1"
+                  className="text-[11px] font-bold text-[#F47174] hover:underline flex items-center gap-1"
                 >
                   <FiCamera className="size-3" /> Photo
                 </button>
@@ -302,7 +302,7 @@ export default function ProfilePage() {
                 onClick={() => setActiveTab("personal")}
                 className={`w-full px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-between ${
                   activeTab === "personal"
-                    ? "bg-[#FF355E] text-white shadow-lg"
+                    ? "bg-[#F47174] text-white shadow-lg"
                     : "text-[#8C93B0] hover:text-white hover:bg-white/5"
                 }`}
               >
@@ -317,7 +317,7 @@ export default function ProfilePage() {
                 onClick={() => setActiveTab("hire-us")}
                 className={`w-full px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-between ${
                   activeTab === "hire-us"
-                    ? "bg-[#FF355E] text-white shadow-lg"
+                    ? "bg-[#F47174] text-white shadow-lg"
                     : "text-[#8C93B0] hover:text-white hover:bg-white/5"
                 }`}
               >
@@ -334,7 +334,7 @@ export default function ProfilePage() {
                 onClick={() => setActiveTab("achievements")}
                 className={`w-full px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-between ${
                   activeTab === "achievements"
-                    ? "bg-[#FF355E] text-white shadow-lg"
+                    ? "bg-[#F47174] text-white shadow-lg"
                     : "text-[#8C93B0] hover:text-white hover:bg-white/5"
                 }`}
               >
@@ -356,7 +356,7 @@ export default function ProfilePage() {
                   href="/admin/dashboard"
                   className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-colors"
                 >
-                  <FiShield className="size-4 text-[#FF355E]" /> Admin Dashboard
+                  <FiShield className="size-4 text-[#F47174]" /> Admin Dashboard
                 </Link>
               )}
 
@@ -391,7 +391,7 @@ export default function ProfilePage() {
               <div className="space-y-6 font-sans">
                 <div className="flex items-center justify-between pb-4 border-b border-white/10">
                   <h2 className="text-lg font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                    <FiUser className="text-[#FF355E]" /> Personal & Academic Info
+                    <FiUser className="text-[#F47174]" /> Personal & Academic Info
                   </h2>
                   {!editing && (
                     <button
@@ -416,7 +416,7 @@ export default function ProfilePage() {
                           required
                           value={firstName}
                           onChange={(e) => setFirstName(e.target.value)}
-                          className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                          className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#F47174]"
                         />
                       </div>
                       <div>
@@ -428,7 +428,7 @@ export default function ProfilePage() {
                           required
                           value={lastName}
                           onChange={(e) => setLastName(e.target.value)}
-                          className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                          className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#F47174]"
                         />
                       </div>
                     </div>
@@ -443,7 +443,7 @@ export default function ProfilePage() {
                           required
                           value={username}
                           onChange={(e) => setUsername(e.target.value)}
-                          className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                          className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#F47174]"
                         />
                       </div>
                       <div>
@@ -455,7 +455,7 @@ export default function ProfilePage() {
                           required
                           value={mobile}
                           onChange={(e) => setMobile(e.target.value)}
-                          className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                          className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#F47174]"
                         />
                       </div>
                     </div>
@@ -470,7 +470,7 @@ export default function ProfilePage() {
                           placeholder="24305"
                           value={rollNo}
                           onChange={(e) => setRollNo(e.target.value)}
-                          className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                          className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#F47174]"
                         />
                       </div>
                       <div>
@@ -482,7 +482,7 @@ export default function ProfilePage() {
                           placeholder="https://example.com/avatar.jpg"
                           value={imageSrc}
                           onChange={(e) => setImageSrc(e.target.value)}
-                          className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                          className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#F47174]"
                         />
                       </div>
                     </div>
@@ -496,7 +496,7 @@ export default function ProfilePage() {
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                        className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#F47174]"
                       />
                     </div>
 
@@ -504,7 +504,7 @@ export default function ProfilePage() {
                       <button
                         type="submit"
                         disabled={saving}
-                        className="px-5 py-2.5 rounded-xl bg-[#FF355E] text-white text-xs font-bold uppercase tracking-wider hover:bg-[#FF4D70] transition-colors disabled:opacity-50 flex items-center gap-2"
+                        className="px-5 py-2.5 rounded-xl bg-[#F47174] text-white text-xs font-bold uppercase tracking-wider hover:bg-[#FF4D70] transition-colors disabled:opacity-50 flex items-center gap-2"
                       >
                         {saving ? <FiLoader className="size-4 animate-spin" /> : "Save Changes"}
                       </button>

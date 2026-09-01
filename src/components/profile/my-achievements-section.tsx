@@ -62,7 +62,7 @@ export function MyAchievementsSection({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-bold text-white uppercase tracking-wider flex items-center gap-2 font-sans">
-            <FiAward className="text-[#FF355E]" /> My Achievements & Milestones
+            <FiAward className="text-[#F47174]" /> My Achievements & Milestones
           </h2>
           <p className="text-xs text-[#8C93B0] mt-0.5 font-sans">
             Add your hackathons, open source contributions, and competitive programming achievements to be featured on the showcase page.
@@ -87,7 +87,7 @@ export function MyAchievementsSection({
             >
               <div className="space-y-0.5 min-w-0 font-sans">
                 <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-[#FF355E]/10 border border-[#FF355E]/20 text-[#FF355E]">
+                  <span className="px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-[#F47174]/10 border border-[#F47174]/20 text-[#F47174]">
                     {ach.category}
                   </span>
                   <h4 className="text-xs font-bold text-white truncate">{ach.event}</h4>
@@ -126,7 +126,7 @@ export function MyAchievementsSection({
               placeholder="e.g. SIH 2024 / GSoC '25"
               value={newAchEvent}
               onChange={(e) => setNewAchEvent(e.target.value)}
-              className="w-full bg-[#121528] border border-white/10 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-[#FF355E]"
+              className="w-full bg-[#121528] border border-white/10 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-[#F47174]"
             />
           </div>
 
@@ -139,7 +139,7 @@ export function MyAchievementsSection({
               placeholder="e.g. Winner / @Google / Candidate Master"
               value={newAchStatus}
               onChange={(e) => setNewAchStatus(e.target.value)}
-              className="w-full bg-[#121528] border border-white/10 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-[#FF355E]"
+              className="w-full bg-[#121528] border border-white/10 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-[#F47174]"
             />
           </div>
 
@@ -150,7 +150,7 @@ export function MyAchievementsSection({
             <select
               value={newAchCategory}
               onChange={(e) => setNewAchCategory(e.target.value)}
-              className="w-full bg-[#121528] border border-white/10 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-[#FF355E]"
+              className="w-full bg-[#121528] border border-white/10 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-[#F47174]"
             >
               {CATEGORY_OPTIONS.map((cat) => (
                 <option key={cat} value={cat}>
@@ -167,7 +167,7 @@ export function MyAchievementsSection({
             onClick={handleAddAchievement}
             className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors font-sans"
           >
-            <FiPlus className="size-4 text-[#FF355E]" /> Add to List
+            <FiPlus className="size-4 text-[#F47174]" /> Add to List
           </button>
         </div>
       </div>
@@ -178,7 +178,7 @@ export function MyAchievementsSection({
           type="button"
           onClick={handleSaveAchievements}
           disabled={savingAch}
-          className="px-6 py-3 rounded-xl bg-[#FF355E] hover:bg-[#FF4D70] text-white text-xs font-bold uppercase tracking-wider shadow-lg flex items-center gap-2 transition-all disabled:opacity-50 font-sans"
+          className="px-6 py-3 rounded-xl bg-[#F47174] hover:bg-[#FF4D70] text-white text-xs font-bold uppercase tracking-wider shadow-lg flex items-center gap-2 transition-all disabled:opacity-50 font-sans"
         >
           {savingAch ? (
             <FiLoader className="size-4 animate-spin" />

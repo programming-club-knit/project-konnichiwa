@@ -46,7 +46,7 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 
-  --color-pink-primary: #FF355E;
+  --color-pink-primary: #F47174;
   --color-gold-accent: #FFB800;
   --color-navy-dark: #0B0D19;
   --color-navy-card: #121526;
@@ -248,7 +248,7 @@ body.has-custom-pointer [class*="cursor-pointer"] {
 
 /* Buttons matching Playgame theme */
 .playgame-btn-pink {
-  background-color: #FF355E;
+  background-color: #F47174;
   color: #FFFFFF;
   font-weight: 600;
   transition: all 0.2s ease-in-out;
