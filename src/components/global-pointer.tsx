@@ -28,5 +28,5 @@ export function GlobalPointer() {
     return null;
   }
 
-  return <Pointer className="fill-[#FF355E] text-[#FF355E] stroke-white" />;
+  return <Pointer className="fill-[#F47174] text-[#F47174] stroke-white" />;
 }

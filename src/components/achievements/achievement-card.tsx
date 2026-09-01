@@ -25,9 +25,11 @@ export function AchievementCard({
   return (
     <div
       key={id}
-      className="group relative overflow-hidden rounded-3xl bg-[#121526] border border-white/10 p-6 transition-all duration-300 hover:border-[#FF355E]/50 flex flex-col justify-between font-sans"
+      className="group relative overflow-hidden rounded-3xl border border-white/20  bg-zinc-950 p-6 backdrop-blur-2xl transition-all duration-300 hover:scale-[1.05] flex flex-col justify-between font-sans"
     >
-      <div>
+      {/* Glass highlight */}
+     
+      <div className="relative">
         {/* Member Profile Header */}
         <div className="flex items-center gap-4 border-b border-white/10 pb-5 mb-5">
           <div className="relative">
@@ -51,7 +53,8 @@ export function AchievementCard({
               {name}
             </h3>
             <span className="text-xs font-semibold text-[#8C93B0]">
-              {achievements.length} Verified Milestone{achievements.length !== 1 ? "s" : ""}
+              {achievements.length} Verified Milestone
+              {achievements.length !== 1 ? "s" : ""}
             </span>
           </div>
         </div>
@@ -61,9 +64,9 @@ export function AchievementCard({
           {achievements.map((ach, idx) => (
             <div
               key={`ach-${id}-${idx}`}
-              className="rounded-xl bg-[#0B0D19]/80 border border-white/5 p-3 flex flex-col justify-center transition-colors hover:border-[#FF355E]/30"
+              className="rounded-xl border border-white/20 bg-white/10 p-3 flex flex-col justify-center transition-colors backdrop-blur-md shadow-lg"
             >
-              <span className="text-xs font-extrabold text-[#FF355E] tracking-wide leading-tight">
+              <span className="text-xs font-extrabold text-[#F47174] tracking-wide leading-tight">
                 {ach.event}
               </span>
               <span className="text-[11px] font-semibold text-[#8C93B0] mt-1 leading-tight">

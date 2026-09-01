@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function AchievementsPage() {
   return (
-    <div className="relative min-h-screen bg-[#0B0D19] text-white pt-12">
+    <div className="relative min-h-screen bg-[#0f0f0f] text-white pt-12">
       <AchievementsSection />
     </div>
   );

@@ -47,10 +47,10 @@ export function EventsSection({ events }: EventsSectionProps) {
   const regularEvents = displayEvents.slice(1);
 
   return (
-    <section id="events" className="relative bg-transparent py-32 selection:bg-[#FF355E]/30 overflow-hidden">
+    <section id="events" className="relative bg-transparent py-32 selection:bg-[#F47174]/30 overflow-hidden">
       {/* Decorative Anime Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-        <div className="absolute -left-[20%] top-[10%] w-[50%] h-[50%] rounded-full bg-gradient-to-br from-[#FF355E]/10 to-transparent blur-[120px]" />
+        <div className="absolute -left-[20%] top-[10%] w-[50%] h-[50%] rounded-full bg-gradient-to-br from-[#F47174]/10 to-transparent blur-[120px]" />
         <div className="absolute -right-[10%] bottom-[10%] w-[40%] h-[60%] rounded-full bg-gradient-to-bl from-[#00F0FF]/10 to-transparent blur-[120px]" />
         {/* Star/Sparkle accents */}
         <div className="absolute top-[15%] right-[20%] text-[#FFB800] opacity-50 animate-pulse text-2xl">✦</div>
@@ -87,7 +87,7 @@ export function EventsSection({ events }: EventsSectionProps) {
                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                   />
                   <div className="absolute top-6 left-6 z-20 flex gap-3">
-                     <span className="rounded-full bg-gradient-to-r from-[#FF355E] to-[#FF4D70] px-4 py-1.5 text-xs font-black uppercase tracking-widest text-white shadow-[0_4px_15px_rgba(255,53,94,0.4)] border border-white/20 backdrop-blur-md">
+                     <span className="rounded-full bg-gradient-to-r from-[#F47174] to-[#FF4D70] px-4 py-1.5 text-xs font-black uppercase tracking-widest text-white shadow-[0_4px_15px_rgba(244,113,116,0.4)] border border-white/20 backdrop-blur-md">
                         Featured
                      </span>
                      <span className="rounded-full bg-black/60 backdrop-blur-md border border-white/10 px-4 py-1.5 text-xs font-bold font-mono text-white shadow-lg">
@@ -108,7 +108,7 @@ export function EventsSection({ events }: EventsSectionProps) {
                       className={buttonVariants({
                         variant: 'sleek',
                         size: 'lg',
-                        className: 'self-start text-center justify-center rounded-2xl shadow-[0_4px_15px_rgba(255,53,94,0.3)] hover:shadow-[0_6px_25px_rgba(255,53,94,0.5)] bg-gradient-to-r from-[#FF355E] to-[#FF4D70] border-none text-base px-8 py-6',
+                        className: 'self-start text-center justify-center rounded-2xl shadow-[0_4px_15px_rgba(244,113,116,0.3)] hover:shadow-[0_6px_25px_rgba(244,113,116,0.5)] bg-gradient-to-r from-[#F47174] to-[#FF4D70] border-none text-base px-8 py-6',
                       })}
                     >
                       View Featured Event
