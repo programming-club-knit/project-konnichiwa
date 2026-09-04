@@ -22,6 +22,7 @@ import {
   FiExternalLink
 } from 'react-icons/fi';
 import { UserType, POSTS } from '../types';
+import { AdminPageHeader, AdminCard, AdminBadge } from '../ui';
 
 interface UsersTabProps {
   filteredUsers: UserType[];
@@ -89,16 +90,11 @@ export function UsersTab({
   return (
     <div className="space-y-6 font-sans">
       {/* Header with Title and Refresh */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-bold text-white tracking-tight">Manage Users & Roles</h1>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Click on any user&apos;s name to inspect full credentials, role assignments, and registration statuses.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          {onRefresh && (
+      <AdminPageHeader
+        title="Manage Users & Roles"
+        description="Click on any member's row or name to inspect full credentials, role assignments, and registration statuses."
+        actions={
+          onRefresh && (
             <button
               onClick={onRefresh}
               disabled={dataLoading}
@@ -107,29 +103,31 @@ export function UsersTab({
               <FiRefreshCw className={`size-3.5 ${dataLoading ? 'animate-spin' : ''}`} />
               <span>Refresh</span>
             </button>
-          )}
-        </div>
-      </div>
+          )
+        }
+      />
 
-      {/* New Signups Control Card */}
-      <div className="p-4 rounded-lg border border-white/10 bg-[#121626] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h3 className="text-sm font-semibold text-white">Allow New Signups</h3>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Toggle whether new users can create accounts from the signup portal.
-          </p>
-        </div>
-        <button
-          onClick={onToggleSignup}
-          className={`px-4 py-2 rounded-md text-xs font-semibold tracking-wide border transition-all ${
-            allowSignup
-              ? 'bg-emerald-950/40 border-emerald-500/20 text-emerald-400 hover:bg-emerald-950/60'
-              : 'bg-red-950/40 border-red-500/20 text-red-400 hover:bg-red-950/60'
-          }`}
-        >
-          {allowSignup ? 'Enabled (Signups Open)' : 'Disabled (Signups Closed)'}
-        </button>
-      </div>
+      {/* New Signups Control Card using AdminCard */}
+      <AdminCard
+        title="Allow New Signups"
+        subtitle="Toggle whether new users can create accounts from the signup portal."
+        headerAction={
+          <button
+            onClick={onToggleSignup}
+            className={`px-4 py-2 rounded-md text-xs font-semibold tracking-wide border transition-all ${
+              allowSignup
+                ? 'bg-emerald-950/40 border-emerald-500/20 text-emerald-400 hover:bg-emerald-950/60'
+                : 'bg-red-950/40 border-red-500/20 text-red-400 hover:bg-red-950/60'
+            }`}
+          >
+            {allowSignup ? 'Enabled (Signups Open)' : 'Disabled (Signups Closed)'}
+          </button>
+        }
+      >
+        <p className="text-xs text-slate-400">
+          When disabled, the public register page rejects new registrations and instructs students to contact club administrators.
+        </p>
+      </AdminCard>
 
       {/* Search & Filter Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">

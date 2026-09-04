@@ -63,24 +63,34 @@ export function MailTab({
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const selectedEvent = events.find(e => e._id === selectedEventId);
+  const logsCacheRef = React.useRef<Record<string, EmailLogItem[]>>({});
 
-  // Fetch logs whenever event changes
+  // Fetch logs whenever event changes (uses in-memory cache if available)
   useEffect(() => {
     if (selectedEventId) {
-      fetchLogs(selectedEventId);
+      fetchLogs(selectedEventId, false);
     } else {
       setLogs([]);
     }
     setStatusMessage(null);
   }, [selectedEventId]);
 
-  const fetchLogs = async (eventId: string) => {
+  const fetchLogs = async (eventId: string, force = false) => {
+    if (!eventId) return;
+
+    if (!force && logsCacheRef.current[eventId]) {
+      setLogs(logsCacheRef.current[eventId]);
+      return;
+    }
+
     try {
       setLogsLoading(true);
       const res = await fetch(`/api/admin/mail/logs?eventId=${eventId}`);
       const data = await res.json();
       if (data.success) {
-        setLogs(data.logs || []);
+        const logList = data.logs || [];
+        logsCacheRef.current[eventId] = logList;
+        setLogs(logList);
       }
     } catch (err) {
       console.error('Error fetching email logs:', err);

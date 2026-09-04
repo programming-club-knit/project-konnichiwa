@@ -16,77 +16,34 @@ export type PositionHolder = {
   linkedin?: string;
 };
 
-export const POSITION_HOLDERS: PositionHolder[] = [
-  {
-    id: "lead-1",
-    name: "Abhay Pratap",
-    role: "PTSC President & Lead",
-    imageSrc: "/teams/placeholder-portrait.png",
-    github: "https://github.com",
-    linkedin: "https://linkedin.com",
-  },
-  {
-    id: "lead-2",
-    name: "Orlando Diggs",
-    role: "PTSC Vice President",
-    imageSrc: "/teams/placeholder-portrait.png",
-    github: "https://github.com",
-    linkedin: "https://linkedin.com",
-  },
-  {
-    id: "lead-3",
-    name: "Sophie Chamberlain",
-    role: "Head of CP Division",
-    imageSrc: "/teams/placeholder-portrait.png",
-    github: "https://github.com",
-    linkedin: "https://linkedin.com",
-  },
-  {
-    id: "lead-4",
-    name: "Lana Steiner",
-    role: "Lead Web Developer",
-    imageSrc: "/teams/placeholder-portrait.png",
-    github: "https://github.com",
-    linkedin: "https://linkedin.com",
-  },
-  {
-    id: "lead-5",
-    name: "Emily Donnavan",
-    role: "Product & UI/UX Lead",
-    imageSrc: "/teams/placeholder-portrait.png",
-    github: "https://github.com",
-    linkedin: "https://linkedin.com",
-  },
-  {
-    id: "lead-6",
-    name: "Sasha Kindred",
-    role: "VP of Operations",
-    imageSrc: "/teams/default-avatar.png",
-    github: "https://github.com",
-    linkedin: "https://linkedin.com",
-  },
-  {
-    id: "lead-7",
-    name: "Jessica Dobrev",
-    role: "Backend Architect Lead",
-    imageSrc: "/teams/default-avatar.png",
-    github: "https://github.com",
-    linkedin: "https://linkedin.com",
-  },
-  {
-    id: "lead-8",
-    name: "Drew Cano",
-    role: "Mobile App Lead",
-    imageSrc: "/teams/default-avatar.png",
-    github: "https://github.com",
-    linkedin: "https://linkedin.com",
-  },
-];
-
 export function TeamSection() {
+  const [members, setMembers] = useState<PositionHolder[]>([]);
+  const [loading, setLoading] = useState(true);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(0);
   const targetRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    fetch("/api/members")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.members)) {
+          const formatted: PositionHolder[] = data.members.map((m: any, idx: number) => ({
+            id: m._id || `member-${idx}`,
+            name: m.name || `${m.firstName || ""} ${m.lastName || ""}`.trim() || "PTSC Member",
+            role: m.post || m.role || "Executive Member",
+            imageSrc: m.imageSrc || "/teams/default-avatar.png",
+            github: m.github,
+            linkedin: m.linkedin,
+          }));
+          setMembers(formatted);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const displayMembers = members;
 
   // Pinned Section Scroll Progress (0 to 1 over 300vh scroll height)
   const { scrollYProgress } = useScroll({
@@ -105,14 +62,15 @@ export function TeamSection() {
 
   // Automatically focus on whichever card is at the center position based on smooth scroll progress
   useEffect(() => {
+    if (displayMembers.length === 0) return;
     return smoothProgress.on("change", (latest) => {
       const activeIdx = Math.min(
-        POSITION_HOLDERS.length - 1,
-        Math.max(0, Math.round(latest * (POSITION_HOLDERS.length - 1)))
+        displayMembers.length - 1,
+        Math.max(0, Math.round(latest * (displayMembers.length - 1)))
       );
       setHoveredIndex(activeIdx);
     });
-  }, [smoothProgress]);
+  }, [smoothProgress, displayMembers.length]);
 
   // GSAP fluid 3D depth animation for centered card and neighboring cards
   useEffect(() => {
@@ -184,7 +142,7 @@ export function TeamSection() {
         {/* Pinned Horizontal Scrolling Track with Spring Physics & GPU Acceleration */}
         <div className="relative z-10 w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
           <motion.div style={{ x }} className="flex items-center gap-6 py-10 px-12 w-max transform-gpu will-change-transform">
-            {POSITION_HOLDERS.map((member, index) => (
+            {displayMembers.map((member, index) => (
               <div
                 key={member.id}
                 ref={(el) => {

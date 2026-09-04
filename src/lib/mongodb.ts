@@ -1,4 +1,13 @@
+import dns from "node:dns";
 import mongoose from "mongoose";
+
+try {
+  const dnsServers = ["1.1.1.1"];
+  dns.setServers(dnsServers);
+  dns.promises.setServers(dnsServers);
+} catch (error) {
+  console.warn("Could not set custom DNS servers:", error);
+}
 
 const MONGODB_URI = process.env.MONGODB_URI!;
 
@@ -27,7 +36,12 @@ export async function connectDB() {
     });
   }
 
-  cached.conn = await cached.promise;
+  try {
+    cached.conn = await cached.promise;
+  } catch (error) {
+    cached.promise = null;
+    throw error;
+  }
 
   return cached.conn;
 }

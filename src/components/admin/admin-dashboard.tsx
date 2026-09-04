@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { FiLoader, FiCheck, FiAlertCircle, FiMenu } from 'react-icons/fi';
 
 import { UserType, EventType, RegistrationType } from './types';
@@ -15,14 +15,46 @@ import { UsersTab } from './tabs/users-tab';
 import { PeopleTab } from './tabs/people-tab';
 import { ProfileTab } from './tabs/profile-tab';
 
+const VALID_TABS = ['overview', 'events', 'registrations', 'attendance', 'mail', 'users', 'people', 'profile'] as const;
+type TabType = typeof VALID_TABS[number];
+
 export function AdminDashboard() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [adminUser, setAdminUser] = useState<UserType | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<
-    'overview' | 'events' | 'registrations' | 'attendance' | 'mail' | 'users' | 'people' | 'profile'
-  >('overview');
+
+  // Initialize activeTab from URL search query (?tab=events, ?tab=registrations etc.)
+  const tabParam = searchParams.get('tab') as TabType | null;
+  const initialTab: TabType = tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'overview';
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab);
+
+  // Sync if URL search param changes (e.g. browser back / forward navigation)
+  useEffect(() => {
+    const currentParam = searchParams.get('tab') as TabType | null;
+    if (currentParam && VALID_TABS.includes(currentParam)) {
+      setActiveTab(currentParam);
+    } else if (!currentParam) {
+      setActiveTab('overview');
+    }
+  }, [searchParams]);
+
+  const handleTabChange = (tab: TabType) => {
+    setActiveTab(tab);
+    setEventFormMode('list');
+
+    // Update address bar URL query param smoothly without triggering page reload
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      if (tab === 'overview') {
+        url.searchParams.delete('tab');
+      } else {
+        url.searchParams.set('tab', tab);
+      }
+      window.history.replaceState(null, '', url.pathname + (url.search ? url.search : ''));
+    }
+  };
 
   // Data States
   const [allUsers, setAllUsers] = useState<UserType[]>([]);
@@ -188,23 +220,35 @@ export function AdminDashboard() {
     }
   };
 
-  // Fetch registrations when selectedEventId or active tab changes
+  // In-memory cache for event registrations: eventId -> RegistrationType[]
+  const registrationsCacheRef = useRef<Record<string, RegistrationType[]>>({});
+
+  // Fetch registrations when selectedEventId or active tab changes (uses cache if available)
   useEffect(() => {
     if (!selectedEventId || (activeTab !== 'registrations' && activeTab !== 'attendance')) return;
     const controller = new AbortController();
-    fetchRegistrations(selectedEventId, controller.signal);
+    fetchRegistrations(selectedEventId, false, controller.signal);
     return () => { controller.abort(); };
   }, [selectedEventId, activeTab]);
 
-  const fetchRegistrations = async (eventId: string, signal?: AbortSignal) => {
+  const fetchRegistrations = async (eventId: string, force = false, signal?: AbortSignal) => {
     if (!eventId) return;
+
+    // Use cached data immediately if not forced to reload from network
+    if (!force && registrationsCacheRef.current[eventId]) {
+      setRegistrations(registrationsCacheRef.current[eventId]);
+      return;
+    }
+
     setDataLoading(true);
     try {
       const res = await fetch(`/api/registrations?eventId=${eventId}`, signal ? { signal } : undefined);
       if (res.ok) {
         const data = await res.json();
         if (data.success) {
-          setRegistrations(data.registrations || []);
+          const list = data.registrations || [];
+          registrationsCacheRef.current[eventId] = list;
+          setRegistrations(list);
         }
       }
     } catch (err: any) {
@@ -569,7 +613,7 @@ export function AdminDashboard() {
       {/* Professional Sidebar */}
       <AdminSidebar
         activeTab={activeTab}
-        setActiveTab={(tab) => { setActiveTab(tab); setEventFormMode('list'); }}
+        setActiveTab={handleTabChange}
         pendingCount={pendingUsers.length}
         adminUser={adminUser}
         onLogout={handleLogout}
@@ -624,8 +668,10 @@ export function AdminDashboard() {
               allUsersCount={allUsers.length}
               pendingUsersCount={pendingUsers.length}
               eventsCount={events.length}
-              onNavigateToUsers={() => setActiveTab('users')}
-              onNavigateToNewEvent={() => { setActiveTab('events'); handleCreateEventClick(); }}
+              onNavigateToUsers={() => handleTabChange('users')}
+              onNavigateToNewEvent={() => { handleTabChange('events'); handleCreateEventClick(); }}
+              onNavigateToEvents={() => handleTabChange('events')}
+              onNavigateToMail={() => handleTabChange('mail')}
             />
           )}
 

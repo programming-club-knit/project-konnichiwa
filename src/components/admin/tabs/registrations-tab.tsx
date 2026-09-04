@@ -16,6 +16,7 @@ import {
   FiUser
 } from 'react-icons/fi';
 import { EventType, RegistrationType } from '../types';
+import { AdminPageHeader, AdminBadge } from '../ui';
 
 interface RegistrationsTabProps {
   events: EventType[];
@@ -227,76 +228,75 @@ export function RegistrationsTab({
   return (
     <div className="space-y-6 font-sans">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-bold text-white tracking-tight">Event Registrations</h1>
-          <p className="text-xs text-slate-400 mt-0.5">
-            {selectedEvent ? (
-              <>Selected Event: <span className="text-white font-medium">{selectedEvent.title}</span></>
-            ) : (
-              'Select an event to view, search, and manage registered participant rosters.'
+      <AdminPageHeader
+        title="Event Registrations"
+        description={
+          selectedEvent ? (
+            <span>Selected Event: <span className="text-white font-medium">{selectedEvent.title}</span></span>
+          ) : (
+            'Select an event to view, search, and manage registered participant rosters.'
+          )
+        }
+        actions={
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Event Selector */}
+            <div className="relative min-w-[200px]">
+              <select
+                value={selectedEventId}
+                onChange={e => setSelectedEventId(e.target.value)}
+                className="w-full bg-[#090B14] border border-white/15 rounded-md py-2 pl-3 pr-9 text-xs text-white focus:outline-none focus:border-white/30 font-sans appearance-none cursor-pointer"
+              >
+                <option value="">Select Event</option>
+                {events.map(ev => (
+                  <option key={ev._id} value={ev._id}>{ev.title}</option>
+                ))}
+              </select>
+              <FiChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 size-3.5" />
+            </div>
+
+            {/* View Active vs View Trash toggle */}
+            {selectedEventId && (
+              <button
+                onClick={() => setShowTrash(prev => !prev)}
+                className={`px-3 py-2 rounded-md border text-xs font-semibold flex items-center gap-1.5 transition-all ${
+                  showTrash
+                    ? 'bg-red-950/40 border-red-500/30 text-red-300'
+                    : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10'
+                }`}
+              >
+                <FiTrash2 className="size-3.5" />
+                <span>{showTrash ? 'Viewing Trash' : 'View Trash'}</span>
+              </button>
             )}
-          </p>
-        </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Event Selector */}
-          <div className="relative min-w-[200px]">
-            <select
-              value={selectedEventId}
-              onChange={e => setSelectedEventId(e.target.value)}
-              className="w-full bg-[#090B14] border border-white/15 rounded-md py-2 pl-3 pr-9 text-xs text-white focus:outline-none focus:border-white/30 font-sans appearance-none cursor-pointer"
+            {/* Export CSV */}
+            <button
+              onClick={handleExportCustomCSV}
+              disabled={displayedRegistrations.length === 0}
+              className="px-3.5 py-2 border border-white/10 bg-white/5 hover:bg-white/10 disabled:opacity-40 text-slate-200 rounded-md text-xs font-medium flex items-center gap-1.5 shrink-0 transition-all shadow-sm"
             >
-              <option value="">Select Event</option>
-              {events.map(ev => (
-                <option key={ev._id} value={ev._id}>{ev.title}</option>
-              ))}
-            </select>
-            <FiChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 size-3.5" />
+              <FiDownload className="size-3.5" /> Export CSV
+            </button>
+
+            {/* Refresh */}
+            {selectedEventId && (
+              <button
+                onClick={() => fetchRegistrations(selectedEventId, showTrash)}
+                disabled={isCurrentLoading}
+                className="p-2 border border-white/10 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white rounded-md transition-all shadow-sm"
+                title="Refresh Roster"
+              >
+                <FiRefreshCw className={`size-3.5 ${isCurrentLoading ? 'animate-spin' : ''}`} />
+              </button>
+            )}
           </div>
-
-          {/* View Active vs View Trash toggle */}
-          {selectedEventId && (
-            <button
-              onClick={() => setShowTrash(prev => !prev)}
-              className={`px-3 py-2 rounded-md border text-xs font-semibold flex items-center gap-1.5 transition-all ${
-                showTrash
-                  ? 'bg-red-950/40 border-red-500/30 text-red-300'
-                  : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10'
-              }`}
-            >
-              <FiTrash2 className="size-3.5" />
-              <span>{showTrash ? 'Viewing Trash' : 'View Trash'}</span>
-            </button>
-          )}
-
-          {/* Export CSV */}
-          <button
-            onClick={handleExportCustomCSV}
-            disabled={displayedRegistrations.length === 0}
-            className="px-3.5 py-2 border border-white/10 bg-white/5 hover:bg-white/10 disabled:opacity-40 text-slate-200 rounded-md text-xs font-medium flex items-center gap-1.5 shrink-0 transition-all shadow-sm"
-          >
-            <FiDownload className="size-3.5" /> Export CSV
-          </button>
-
-          {/* Refresh */}
-          {selectedEventId && (
-            <button
-              onClick={() => fetchRegistrations(selectedEventId, showTrash)}
-              disabled={isCurrentLoading}
-              className="p-2 border border-white/10 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white rounded-md transition-all shadow-sm"
-              title="Refresh Roster"
-            >
-              <FiRefreshCw className={`size-3.5 ${isCurrentLoading ? 'animate-spin' : ''}`} />
-            </button>
-          )}
-        </div>
-      </div>
+        }
+      />
 
       {/* Real-time Registration Stats Section */}
       {selectedEventId && registrations.length > 0 && !isCurrentLoading && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-lg border border-white/10 bg-[#121626]">
-          <div className="space-y-1">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="p-4 rounded-lg border border-white/10 bg-[#121626] space-y-1">
             <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider block">
               Total Registrations
             </span>
@@ -305,7 +305,7 @@ export function RegistrationsTab({
             </span>
           </div>
 
-          <div className="space-y-1">
+          <div className="p-4 rounded-lg border border-white/10 bg-[#121626] space-y-1">
             <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider block">
               Total Participants
             </span>
@@ -314,7 +314,7 @@ export function RegistrationsTab({
             </span>
           </div>
 
-          <div className="space-y-1">
+          <div className="p-4 rounded-lg border border-white/10 bg-[#121626] space-y-1">
             <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider block">
               Male Candidates
             </span>
@@ -323,7 +323,7 @@ export function RegistrationsTab({
             </span>
           </div>
 
-          <div className="space-y-1">
+          <div className="p-4 rounded-lg border border-white/10 bg-[#121626] space-y-1">
             <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider block">
               Female Candidates
             </span>

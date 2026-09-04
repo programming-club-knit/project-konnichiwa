@@ -6,6 +6,7 @@ import {
   FiChevronDown, FiChevronRight, FiUsers, FiLoader,
 } from 'react-icons/fi';
 import { EventType } from '../types';
+import { AdminPageHeader, AdminMetricCard, AdminEmptyState } from '../ui';
 
 // Extended registration type to include all fields from old implementation
 interface Attendee {
@@ -198,42 +199,41 @@ export function AttendanceTab({
   const localPresent = attendees.filter(a => a.attendanceStatus === 'present').length;
 
   return (
-    <div className="space-y-5 font-sans">
+    <div className="space-y-6 font-sans">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-bold text-white tracking-tight">Attendance Management</h1>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Mark and save attendance for each event participant.
-          </p>
-        </div>
-        <div className="relative min-w-[200px]">
-          <select
-            value={selectedEventId}
-            onChange={e => setSelectedEventId(e.target.value)}
-            className="w-full bg-[#090B14] border border-white/15 rounded-md py-2 pl-3 pr-8 text-xs text-white focus:outline-none focus:border-white/30 font-sans appearance-none cursor-pointer"
-          >
-            <option value="">Select Event</option>
-            {events.map(ev => (
-              <option key={ev._id} value={ev._id}>{ev.title}</option>
-            ))}
-          </select>
-          <FiChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 size-3.5" />
-        </div>
-      </div>
+      <AdminPageHeader
+        title="Attendance Management"
+        description="Mark and save attendance for each event participant."
+        actions={
+          <div className="relative min-w-[200px]">
+            <select
+              value={selectedEventId}
+              onChange={e => setSelectedEventId(e.target.value)}
+              className="w-full bg-[#090B14] border border-white/15 rounded-md py-2 pl-3 pr-8 text-xs text-white focus:outline-none focus:border-white/30 font-sans appearance-none cursor-pointer"
+            >
+              <option value="">Select Event</option>
+              {events.map(ev => (
+                <option key={ev._id} value={ev._id}>{ev.title}</option>
+              ))}
+            </select>
+            <FiChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 size-3.5" />
+          </div>
+        }
+      />
 
       {/* No event selected */}
       {!selectedEventId && (
-        <div className="py-16 text-center border border-white/10 rounded-lg bg-[#121626] space-y-2">
-          <FiCalendar className="size-10 text-slate-600 mx-auto" />
-          <p className="text-sm text-slate-400">Select an event to manage attendance.</p>
-        </div>
+        <AdminEmptyState
+          icon={<FiCalendar className="size-5 text-slate-400" />}
+          title="No Event Selected"
+          description="Select an event from the dropdown above to view, mark and manage participant attendance rosters."
+        />
       )}
 
       {/* Loading */}
       {selectedEventId && loading && (
         <div className="py-14 text-center border border-white/10 rounded-lg bg-[#121626] flex items-center justify-center gap-2 text-xs text-slate-400">
-          <FiLoader className="size-4 animate-spin" /> Loading attendees...
+          <FiLoader className="size-4 animate-spin text-[#FF355E]" /> Loading attendees...
         </div>
       )}
 
@@ -244,36 +244,27 @@ export function AttendanceTab({
           {/* Stats Cards */}
           {stats && (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {/* Total */}
-              <div className="bg-[#121626] border border-white/10 rounded-lg p-4 flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-slate-400 font-medium">Total Registered</p>
-                  <p className="text-2xl font-bold text-white mt-0.5 font-mono">{stats.total}</p>
-                </div>
-                <div className="p-2.5 bg-white/5 border border-white/10 rounded-md text-slate-300">
-                  <FiUsers className="size-5" />
-                </div>
-              </div>
-              {/* Present */}
-              <div className="bg-[#121626] border border-white/10 rounded-lg p-4 flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-slate-400 font-medium">Present</p>
-                  <p className="text-2xl font-bold text-emerald-400 mt-0.5 font-mono">{localPresent}</p>
-                </div>
-                <div className="p-2.5 bg-emerald-950/40 border border-emerald-500/20 rounded-md text-emerald-400">
-                  <FiCheck className="size-5" />
-                </div>
-              </div>
-              {/* Absent */}
-              <div className="bg-[#121626] border border-white/10 rounded-lg p-4 flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-slate-400 font-medium">Absent</p>
-                  <p className="text-2xl font-bold text-red-400 mt-0.5 font-mono">{attendees.length - localPresent}</p>
-                </div>
-                <div className="p-2.5 bg-red-950/40 border border-red-500/20 rounded-md text-red-400">
-                  <FiX className="size-5" />
-                </div>
-              </div>
+              <AdminMetricCard
+                title="Total Registered"
+                value={stats.total}
+                icon={<FiUsers className="size-4" />}
+                badgeText="Roster"
+                badgeVariant="default"
+              />
+              <AdminMetricCard
+                title="Present"
+                value={localPresent}
+                icon={<FiCheck className="size-4" />}
+                badgeText="Verified"
+                badgeVariant="success"
+              />
+              <AdminMetricCard
+                title="Absent"
+                value={attendees.length - localPresent}
+                icon={<FiX className="size-4" />}
+                badgeText="Unverified"
+                badgeVariant="danger"
+              />
             </div>
           )}
 
