@@ -61,24 +61,49 @@ export const NAV: NavItem[] = [
   // { label: "OSS", href: "/oss" },
   // { label: "CP", href: "/cp" },
   { label: "Team", href: "/team" },
-  { label: "Our Peoples", href: "/people" },
+  { label: "Alumni", href: "/people" },
   { label: "Achievements", href: "/achievements" },
-  { label: "Support Us", href: "/support-us" },
+  { label: "Support", href: "/support-us" },
   { label: "Hire Us", href: "/hire-us" },
 ];
 
 export const SOCIAL_PLATFORMS = [
-  { name: "Skype", icon: FaSkype },
-  { name: "WhatsApp", icon: FaWhatsapp },
-  { name: "Twitch", icon: FaTwitch },
-  { name: "Dribbble", icon: FiDribbble },
-  { name: "TikTok", icon: FaTiktok },
-  { name: "Slack", icon: FiSlack },
-  { name: "Discord", icon: FaDiscord },
-  { name: "Instagram", icon: FiInstagram },
-  { name: "Google", icon: FaGoogle },
-  { name: "GitHub", icon: FiGithub },
-  { name: "LinkedIn", icon: FaLinkedin },
+  {
+    name: "WhatsApp",
+    icon: FaWhatsapp,
+    link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=RDdQw4w9WgXcQ&start_radio=1&pp=ygUJcmljayByb2xsoAcB0gcJCRMMAYcqIYzv",
+  },
+  {
+    name: "Twitch",
+    icon: FaTwitch,
+    link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=RDdQw4w9WgXcQ&start_radio=1&pp=ygUJcmljayByb2xsoAcB0gcJCRMMAYcqIYzv",
+  },
+
+  {
+    name: "Discord",
+    icon: FaDiscord,
+    link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=RDdQw4w9WgXcQ&start_radio=1&pp=ygUJcmljayByb2xsoAcB0gcJCRMMAYcqIYzv",
+  },
+  {
+    name: "Instagram",
+    icon: FiInstagram,
+    link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=RDdQw4w9WgXcQ&start_radio=1&pp=ygUJcmljayByb2xsoAcB0gcJCRMMAYcqIYzv",
+  },
+  {
+    name: "Google",
+    icon: FaGoogle,
+    link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=RDdQw4w9WgXcQ&start_radio=1&pp=ygUJcmljayByb2xsoAcB0gcJCRMMAYcqIYzv",
+  },
+  {
+    name: "GitHub",
+    icon: FiGithub,
+    link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=RDdQw4w9WgXcQ&start_radio=1&pp=ygUJcmljayByb2xsoAcB0gcJCRMMAYcqIYzv",
+  },
+  {
+    name: "LinkedIn",
+    icon: FaLinkedin,
+    link: "https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=RDdQw4w9WgXcQ&start_radio=1&pp=ygUJcmljayByb2xsoAcB0gcJCRMMAYcqIYzv",
+  },
 ];
 
 export const HERO_TOPIC_CARDS: HeroTopicCard[] = [
@@ -103,9 +128,9 @@ export const HERO_TOPIC_CARDS: HeroTopicCard[] = [
 ];
 
 export const STATS = [
-  { value: "500+", label: "Active members" },
-  { value: "40+", label: "Events hosted" },
-  { value: "15+", label: "Hackathon wins" },
+  { value: "34", label: "Active members" },
+  { value: "+", label: "Events hosted" },
+  { value: "2", label: "Hackathon conducted" },
   { value: "1", label: "Community, KNIT" },
 ];
 
@@ -137,12 +162,32 @@ export const FEATURES: FeatureCard[] = [
 ];
 
 export const DOMAINS: IconCard[] = [
-  { icon: FiCode, name: "Development", desc: "Web, mobile & backend engineering." },
-  { icon: FiTerminal, name: "CP & DSA", desc: "Contests, ladders & interview prep." },
+  {
+    icon: FiCode,
+    name: "Development",
+    desc: "Web, mobile & backend engineering.",
+  },
+  {
+    icon: FiTerminal,
+    name: "CP & DSA",
+    desc: "Contests, ladders & interview prep.",
+  },
   { icon: FiCpu, name: "AI / ML", desc: "Models, data pipelines & research." },
-  { icon: FiGitBranch, name: "Open Source", desc: "Real contributions, real impact." },
-  { icon: LuRocket, name: "Product & Design", desc: "From idea to shipped product." },
-  { icon: LuTrophy, name: "Hackathons", desc: "Build fast, win big, learn faster." },
+  {
+    icon: FiGitBranch,
+    name: "Open Source",
+    desc: "Real contributions, real impact.",
+  },
+  {
+    icon: LuRocket,
+    name: "Product & Design",
+    desc: "From idea to shipped product.",
+  },
+  {
+    icon: LuTrophy,
+    name: "Hackathons",
+    desc: "Build fast, win big, learn faster.",
+  },
 ];
 
 export const EVENTS: EventCard[] = [

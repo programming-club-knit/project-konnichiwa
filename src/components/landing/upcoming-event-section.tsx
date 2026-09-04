@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FiArrowRight, FiCalendar, FiMapPin, FiImage } from "react-icons/fi";
-import type { EventItem } from "@/lib/events";
+import { type EventItem, getEventDynamicStatus } from "@/lib/event-status";
 
 interface UpcomingEventSectionProps {
   event: EventItem | null;
@@ -12,8 +12,21 @@ interface UpcomingEventSectionProps {
 export function UpcomingEventSection({ event }: UpcomingEventSectionProps) {
   if (!event) return null;
 
+  const timing = getEventDynamicStatus(event);
+  const { isLive, isPast, label } = timing;
+
   return (
-    <section id="upcoming-event" className="relative bg-[#0B0D19] py-16 overflow-hidden selection:bg-white/20">
+    <section id="upcoming-event" className="relative bg-[#0f0f0f] py-24 border-b border-white/5 overflow-hidden">
+      {/* Vertical Dashed Guidelines Overlay */}
+      <div className="pointer-events-none absolute inset-0 z-0 opacity-40">
+        <div className="mx-auto h-full max-w-7xl px-6 lg:px-12 grid grid-cols-5 border-x border-dashed border-white/5">
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+        </div>
+      </div>
+
       <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-12">
         <div className="grid lg:grid-cols-[5fr_7fr] gap-8 lg:gap-12 items-stretch">
 
@@ -39,10 +52,26 @@ export function UpcomingEventSection({ event }: UpcomingEventSectionProps) {
             )}
 
             {/* Status Badge */}
-            <div className="absolute top-4 left-4 flex items-center gap-1.5 rounded-full bg-[#FF355E]/10 border border-[#FF355E]/20 px-3 py-1 backdrop-blur-md">
-              <span className="size-1.5 rounded-full bg-[#FF355E] animate-pulse" />
-              <span className="text-[10px] font-black text-[#FF355E] uppercase tracking-widest">
-                {event.status || "Upcoming"}
+            <div
+              className={`absolute top-4 left-4 flex items-center gap-1.5 rounded-full px-3 py-1 backdrop-blur-md border ${
+                isLive
+                  ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.3)]"
+                  : isPast
+                  ? "bg-slate-900/80 border-white/20 text-slate-300"
+                  : "bg-[#FF355E]/10 border-[#FF355E]/20 text-[#FF355E]"
+              }`}
+            >
+              <span
+                className={`size-1.5 rounded-full ${
+                  isLive
+                    ? "bg-emerald-400 animate-ping"
+                    : isPast
+                    ? "bg-slate-400"
+                    : "bg-[#FF355E] animate-pulse"
+                }`}
+              />
+              <span className="text-[10px] font-black uppercase tracking-widest">
+                {label}
               </span>
             </div>
           </div>
@@ -81,7 +110,8 @@ export function UpcomingEventSection({ event }: UpcomingEventSectionProps) {
                 href={`/events/${event.slug || event._id}`}
                 className="inline-flex items-center gap-2 rounded-full bg-[#FF355E] px-8 py-3.5 text-sm font-black uppercase tracking-wider text-white shadow-lg shadow-[#FF355E]/20 hover:bg-[#FF4D70] hover:scale-[1.03] active:scale-[0.97] transition-all duration-300 group"
               >
-                Register & Details <FiArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+                {isLive ? "Join Live Event" : isPast ? "View Details" : "Register & Details"}{" "}
+                <FiArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
               </Link>
             </div>
           </div>

@@ -2,7 +2,7 @@ import React from 'react'
 
 const page = () => {
   return (
-    <div>Abhay</div>
+    <div>This is a hidden page only for The OGs</div>
   )
 }
 

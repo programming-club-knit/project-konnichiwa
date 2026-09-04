@@ -22,7 +22,7 @@ import {
   FiAward,
   FiCheckCircle
 } from "react-icons/fi";
-import type { EventItem } from "@/lib/events";
+import { type EventItem, getEventDynamicStatus } from "@/lib/event-status";
 
 interface EventDetailContentProps {
   event: EventItem;
@@ -31,9 +31,8 @@ interface EventDetailContentProps {
 export function EventDetailContent({ event }: EventDetailContentProps) {
   const [copied, setCopied] = useState(false);
 
-  const isPast = event.status?.toLowerCase() === "past" || 
-                 event.status?.toLowerCase() === "completed" || 
-                 Boolean(event.completed);
+  const timing = getEventDynamicStatus(event);
+  const { isPast, isLive, isUpcoming, label, isRegistrationClosed } = timing;
   const isOnline = event.eventType === "online";
 
   const handleCopyLink = () => {
@@ -52,11 +51,15 @@ export function EventDetailContent({ event }: EventDetailContentProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#090B14] text-slate-200 pt-24 pb-20 selection:bg-[#FF355E]/30 font-sans">
-      {/* Subtle Background Glow */}
-      <div className="pointer-events-none absolute inset-0 z-0 opacity-15">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:32px_32px]" />
-        <div className="absolute left-1/2 top-20 -translate-x-1/2 -z-10 h-[350px] w-[600px] rounded-full bg-[#FF355E] opacity-20 blur-[140px]" />
+    <div className="relative min-h-screen bg-[#0f0f0f] text-slate-200 pt-24 pb-20 selection:bg-[#FF355E]/30 font-sans">
+      {/* Vertical Dashed Guidelines Overlay matching /people */}
+      <div className="pointer-events-none absolute inset-0 z-0 opacity-40">
+        <div className="mx-auto h-full max-w-7xl px-6 lg:px-12 grid grid-cols-5 border-x border-dashed border-white/5">
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+        </div>
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto px-6 lg:px-12 pt-6">
@@ -111,12 +114,19 @@ export function EventDetailContent({ event }: EventDetailContentProps) {
           {/* Floating Badges */}
           <div className="absolute top-5 left-5 right-5 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
             <div className="flex items-center gap-2">
-              <span className={`px-3.5 py-1 rounded-full text-xs font-semibold shadow-lg ${
-                isPast 
-                  ? "bg-slate-900/90 border border-white/20 text-slate-300"
-                  : "bg-[#FF355E] text-white"
-              }`}>
-                {isPast ? "Concluded" : event.status || "Upcoming"}
+              <span
+                className={`px-3.5 py-1 rounded-full text-xs font-semibold shadow-lg flex items-center gap-1.5 ${
+                  isLive
+                    ? "bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.3)] backdrop-blur-md"
+                    : isPast
+                    ? "bg-slate-900/90 border border-white/20 text-slate-300 backdrop-blur-md"
+                    : "bg-[#FF355E] text-white"
+                }`}
+              >
+                {isLive && (
+                  <span className="size-1.5 rounded-full bg-emerald-400 animate-ping" />
+                )}
+                {label}
               </span>
 
               {isOnline ? (
@@ -251,25 +261,66 @@ export function EventDetailContent({ event }: EventDetailContentProps) {
 
           {/* Right Action & Registration Sidebar */}
           <div className="space-y-6 lg:sticky lg:top-28">
-            <div className="p-6 sm:p-8 rounded-3xl bg-[#121626] border border-white/15 shadow-2xl space-y-6">
+            <div className="p-6 sm:p-8 rounded-3xl bg-[#141414] border border-white/15 shadow-2xl space-y-6">
               <div>
                 <div className="flex items-center justify-between pb-3 border-b border-white/10">
                   <h3 className="text-base font-bold text-white">Registration Hub</h3>
-                  <span className={`text-xs font-semibold px-2 py-0.5 rounded ${
-                    isPast ? "bg-white/10 text-slate-400" : "bg-emerald-500/20 text-emerald-300"
-                  }`}>
-                    {isPast ? "Archived" : "Open for Entries"}
+                  <span
+                    className={`text-xs font-semibold px-2.5 py-0.5 rounded flex items-center gap-1.5 ${
+                      isPast
+                        ? "bg-white/10 text-slate-400"
+                        : isRegistrationClosed
+                        ? "bg-red-500/20 text-red-300 border border-red-500/30"
+                        : isLive
+                        ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                        : "bg-emerald-500/20 text-emerald-300"
+                    }`}
+                  >
+                    {isLive && !isRegistrationClosed && (
+                      <span className="size-1.5 rounded-full bg-emerald-400 animate-ping" />
+                    )}
+                    {isPast
+                      ? "Archived"
+                      : isRegistrationClosed
+                      ? "Registration Closed"
+                      : isLive
+                      ? "Happening Now"
+                      : "Open for Entries"}
                   </span>
                 </div>
               </div>
 
               {/* Deadline Badge if present */}
               {event.registrationDeadline && !isPast && (
-                <div className="p-3.5 rounded-2xl bg-[#090B14] border border-amber-500/20 text-xs text-amber-300 flex items-start gap-2.5">
-                  <FiClock className="size-4 shrink-0 text-amber-400 mt-0.5 animate-pulse" />
+                <div
+                  className={`p-3.5 rounded-2xl border text-xs flex items-start gap-2.5 ${
+                    isRegistrationClosed
+                      ? "bg-red-500/10 border-red-500/30 text-red-300"
+                      : "bg-[#0f0f0f] border-amber-500/30 text-amber-300"
+                  }`}
+                >
+                  <FiClock
+                    className={`size-4 shrink-0 mt-0.5 ${
+                      isRegistrationClosed ? "text-red-400" : "text-amber-400 animate-pulse"
+                    }`}
+                  />
                   <div>
-                    <span className="block font-semibold text-xs text-amber-400">Registration Deadline</span>
-                    <span className="text-xs text-amber-200">{new Date(event.registrationDeadline).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
+                    <span
+                      className={`block font-semibold text-xs ${
+                        isRegistrationClosed ? "text-red-400" : "text-amber-400"
+                      }`}
+                    >
+                      {isRegistrationClosed ? "Registration Closed" : "Registration Deadline"}
+                    </span>
+                    <span className={isRegistrationClosed ? "text-red-200/90" : "text-amber-200"}>
+                      {isRegistrationClosed ? "Deadline passed on " : "Closes: "}
+                      {new Date(event.registrationDeadline).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </span>
                   </div>
                 </div>
               )}
@@ -302,7 +353,53 @@ export function EventDetailContent({ event }: EventDetailContentProps) {
 
               {/* Action Buttons */}
               <div className="space-y-3 pt-2">
-                {!isPast ? (
+                {isPast ? (
+                  <div className="p-4 bg-white/5 border border-white/10 rounded-2xl text-center space-y-1">
+                    <span className="block text-xs font-semibold text-slate-300 uppercase tracking-wide">
+                      Event Concluded
+                    </span>
+                    <p className="text-xs text-slate-500">
+                      This competition has concluded. Check back for upcoming events.
+                    </p>
+                  </div>
+                ) : isRegistrationClosed ? (
+                  <>
+                    <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-center space-y-1">
+                      <span className="block text-xs font-semibold text-red-400 uppercase tracking-wide">
+                        Registration Closed
+                      </span>
+                      <p className="text-xs text-red-300/80">
+                        The registration deadline for this event has passed.
+                      </p>
+                    </div>
+
+                    {/* Virtual Meeting Join Link */}
+                    {isOnline && event.meetLink && (
+                      <a
+                        href={event.meetLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full py-3 px-4 bg-cyan-950/60 hover:bg-cyan-900/60 border border-cyan-500/30 text-cyan-300 font-medium text-xs rounded-xl transition-all flex items-center justify-center gap-2"
+                      >
+                        <FiVideo className="size-4 text-cyan-400" />
+                        <span>Join Live Virtual Room</span>
+                      </a>
+                    )}
+
+                    {/* WhatsApp Updates Community */}
+                    {event.whatsappGroupLink && (
+                      <a
+                        href={event.whatsappGroupLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full py-3 px-4 bg-[#25D366]/10 hover:bg-[#25D366]/20 border border-[#25D366]/30 text-[#25D366] font-medium text-xs rounded-xl transition-all flex items-center justify-center gap-2"
+                      >
+                        <FiMessageCircle className="size-4" />
+                        <span>Join Official WhatsApp Group</span>
+                      </a>
+                    )}
+                  </>
+                ) : (
                   <>
                     {event.googleFormLink ? (
                       <a
@@ -346,11 +443,6 @@ export function EventDetailContent({ event }: EventDetailContentProps) {
                       </a>
                     )}
                   </>
-                ) : (
-                  <div className="p-4 bg-white/5 border border-white/10 rounded-2xl text-center space-y-1">
-                    <span className="block text-xs font-semibold text-slate-300 uppercase tracking-wide">Event Concluded</span>
-                    <p className="text-xs text-slate-500">This competition has concluded. Check back for upcoming events.</p>
-                  </div>
                 )}
               </div>
 

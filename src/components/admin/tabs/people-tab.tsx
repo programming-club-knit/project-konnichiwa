@@ -2,8 +2,35 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { FiPlus, FiSearch, FiEdit2, FiTrash2, FiLoader, FiCheck, FiRefreshCw, FiArrowLeft, FiUser, FiGithub, FiLinkedin } from "react-icons/fi";
+import { FiPlus, FiSearch, FiEdit2, FiTrash2, FiLoader, FiCheck, FiRefreshCw, FiArrowLeft, FiUser, FiZap, FiGithub, FiLinkedin } from "react-icons/fi";
 import { ImageUpload } from "@/components/admin/image-upload";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+
+const personSchema = z.object({
+  name: z.string().min(1, "Full name is required"),
+  batch: z.string().optional(),
+  company: z.string().min(1, "Company / Organization is required"),
+  role: z.string().min(1, "Job role is required"),
+  domain: z.string().min(1, "Domain / Tech field is required"),
+  imageSrc: z.string().optional(),
+  github: z.string().optional(),
+  linkedin: z.string().optional(),
+  isPTSCAlumni: z.boolean(),
+  order: z.number().optional(),
+});
+
+type PersonFormValues = z.infer<typeof personSchema>;
 
 export type PersonMember = {
   _id?: string;
@@ -49,17 +76,20 @@ export function PeopleTab() {
   const [submitting, setSubmitting] = useState(false);
   const [seeding, setSeeding] = useState(false);
 
-  const [form, setForm] = useState({
-    name: "",
-    batch: "",
-    company: "",
-    role: "",
-    domain: "",
-    imageSrc: "",
-    github: "",
-    linkedin: "",
-    isPTSCAlumni: true,
-    order: 0,
+  const personForm = useForm<PersonFormValues>({
+    resolver: zodResolver(personSchema),
+    defaultValues: {
+      name: "",
+      batch: "",
+      company: "",
+      role: "",
+      domain: "",
+      imageSrc: "",
+      github: "",
+      linkedin: "",
+      isPTSCAlumni: true,
+      order: 0,
+    },
   });
 
   const showToast = (msg: string) => {
@@ -113,7 +143,7 @@ export function PeopleTab() {
 
   const handleOpenAdd = () => {
     setEditingId(null);
-    setForm({
+    personForm.reset({
       name: "",
       batch: "",
       company: "",
@@ -141,7 +171,7 @@ export function PeopleTab() {
       yearVal = "";
     }
 
-    setForm({
+    personForm.reset({
       name: p.name || "",
       batch: yearVal,
       company: p.company || "",
@@ -173,13 +203,12 @@ export function PeopleTab() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (values: PersonFormValues) => {
     setSubmitting(true);
 
-    const formattedBatch = formatBatchYear(form.batch);
+    const formattedBatch = formatBatchYear(values.batch);
     const payload = {
-      ...form,
+      ...values,
       batch: formattedBatch,
     };
 
@@ -222,10 +251,11 @@ export function PeopleTab() {
 
   // Render Full Landscape Add/Edit Page View
   if (formMode === "form") {
-    const splitName = form.name ? form.name.split(" ") : ["First", "Last"];
+    const formValues = personForm.watch();
+    const splitName = formValues.name ? formValues.name.split(" ") : ["First", "Last"];
     const firstName = splitName[0] || "First";
     const lastName = splitName.slice(1).join(" ") || "Last";
-    const previewBatch = formatBatchYear(form.batch);
+    const previewBatch = formatBatchYear(formValues.batch);
 
     return (
       <div className="space-y-6 font-sans">
@@ -234,238 +264,286 @@ export function PeopleTab() {
           <button
             type="button"
             onClick={() => setFormMode("list")}
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md border border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 text-xs font-semibold tracking-wide transition-all group"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 bg-white/5 text-[#8C93B0] hover:text-white hover:border-[#FF355E]/50 hover:bg-[#FF355E]/10 text-xs font-bold uppercase tracking-wider transition-all shadow-md group cursor-pointer"
           >
-            <FiArrowLeft className="size-3.5 group-hover:-translate-x-0.5 transition-transform" />
-            Back to Alumni Directory
+            <FiArrowLeft className="size-4 group-hover:-translate-x-1 transition-transform text-[#FF355E]" />
+            Back to People Directory
           </button>
         </div>
 
         {/* Main Landscape Card: Horizontal Layout on Desktop (lg:flex-row) */}
-        <div className="rounded-lg border border-white/10 bg-[#121626] p-6 sm:p-8 flex flex-col lg:flex-row gap-8 lg:gap-10 items-stretch font-sans">
+        <div className="rounded-3xl border border-white/10 bg-[#121528] p-6 sm:p-10 shadow-2xl flex flex-col lg:flex-row gap-8 lg:gap-12 items-stretch font-sans">
           
           {/* Left Column: Branding & Poster Card Live Preview */}
-          <div className="flex-1 flex flex-col justify-between space-y-5 lg:border-r lg:border-white/10 lg:pr-8">
-            <div className="space-y-3">
-              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-white/5 border border-white/10 text-slate-300 text-xs font-mono">
-                <FiUser className="size-3" />
+          <div className="flex-1 flex flex-col justify-between space-y-6 lg:border-r lg:border-white/10 lg:pr-10">
+            <div className="space-y-4">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FF355E]/10 border border-[#FF355E]/20 text-[#FF355E] text-xs font-bold uppercase tracking-wider">
+                <FiUser className="size-3.5" />
                 Alumni Manager
               </div>
 
-              <h1 className="text-xl font-bold text-white tracking-tight leading-tight">
-                {editingId ? "Edit Alumni Profile" : "Register New Alumni"}
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white uppercase font-sans leading-tight">
+                {editingId ? "Edit Alumni Member" : "Add New Alumni / Achiever"}
               </h1>
 
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Add distinguished KNIT alumni and club seniors to be featured on the showcase page. Graduation year is optional — leaving it empty categorizes them into <strong className="text-white">&quot;Other&quot;</strong>.
+              <p className="text-xs text-[#8C93B0] leading-relaxed">
+                Add cracked KNIT seniors, alumni, and high achievers to be featured on the main website. Graduation year is optional — leaving it empty categorizes them into <strong className="text-white">&quot;Other&quot;</strong>.
               </p>
             </div>
 
             {/* Live Poster Card Preview */}
             <div className="space-y-2">
-              <span className="text-[11px] font-mono text-slate-400 uppercase tracking-wider block">
-                Live Preview Card
+              <span className="text-[10px] font-mono font-bold text-white/40 uppercase tracking-widest block">
+                Live Poster Card Preview
               </span>
-              <div className="relative overflow-hidden rounded-md bg-[#090B14] border border-white/10 aspect-[3/4] max-w-xs mx-auto lg:mx-0 flex flex-col justify-between">
-                {form.imageSrc ? (
+              <div className="relative overflow-hidden rounded-xl bg-[#0B0D19] border border-white/10 aspect-[3/4] max-w-xs mx-auto lg:mx-0 flex flex-col justify-between shadow-2xl">
+                {formValues.imageSrc ? (
                   <Image
-                    src={form.imageSrc}
-                    alt={form.name || "Preview"}
+                    src={formValues.imageSrc}
+                    alt={formValues.name || "Preview"}
                     fill
                     className="object-cover"
                   />
                 ) : (
-                  <div className="absolute inset-0 bg-[#090B14] flex flex-col items-center justify-center text-slate-500 text-xs font-mono">
-                    <FiUser className="size-10 mb-2" />
+                  <div className="absolute inset-0 bg-[#0B0D19] flex flex-col items-center justify-center text-white/20 text-xs font-mono">
+                    <FiUser className="size-12 mb-2" />
                     <span>No Photo Uploaded</span>
                   </div>
                 )}
 
-                {/* Dark overlay without gradient */}
-                <div className="absolute inset-0 bg-[#090B14]/75" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D19] via-[#0B0D19]/40 to-transparent" />
 
-                <div className="absolute top-3 left-3 z-10 flex flex-col gap-1">
-                  <span className="text-[10px] font-mono font-bold tracking-wider text-slate-300 uppercase">
-                    {form.isPTSCAlumni ? "PTSC ALUMNI" : "ALUMNI"}
+                <div className="absolute top-4 left-4 z-10 flex flex-col gap-1">
+                  <span className="text-[9px] font-extrabold tracking-widest text-[#FF355E] uppercase">
+                    {formValues.isPTSCAlumni ? "PTSC ALUMNI" : "ALUMNI"}
                   </span>
-                  <span className="text-[11px] font-mono text-slate-400">
-                    {previewBatch}
+                  <span className="text-[10px] font-semibold tracking-widest text-white/80 uppercase font-sans">
+                    {previewBatch.toUpperCase()}
                   </span>
                 </div>
 
-                <div className="relative z-10 p-4 mt-auto flex flex-col">
-                  <div className="mb-1.5">
-                    <h3 className="text-lg font-bold text-white leading-tight">
-                      {firstName} {lastName}
+                <div className="relative z-10 p-5 mt-auto flex flex-col">
+                  <div className="mb-2">
+                    <h3 className="text-2xl font-black text-white uppercase leading-none tracking-tight">
+                      {firstName}
+                    </h3>
+                    <h3 className="text-2xl font-black text-white uppercase leading-none tracking-tight inline-block border-b-2 border-[#FF355E] pb-0.5">
+                      {lastName}
                     </h3>
                   </div>
 
-                  <p className="text-xs text-slate-300">
-                    {form.role || "Job Role"}
+                  <p className="text-xs font-medium text-white/90">
+                    {formValues.role || "Job Role"}
                   </p>
-                  <p className="text-xs font-medium text-emerald-400 mt-0.5">
-                    {form.company || "Company / Organization"}
+                  <p className="text-xs font-black text-[#FFB800] uppercase tracking-wider mt-0.5">
+                    {formValues.company || "Company / Org"}
                   </p>
 
-                  <div className="mt-2.5 pt-2 flex items-center gap-3 border-t border-white/10 text-[10px] text-slate-400 font-mono">
-                    {form.github && <span className="flex items-center gap-1"><FiGithub className="size-3" /> GitHub</span>}
-                    {form.linkedin && <span className="flex items-center gap-1"><FiLinkedin className="size-3" /> LinkedIn</span>}
+                  <div className="mt-3 pt-3 flex items-center gap-3 border-t border-white/20 text-[10px] text-white/70 font-mono">
+                    {formValues.github && <span className="flex items-center gap-1"><FiGithub className="size-3 text-[#FF355E]" /> GitHub</span>}
+                    {formValues.linkedin && <span className="flex items-center gap-1"><FiLinkedin className="size-3 text-[#FF355E]" /> LinkedIn</span>}
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Right Column: Form Inputs */}
-          <div className="flex-1 flex flex-col justify-center space-y-4">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">
-                  Full Name *
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Aseem Srivastava"
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full bg-[#090B14] border border-white/15 rounded-md py-2.5 px-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30"
+          {/* Right Column: Horizontal Form Inputs */}
+          <div className="flex-1 flex flex-col justify-center space-y-5">
+            <Form {...personForm}>
+              <form onSubmit={personForm.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={personForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Full Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Aseem Srivastava"
+                          disabled={submitting}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div>
-                  <label className="text-xs font-semibold text-slate-300 block mb-1">
-                    Graduation Year <span className="text-slate-500 font-normal">(Optional)</span>
-                  </label>
-                  <input
-                    type="number"
-                    min={1950}
-                    max={2100}
-                    placeholder="e.g. 2021"
-                    value={form.batch}
-                    onChange={(e) => setForm({ ...form, batch: e.target.value })}
-                    className="w-full bg-[#090B14] border border-white/15 rounded-md py-2.5 px-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30"
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <FormField
+                    control={personForm.control}
+                    name="batch"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Graduation Year (Optional)</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            min={1950}
+                            max={2100}
+                            placeholder="e.g. 2021"
+                            disabled={submitting}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={personForm.control}
+                    name="company"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Company / Organization</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="MBZUAI / Google / Bloomberg"
+                            disabled={submitting}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
                 </div>
 
-                <div>
-                  <label className="text-xs font-semibold text-slate-300 block mb-1">
-                    Company / Org *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Google / Microsoft"
-                    value={form.company}
-                    onChange={(e) => setForm({ ...form, company: e.target.value })}
-                    className="w-full bg-[#090B14] border border-white/15 rounded-md py-2.5 px-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30"
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <FormField
+                    control={personForm.control}
+                    name="role"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Job Role</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Software Engineer / Researcher"
+                            disabled={submitting}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={personForm.control}
+                    name="domain"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Domain / Tech Field</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="AI & LLMs / High-Performance Systems"
+                            disabled={submitting}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
                 </div>
-              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div>
-                  <label className="text-xs font-semibold text-slate-300 block mb-1">
-                    Job Role *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Software Engineer"
-                    value={form.role}
-                    onChange={(e) => setForm({ ...form, role: e.target.value })}
-                    className="w-full bg-[#090B14] border border-white/15 rounded-md py-2.5 px-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-xs font-semibold text-slate-300 block mb-1">
-                    Domain / Field *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Distributed Systems"
-                    value={form.domain}
-                    onChange={(e) => setForm({ ...form, domain: e.target.value })}
-                    className="w-full bg-[#090B14] border border-white/15 rounded-md py-2.5 px-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">
-                  Profile Photo Upload
-                </label>
-                <ImageUpload
-                  value={form.imageSrc}
-                  onChange={(url) => setForm({ ...form, imageSrc: url })}
+                <FormField
+                  control={personForm.control}
+                  name="imageSrc"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Profile Photo / Image Upload</FormLabel>
+                      <FormControl>
+                        <ImageUpload
+                          value={field.value || ""}
+                          onChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div>
-                  <label className="text-xs font-semibold text-slate-300 block mb-1">
-                    GitHub Profile URL
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="https://github.com/..."
-                    value={form.github}
-                    onChange={(e) => setForm({ ...form, github: e.target.value })}
-                    className="w-full bg-[#090B14] border border-white/15 rounded-md py-2.5 px-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30"
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <FormField
+                    control={personForm.control}
+                    name="github"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>GitHub Profile URL</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="https://github.com/..."
+                            disabled={submitting}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={personForm.control}
+                    name="linkedin"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>LinkedIn Profile URL</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="https://linkedin.com/in/..."
+                            disabled={submitting}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
                 </div>
 
-                <div>
-                  <label className="text-xs font-semibold text-slate-300 block mb-1">
-                    LinkedIn Profile URL
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="https://linkedin.com/in/..."
-                    value={form.linkedin}
-                    onChange={(e) => setForm({ ...form, linkedin: e.target.value })}
-                    className="w-full bg-[#090B14] border border-white/15 rounded-md py-2.5 px-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30"
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 py-2.5 px-3.5 rounded-md bg-[#090B14] border border-white/10">
-                <input
-                  type="checkbox"
-                  id="isPTSCAlumni"
-                  checked={form.isPTSCAlumni}
-                  onChange={(e) => setForm({ ...form, isPTSCAlumni: e.target.checked })}
-                  className="size-4 rounded bg-[#121626] border-white/20 accent-white cursor-pointer"
+                <FormField
+                  control={personForm.control}
+                  name="isPTSCAlumni"
+                  render={({ field }) => (
+                    <div className="flex items-center gap-3 py-3 px-4 rounded-xl bg-[#0f0f0f] border border-white/10">
+                      <input
+                        type="checkbox"
+                        id="isPTSCAlumni"
+                        checked={field.value}
+                        onChange={field.onChange}
+                        className="size-4 rounded bg-[#141414] border-white/20 text-[#FF355E] focus:ring-0 cursor-pointer"
+                      />
+                      <label htmlFor="isPTSCAlumni" className="text-xs font-bold text-white cursor-pointer select-none">
+                        PTSC Alumni Member?{" "}
+                        <span className="text-[#8C93B0] font-normal font-mono text-[11px]">
+                          (Checked: &quot;PTSC ALUMNI&quot; • Unchecked: &quot;ALUMNI&quot;)
+                        </span>
+                      </label>
+                    </div>
+                  )}
                 />
-                <label htmlFor="isPTSCAlumni" className="text-xs font-medium text-white cursor-pointer select-none">
-                  PTSC Alumni Member?{" "}
-                  <span className="text-slate-400 font-normal text-[11px]">
-                    (Tag: {form.isPTSCAlumni ? "PTSC ALUMNI" : "ALUMNI"})
-                  </span>
-                </label>
-              </div>
 
-              <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/10">
-                <button
-                  type="button"
-                  onClick={() => setFormMode("list")}
-                  className="px-4 py-2 rounded-md bg-white/5 border border-white/10 text-slate-300 text-xs font-medium hover:bg-white/10 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="px-5 py-2 rounded-md bg-white text-black text-xs font-semibold hover:bg-slate-200 transition-colors disabled:opacity-50 flex items-center gap-2 shadow-sm"
-                >
-                  {submitting ? <FiLoader className="size-3.5 animate-spin" /> : null}
-                  {editingId ? "Save Changes" : "Create Alumni Member"}
-                </button>
-              </div>
-            </form>
+                <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
+                  <button
+                    type="button"
+                    onClick={() => setFormMode("list")}
+                    className="px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-white/70 text-xs font-bold uppercase hover:bg-white/10 transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="px-6 py-3 rounded-xl bg-[#FF355E] text-white text-xs font-bold uppercase tracking-wider hover:bg-[#FF4D70] transition-colors disabled:opacity-50 flex items-center gap-2 shadow-lg cursor-pointer"
+                  >
+                    {submitting ? <FiLoader className="size-4 animate-spin" /> : editingId ? "Save Changes" : "Create Alumni Member"}
+                  </button>
+                </div>
+              </form>
+            </Form>
           </div>
         </div>
       </div>
@@ -477,20 +555,17 @@ export function PeopleTab() {
     <div className="space-y-6 font-sans">
       {/* Toast Notification */}
       {notification && (
-        <div className="fixed top-6 right-6 z-50 px-4 py-3 bg-[#13172B] text-white text-sm font-semibold rounded-md border border-emerald-500/30 shadow-xl flex items-center gap-3">
-          <div className="size-6 rounded bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
-            <FiCheck className="size-3.5" />
-          </div>
-          <span>{notification}</span>
+        <div className="fixed top-5 right-5 z-50 px-4 py-2.5 bg-emerald-500 text-white font-mono text-xs font-bold rounded-xl shadow-2xl flex items-center gap-2 animate-bounce">
+          <FiCheck className="size-4" /> {notification}
         </div>
       )}
 
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-5">
         <div>
-          <h1 className="text-xl font-bold text-white tracking-tight">Our People / Alumni Directory</h1>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Manage alumni profiles, company achievements, and mentors showcased on the website.
+          <h2 className="text-xl font-bold text-white tracking-tight">Our People / Alumni Manager</h2>
+          <p className="text-xs text-white/50 mt-0.5">
+            Manage cracked alumni, high achievers, and top mentors displayed on the landing page.
           </p>
         </div>
 
@@ -499,7 +574,7 @@ export function PeopleTab() {
             type="button"
             onClick={handleSeed}
             disabled={seeding}
-            className="px-3.5 py-1.5 rounded-md border border-white/15 bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-medium flex items-center gap-2 transition-all disabled:opacity-50"
+            className="px-3.5 py-2 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-white text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all disabled:opacity-50"
           >
             <FiRefreshCw className={`size-3.5 ${seeding ? "animate-spin" : ""}`} /> Seed Defaults
           </button>
@@ -507,30 +582,30 @@ export function PeopleTab() {
           <button
             type="button"
             onClick={handleOpenAdd}
-            className="px-3.5 py-1.5 rounded-md bg-white text-black hover:bg-slate-200 text-xs font-semibold flex items-center gap-2 transition-all shadow-sm"
+            className="px-4 py-2 rounded-xl bg-[#FF355E] hover:bg-[#FF4D70] text-white text-xs font-bold uppercase tracking-wider shadow-lg flex items-center gap-2 transition-all"
           >
-            <FiPlus className="size-3.5" /> Add Member
+            <FiPlus className="size-4" /> Add Person
           </button>
         </div>
       </div>
 
       {/* Search & Filter Bar */}
-      <div className="flex flex-col sm:flex-row items-center gap-3">
+      <div className="flex flex-col sm:flex-row items-center gap-4">
         <div className="relative flex-1 w-full">
-          <FiSearch className="size-3.5 absolute left-3 top-2.5 text-slate-400" />
+          <FiSearch className="size-4 absolute left-3.5 top-3.5 text-white/40" />
           <input
             type="text"
-            placeholder="Search alumni by name, company, role, domain..."
+            placeholder="Search by name, company, role, domain..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-[#121626] border border-white/10 rounded-md py-1.5 pl-9 pr-3 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30"
+            className="w-full bg-[#0E101A] border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-xs text-white focus:outline-none focus:border-[#FF355E]"
           />
         </div>
 
         <select
           value={selectedBatch}
           onChange={(e) => setSelectedBatch(e.target.value)}
-          className="w-full sm:w-48 bg-[#121626] border border-white/10 rounded-md py-1.5 px-3 text-xs text-white focus:outline-none focus:border-white/30"
+          className="w-full sm:w-48 bg-[#0E101A] border border-white/10 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-[#FF355E]"
         >
           <option value="all">All Batches ({people.length})</option>
           {uniqueBatches.map((b) => (
@@ -543,20 +618,20 @@ export function PeopleTab() {
 
       {/* Table / Grid Content */}
       {loading ? (
-        <div className="p-16 text-center border border-white/10 rounded-lg bg-[#121626] text-slate-400 text-xs font-sans flex items-center justify-center gap-2">
-          <FiLoader className="size-4 animate-spin text-white/60" /> Loading alumni records...
+        <div className="p-12 text-center border border-white/10 rounded-2xl bg-[#0E101A] text-white/50 text-xs font-mono flex items-center justify-center gap-2">
+          <FiLoader className="size-5 animate-spin text-[#FF355E]" /> Loading people members...
         </div>
       ) : error ? (
-        <div className="p-4 text-center border border-red-500/20 bg-red-500/10 rounded-md text-red-300 text-xs">
+        <div className="p-6 text-center border border-red-500/20 bg-red-500/10 rounded-2xl text-red-300 text-xs font-mono">
           {error}
         </div>
       ) : filteredPeople.length === 0 ? (
-        <div className="p-16 text-center border border-white/10 rounded-lg bg-[#121626] text-slate-400 text-xs space-y-3">
-          <p>No alumni members found.</p>
+        <div className="p-12 text-center border border-white/10 rounded-2xl bg-[#0E101A] text-white/40 text-xs font-mono space-y-3">
+          <p>No people members found.</p>
           <button
             type="button"
             onClick={handleSeed}
-            className="px-3.5 py-1.5 rounded-md bg-white/10 text-white text-xs font-medium hover:bg-white/20 transition-all"
+            className="px-4 py-2 rounded-xl bg-white/10 text-white text-xs font-bold uppercase hover:bg-white/20 transition-all"
           >
             Seed Default Alumni Data
           </button>
@@ -566,54 +641,54 @@ export function PeopleTab() {
           {filteredPeople.map((person) => (
             <div
               key={person._id || person.id}
-              className="p-4 rounded-lg border border-white/10 bg-[#121626] hover:border-white/20 transition-all space-y-3.5 flex flex-col justify-between"
+              className="p-5 rounded-2xl border border-white/10 bg-[#0E101A] hover:border-white/20 transition-all space-y-4 flex flex-col justify-between"
             >
-              <div className="flex items-start gap-3">
-                <div className="relative size-12 rounded-md overflow-hidden border border-white/10 shrink-0 bg-white/5">
+              <div className="flex items-start gap-4">
+                <div className="relative size-14 rounded-xl overflow-hidden border border-white/15 shrink-0 bg-white/5">
                   <Image
                     src={person.imageSrc || "/teams/default-avatar.png"}
                     alt={person.name}
                     fill
                     className="object-cover"
-                    sizes="48px"
+                    sizes="56px"
                   />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5 mb-1">
-                    <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-mono border border-white/10 bg-white/5 text-slate-300">
+                    <span className="inline-block px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#FF355E]/10 border border-[#FF355E]/20 text-[#FF355E] uppercase tracking-wider">
                       {formatBatchYear(person.batch)}
                     </span>
-                    <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-mono border border-white/10 bg-white/5 text-slate-400">
+                    <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-white/5 border border-white/10 text-white/60 uppercase">
                       {person.isPTSCAlumni !== false ? "PTSC ALUMNI" : "ALUMNI"}
                     </span>
                   </div>
-                  <h3 className="text-xs font-bold text-white truncate">{person.name}</h3>
-                  <p className="text-xs text-emerald-400 font-medium truncate">{person.company}</p>
-                  <p className="text-[11px] text-slate-400 truncate">{person.role}</p>
+                  <h3 className="text-sm font-bold text-white truncate">{person.name}</h3>
+                  <p className="text-xs text-emerald-400 font-semibold truncate">{person.company}</p>
+                  <p className="text-[11px] text-white/60 truncate">{person.role}</p>
                 </div>
               </div>
 
-              <div className="pt-2.5 border-t border-white/10 flex items-center justify-between">
-                <span className="text-[11px] font-mono text-slate-400 uppercase tracking-wider truncate max-w-[140px]">
+              <div className="pt-3 border-t border-white/10 flex items-center justify-between">
+                <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider truncate max-w-[150px]">
                   {person.domain}
                 </span>
 
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={() => handleOpenEdit(person)}
-                    className="size-7 grid place-items-center rounded bg-white/5 border border-white/10 hover:bg-white/10 text-slate-300 hover:text-white transition-colors"
+                    className="size-8 grid place-items-center rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-white transition-colors"
                     title="Edit Member"
                   >
-                    <FiEdit2 className="size-3" />
+                    <FiEdit2 className="size-3.5" />
                   </button>
                   <button
                     type="button"
                     onClick={() => handleDelete(person._id || person.id)}
-                    className="size-7 grid place-items-center rounded bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-colors"
+                    className="size-8 grid place-items-center rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-colors"
                     title="Delete Member"
                   >
-                    <FiTrash2 className="size-3" />
+                    <FiTrash2 className="size-3.5" />
                   </button>
                 </div>
               </div>

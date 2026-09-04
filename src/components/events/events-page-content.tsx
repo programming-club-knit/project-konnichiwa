@@ -17,30 +17,53 @@ import {
   FiAward
 } from "react-icons/fi";
 import { Highlighter } from "@/components/ui/highlighter";
-import type { EventItem } from "@/lib/events";
+import { type EventItem, getEventDynamicStatus } from "@/lib/event-status";
 
 interface EventsPageContentProps {
   upcomingEvents: EventItem[];
   pastEvents: EventItem[];
+  liveEvents?: EventItem[];
 }
 
-export function EventsPageContent({ upcomingEvents, pastEvents }: EventsPageContentProps) {
+export function EventsPageContent({
+  upcomingEvents,
+  pastEvents,
+  liveEvents = [],
+}: EventsPageContentProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterType, setFilterType] = useState<"all" | "upcoming" | "past" | "online" | "offline">("all");
+  const [filterType, setFilterType] = useState<
+    "all" | "live" | "upcoming" | "past" | "online" | "offline"
+  >("all");
 
   const allEvents = useMemo(() => {
-    return [...upcomingEvents, ...pastEvents];
-  }, [upcomingEvents, pastEvents]);
+    return [...liveEvents, ...upcomingEvents, ...pastEvents];
+  }, [liveEvents, upcomingEvents, pastEvents]);
 
-  // Filtered list
+  // Dynamically partition and track timing
+  const liveList = useMemo(() => {
+    return allEvents.filter((e) => getEventDynamicStatus(e).status === "live");
+  }, [allEvents]);
+
+  const upcomingList = useMemo(() => {
+    return allEvents.filter((e) => getEventDynamicStatus(e).status === "upcoming");
+  }, [allEvents]);
+
+  const pastList = useMemo(() => {
+    return allEvents.filter((e) => getEventDynamicStatus(e).status === "past");
+  }, [allEvents]);
+
+  // Filtered list with intelligent sorting: Live first, then upcoming (closest date), then past (newest)
   const filteredEvents = useMemo(() => {
-    return allEvents.filter((event) => {
-      const isPast = event.status?.toLowerCase() === "past" || event.status?.toLowerCase() === "completed" || Boolean(event.completed);
-      const isUpcoming = !isPast;
+    const filtered = allEvents.filter((event) => {
+      const timing = getEventDynamicStatus(event);
+      const isLive = timing.status === "live";
+      const isUpcoming = timing.status === "upcoming";
+      const isPast = timing.status === "past";
       const isOnline = event.eventType === "online";
       const isOffline = event.eventType === "offline" || !event.eventType;
 
       // Filter by category tab
+      if (filterType === "live" && !isLive) return false;
       if (filterType === "upcoming" && !isUpcoming) return false;
       if (filterType === "past" && !isPast) return false;
       if (filterType === "online" && !isOnline) return false;
@@ -58,17 +81,88 @@ export function EventsPageContent({ upcomingEvents, pastEvents }: EventsPageCont
 
       return true;
     });
+
+    // If viewing all, online, or offline, sort: Live first -> Upcoming (earliest first) -> Past (latest first)
+    return filtered.sort((a, b) => {
+      const timingA = getEventDynamicStatus(a);
+      const timingB = getEventDynamicStatus(b);
+
+      const rank = (status: string) => (status === "live" ? 0 : status === "upcoming" ? 1 : 2);
+      const rankA = rank(timingA.status);
+      const rankB = rank(timingB.status);
+
+      if (rankA !== rankB) return rankA - rankB;
+
+      const dateA = a.date ? new Date(a.date).getTime() : 0;
+      const dateB = b.date ? new Date(b.date).getTime() : 0;
+
+      if (rankA === 1) {
+        // Upcoming: soonest event first
+        return dateA - dateB;
+      }
+      // Past or Live: newest date first
+      return dateB - dateA;
+    });
   }, [allEvents, filterType, searchQuery]);
 
-  // Featured flagship spotlight: First upcoming event if available
-  const featuredEvent = upcomingEvents.length > 0 ? upcomingEvents[0] : null;
+  // Featured flagship spotlight: Live event first, then next upcoming event, or most recent
+  const featuredEvent = useMemo(() => {
+    if (liveList.length > 0) return liveList[0];
+    if (upcomingList.length > 0) return upcomingList[0];
+    if (allEvents.length > 0) return allEvents[0];
+    return null;
+  }, [liveList, upcomingList, allEvents]);
+
+  const featuredTiming = useMemo(() => {
+    return featuredEvent ? getEventDynamicStatus(featuredEvent) : null;
+  }, [featuredEvent]);
+
+  // Dynamic filter tabs
+  const filterTabs = useMemo(() => {
+    const tabs: {
+      id: "all" | "live" | "upcoming" | "past" | "online" | "offline";
+      label: string;
+      count: number;
+      isLiveTab?: boolean;
+    }[] = [{ id: "all", label: "All Events", count: allEvents.length }];
+
+    if (liveList.length > 0) {
+      tabs.push({
+        id: "live",
+        label: "Live Now",
+        count: liveList.length,
+        isLiveTab: true,
+      });
+    }
+
+    tabs.push(
+      { id: "upcoming", label: "Upcoming", count: upcomingList.length },
+      { id: "past", label: "Archived Vault", count: pastList.length },
+      {
+        id: "online",
+        label: "Online",
+        count: allEvents.filter((e) => e.eventType === "online").length,
+      },
+      {
+        id: "offline",
+        label: "Campus Offline",
+        count: allEvents.filter((e) => e.eventType !== "online").length,
+      }
+    );
+
+    return tabs;
+  }, [allEvents, liveList.length, upcomingList.length, pastList.length]);
 
   return (
-    <div className="relative min-h-screen bg-[#090B14] pt-24 pb-20 flex flex-col selection:bg-[#FF355E]/30 font-sans text-slate-200">
-      {/* Background Ambience */}
-      <div className="pointer-events-none absolute inset-0 z-0 opacity-10">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:32px_32px]" />
-        <div className="absolute left-1/2 top-10 -translate-x-1/2 -z-10 h-[380px] w-[500px] rounded-full bg-[#FF355E] opacity-15 blur-[140px]" />
+    <div className="relative min-h-screen bg-[#0f0f0f] pt-24 pb-20 flex flex-col selection:bg-[#FF355E]/30 font-sans text-slate-200">
+      {/* Vertical Dashed Guidelines Overlay matching /people */}
+      <div className="pointer-events-none absolute inset-0 z-0 opacity-40">
+        <div className="mx-auto h-full max-w-7xl px-6 lg:px-12 grid grid-cols-5 border-x border-dashed border-white/5">
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+        </div>
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-12 pt-10 pb-6 w-full">
@@ -89,27 +183,32 @@ export function EventsPageContent({ upcomingEvents, pastEvents }: EventsPageCont
         <div className="mt-10 mb-10 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 p-2 rounded-2xl bg-[#121626] border border-white/10 shadow-lg">
           {/* Filter Pills */}
           <div className="flex items-center gap-1.5 overflow-x-auto p-1 scrollbar-none">
-            {[
-              { id: "all", label: "All Events", count: allEvents.length },
-              { id: "upcoming", label: "Live & Upcoming", count: upcomingEvents.length },
-              { id: "past", label: "Archived Vault", count: pastEvents.length },
-              { id: "online", label: "Online", count: allEvents.filter(e => e.eventType === "online").length },
-              { id: "offline", label: "Campus Offline", count: allEvents.filter(e => e.eventType !== "online").length },
-            ].map((tab) => (
+            {filterTabs.map((tab) => (
               <button
                 key={tab.id}
                 type="button"
-                onClick={() => setFilterType(tab.id as any)}
+                onClick={() => setFilterType(tab.id)}
                 className={`px-4 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all flex items-center gap-2 ${
                   filterType === tab.id
-                    ? "bg-white text-slate-900 font-semibold shadow-md"
+                    ? tab.isLiveTab
+                      ? "bg-emerald-400 text-slate-950 font-bold shadow-md shadow-emerald-500/20"
+                      : "bg-white text-slate-900 font-semibold shadow-md"
+                    : tab.isLiveTab
+                    ? "text-emerald-300 hover:text-emerald-200 hover:bg-emerald-500/10 border border-emerald-500/30"
                     : "text-slate-400 hover:text-white hover:bg-white/5"
                 }`}
               >
+                {tab.isLiveTab && (
+                  <span className="size-2 rounded-full bg-emerald-400 animate-ping" />
+                )}
                 <span>{tab.label}</span>
-                <span className={`text-[11px] px-1.5 py-0.5 rounded ${
-                  filterType === tab.id ? "bg-slate-900/10 text-slate-900 font-semibold" : "bg-white/10 text-slate-400"
-                }`}>
+                <span
+                  className={`text-[11px] px-1.5 py-0.5 rounded ${
+                    filterType === tab.id
+                      ? "bg-slate-900/15 text-slate-900 font-bold"
+                      : "bg-white/10 text-slate-400"
+                  }`}
+                >
                   {tab.count}
                 </span>
               </button>
@@ -129,17 +228,27 @@ export function EventsPageContent({ upcomingEvents, pastEvents }: EventsPageCont
           </div>
         </div>
 
-        {/* FEATURED FLAGSHIP SPOTLIGHT (Shown when filter is 'all' or 'upcoming' and no search query) */}
-        {!searchQuery && (filterType === "all" || filterType === "upcoming") && featuredEvent && (
+        {/* FEATURED FLAGSHIP SPOTLIGHT (Shown when filter is 'all', 'live', or 'upcoming' and no search query) */}
+        {!searchQuery && (filterType === "all" || filterType === "live" || filterType === "upcoming") && featuredEvent && featuredTiming && (
           <div className="mb-14">
             <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 tracking-wide uppercase mb-3">
-              <span className="size-2 rounded-full bg-emerald-400 animate-ping" />
-              <span>Flagship Spotlight</span>
+              <span
+                className={`size-2 rounded-full ${
+                  featuredTiming.isLive ? "bg-emerald-400 animate-ping" : "bg-[#FF355E]"
+                }`}
+              />
+              <span>
+                {featuredTiming.isLive
+                  ? "Live Competition Spotlight"
+                  : featuredTiming.isPast
+                  ? "Recent Event Spotlight"
+                  : "Flagship Spotlight"}
+              </span>
             </div>
 
-            <div className="relative overflow-hidden rounded-3xl bg-[#121626] border border-white/15 hover:border-white/25 transition-all shadow-2xl group flex flex-col lg:flex-row items-stretch">
+            <div className="relative overflow-hidden rounded-3xl bg-[#141414] border border-white/15 hover:border-white/25 transition-all shadow-2xl group flex flex-col lg:flex-row items-stretch">
               {/* Left: Poster / Cover Showcase */}
-              <div className="relative lg:w-1/2 min-h-[280px] sm:min-h-[340px] bg-[#070913] flex items-center justify-center overflow-hidden border-b lg:border-b-0 lg:border-r border-white/10">
+              <div className="relative lg:w-1/2 min-h-[280px] sm:min-h-[340px] bg-[#1a1a1a] flex items-center justify-center overflow-hidden border-b lg:border-b-0 lg:border-r border-white/10">
                 {featuredEvent.coverImageUrl ? (
                   <Image
                     src={featuredEvent.coverImageUrl}
@@ -163,8 +272,19 @@ export function EventsPageContent({ upcomingEvents, pastEvents }: EventsPageCont
 
                 {/* Floating Format Badges */}
                 <div className="absolute top-4 left-4 flex flex-wrap gap-2 pointer-events-none">
-                  <span className="px-3 py-1 rounded-full bg-[#FF355E] text-white font-semibold text-xs shadow-lg">
-                    {featuredEvent.status || "Upcoming"}
+                  <span
+                    className={`px-3 py-1 rounded-full font-semibold text-xs shadow-lg flex items-center gap-1.5 ${
+                      featuredTiming.isLive
+                        ? "bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.3)] backdrop-blur-md"
+                        : featuredTiming.isPast
+                        ? "bg-slate-900/90 border border-white/20 text-slate-300 backdrop-blur-md"
+                        : "bg-[#FF355E] text-white"
+                    }`}
+                  >
+                    {featuredTiming.isLive && (
+                      <span className="size-1.5 rounded-full bg-emerald-400 animate-ping" />
+                    )}
+                    {featuredTiming.label}
                   </span>
                   {featuredEvent.eventType === "online" ? (
                     <span className="px-3 py-1 rounded-full bg-[#090B14]/90 backdrop-blur-md border border-cyan-500/30 text-cyan-300 text-xs font-medium flex items-center gap-1.5">
@@ -217,11 +337,25 @@ export function EventsPageContent({ upcomingEvents, pastEvents }: EventsPageCont
                   </p>
 
                   {/* Deadline Notice */}
-                  {featuredEvent.registrationDeadline && (
-                    <div className="p-3 rounded-xl bg-[#090B14] border border-amber-500/20 flex items-center gap-2.5 text-xs text-amber-300">
-                      <FiClock className="size-4 shrink-0 text-amber-400 animate-pulse" />
+                  {featuredEvent.registrationDeadline && !featuredTiming.isPast && (
+                    <div
+                      className={`p-3 rounded-xl border flex items-center gap-2.5 text-xs ${
+                        featuredTiming.isRegistrationClosed
+                          ? "bg-red-500/10 border-red-500/30 text-red-300"
+                          : "bg-[#0f0f0f] border-amber-500/30 text-amber-300"
+                      }`}
+                    >
+                      <FiClock
+                        className={`size-4 shrink-0 ${
+                          featuredTiming.isRegistrationClosed
+                            ? "text-red-400"
+                            : "text-amber-400 animate-pulse"
+                        }`}
+                      />
                       <span>
-                        Registration Closes: {new Date(featuredEvent.registrationDeadline).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                        {featuredTiming.isRegistrationClosed
+                          ? `Registration Closed (Deadline was ${featuredTiming.registrationDeadlineLabel})`
+                          : `Registration Closes: ${featuredTiming.registrationDeadlineLabel}`}
                       </span>
                     </div>
                   )}
@@ -231,9 +365,22 @@ export function EventsPageContent({ upcomingEvents, pastEvents }: EventsPageCont
                 <div className="pt-4 border-t border-white/10 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                   <Link
                     href={`/events/${featuredEvent.slug || featuredEvent._id}`}
-                    className="flex-1 inline-flex items-center justify-center gap-2 py-3 px-5 rounded-xl bg-white text-slate-900 font-semibold text-xs tracking-wide hover:bg-slate-200 transition-all shadow-md"
+                    className={`flex-1 inline-flex items-center justify-center gap-2 py-3 px-5 rounded-xl font-semibold text-xs tracking-wide transition-all shadow-md ${
+                      featuredTiming.isLive
+                        ? "bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-bold shadow-[0_0_15px_rgba(52,211,153,0.4)]"
+                        : featuredTiming.isPast
+                        ? "bg-white/10 hover:bg-white/20 text-white border border-white/15"
+                        : "bg-white text-slate-900 hover:bg-slate-200 font-semibold"
+                    }`}
                   >
-                    View Details & Register <FiArrowRight className="size-4" />
+                    {featuredTiming.isLive
+                      ? "Enter Live Event & Details"
+                      : featuredTiming.isPast
+                      ? "View Archived Event"
+                      : featuredTiming.isRegistrationClosed
+                      ? "View Event Details"
+                      : "View Details & Register"}{" "}
+                    <FiArrowRight className="size-4" />
                   </Link>
                   {featuredEvent.ruleBookUrl && (
                     <a
@@ -259,8 +406,10 @@ export function EventsPageContent({ upcomingEvents, pastEvents }: EventsPageCont
               <span>
                 {filterType === "past"
                   ? "Archived Events Vault"
+                  : filterType === "live"
+                  ? "Live Competitions Happening Now"
                   : filterType === "upcoming"
-                  ? "Live & Upcoming Competitions"
+                  ? "Upcoming Competitions & Tournaments"
                   : "All Club Events & Competitions"}
               </span>
             </h2>
@@ -272,7 +421,8 @@ export function EventsPageContent({ upcomingEvents, pastEvents }: EventsPageCont
           {filteredEvents.length > 0 ? (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {filteredEvents.map((event) => {
-                const isPast = event.status?.toLowerCase() === "past" || event.status?.toLowerCase() === "completed" || Boolean(event.completed);
+                const timing = getEventDynamicStatus(event);
+                const { isPast, isLive, isUpcoming, label } = timing;
 
                 return (
                   <div
@@ -303,12 +453,19 @@ export function EventsPageContent({ upcomingEvents, pastEvents }: EventsPageCont
 
                       {/* Top Glass Badges */}
                       <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 pointer-events-none">
-                        <span className={`px-2.5 py-0.5 rounded text-xs font-semibold border shadow-md ${
-                          isPast
-                            ? "bg-slate-900/90 border-white/20 text-slate-300"
-                            : "bg-[#FF355E] border-transparent text-white"
-                        }`}>
-                          {isPast ? "Concluded" : event.status || "Upcoming"}
+                        <span
+                          className={`px-2.5 py-0.5 rounded text-xs font-semibold border shadow-md flex items-center gap-1.5 ${
+                            isLive
+                              ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.3)] backdrop-blur-md"
+                              : isPast
+                              ? "bg-slate-900/90 border-white/20 text-slate-400 backdrop-blur-md"
+                              : "bg-[#FF355E] border-transparent text-white shadow-[0_2px_8px_rgba(255,53,94,0.3)]"
+                          }`}
+                        >
+                          {isLive && (
+                            <span className="size-1.5 rounded-full bg-emerald-400 animate-ping" />
+                          )}
+                          {label}
                         </span>
 
                         <span className="px-2.5 py-0.5 rounded bg-[#090B14]/85 backdrop-blur-md border border-white/15 text-xs text-slate-200 flex items-center gap-1.5">
@@ -364,12 +521,20 @@ export function EventsPageContent({ upcomingEvents, pastEvents }: EventsPageCont
                         <Link
                           href={`/events/${event.slug || event._id}`}
                           className={`flex-1 py-2.5 px-4 rounded-xl text-xs tracking-wide flex items-center justify-center gap-1.5 transition-all ${
-                            isPast
+                            isLive
+                              ? "bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-bold shadow-[0_0_12px_rgba(52,211,153,0.35)]"
+                              : isPast
                               ? "bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white font-medium"
                               : "bg-white text-slate-900 hover:bg-slate-200 font-semibold shadow-sm"
                           }`}
                         >
-                          <span>{isPast ? "View Archive & Details" : "Explore & Register"}</span>
+                          <span>
+                            {isLive
+                              ? "Join Live Event"
+                              : isPast
+                              ? "View Archive & Details"
+                              : "Explore & Register"}
+                          </span>
                           <FiArrowRight className="size-3.5 group-hover:translate-x-0.5 transition-transform" />
                         </Link>
                       </div>

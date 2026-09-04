@@ -6,10 +6,12 @@ export async function GET() {
   try {
     await connectDB();
 
-    // Fetch approved team members who have an active post assigned and a valid batch
+    // Fetch approved executive members who have a post assigned or admin/member role
     const members = await User.find({
-      post: { $exists: true, $nin: ["", null] },
-      batch: { $exists: true, $nin: [null] },
+      $or: [
+        { post: { $exists: true, $ne: "" } },
+        { role: { $in: ["admin", "member"] } }
+      ],
       status: "approved"
     })
       .select("firstName lastName username email mobile batch post role status imageSrc")

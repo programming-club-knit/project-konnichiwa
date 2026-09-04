@@ -4,25 +4,54 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { FiLock, FiMail, FiArrowRight, FiArrowLeft, FiLoader } from 'react-icons/fi';
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+
+const adminLoginSchema = z.object({
+  email: z
+    .string()
+    .min(1, "Email is required")
+    .email("Please enter a valid email address"),
+  password: z
+    .string()
+    .min(1, "Password is required")
+    .min(6, "Password must be at least 6 characters"),
+});
+
+type AdminLoginFormValues = z.infer<typeof adminLoginSchema>;
 
 export function AdminLoginForm() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
+  const form = useForm<AdminLoginFormValues>({
+    resolver: zodResolver(adminLoginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = async (values: AdminLoginFormValues) => {
+    setServerError(null);
 
     try {
       const res = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(values),
       });
 
       const data = await res.json();
@@ -31,125 +60,154 @@ export function AdminLoginForm() {
         throw new Error(data.message || "Failed to log in");
       }
 
-      // On success, redirect to the admin dashboard
-      router.push("/admin/dashboard");
+      // On success, redirect to the admin dashboard with fresh page load
+      window.location.href = "/admin/dashboard";
     } catch (err: any) {
-      setError(err.message || "An unexpected error occurred");
-    } finally {
-      setLoading(false);
+      setServerError(err.message || "An unexpected error occurred");
     }
   };
 
+  const loading = form.formState.isSubmitting;
+
   return (
-    <div data-admin-panel="true" className="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden bg-[#090B14] font-sans">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden bg-[#0f0f0f] font-sans">
+      {/* Vertical Dashed Guidelines Overlay to match UI layout style */}
+      <div className="pointer-events-none absolute inset-0 z-0 opacity-40">
+        <div className="mx-auto h-full max-w-7xl px-6 lg:px-12 grid grid-cols-5 border-x border-dashed border-white/5">
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+        </div>
+      </div>
+
       <div className="relative z-10 w-full max-w-md px-6 font-sans">
         
         {/* Back to Home Button */}
         <div className="mb-6">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md border border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 text-xs font-semibold tracking-wide transition-all group"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 bg-white/5 text-[#8C93B0] hover:text-white hover:border-[#FF355E]/50 hover:bg-[#FF355E]/10 text-xs font-bold uppercase tracking-wider transition-all shadow-md group"
           >
-            <FiArrowLeft className="size-3.5 group-hover:-translate-x-0.5 transition-transform" />
+            <FiArrowLeft className="size-4 group-hover:-translate-x-1 transition-transform text-[#FF355E]" />
             Back to Home
           </Link>
         </div>
 
-        <div className="flex flex-col items-center mb-6">
-          <div className="grid size-14 place-items-center rounded-lg border border-white/10 bg-[#121626] mb-4">
+        <div className="flex flex-col items-center mb-8">
+          <div className="grid size-16 place-items-center rounded-2xl border border-white/10 bg-[#141414] shadow-xl mb-6">
             <Image
               src="/logo.png"
               alt="PTSC logo"
-              width={36}
-              height={36}
-              className="size-9 object-contain"
+              width={40}
+              height={40}
+              className="size-10 object-contain"
             />
           </div>
-          <h1 className="text-2xl font-bold text-white font-sans tracking-tight mb-1">
-            Admin Console Login
+          <h1 className="text-3xl font-black text-white font-sans tracking-tight mb-2 uppercase">
+            Admin Login
           </h1>
-          <p className="text-slate-400 text-xs text-center font-sans">
-            Enter credentials to access the PTSC administrative dashboard.
+          <p className="text-[#8C93B0] text-sm text-center font-sans font-medium">
+            Enter credentials to access the PTSC dashboard.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5 p-6 sm:p-7 rounded-lg border border-white/10 bg-[#121626] font-sans">
-          {error && (
-            <div className="p-3 rounded-md bg-red-500/10 border border-red-500/20 text-red-300 text-xs font-medium text-center">
-              {error}
+        <div className="p-8 rounded-2xl border border-white/10 bg-[#141414] shadow-xl font-sans">
+          {serverError && (
+            <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-[#FF4D70] text-xs font-semibold font-sans uppercase tracking-wider text-center">
+              {serverError}
             </div>
           )}
 
-          <div className="flex flex-col gap-1.5 font-sans">
-            <label className="text-xs font-semibold text-slate-300">
-              Email Address
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                <FiMail className="size-4" />
-              </div>
-              <input
-                type="email"
-                placeholder="admin@ptsc.knit.ac.in"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-[#090B14] border border-white/15 rounded-md py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30 transition-colors font-sans"
-                required
-                disabled={loading}
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5 font-sans">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email Address</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#8C93B0]">
+                          <FiMail className="size-4" />
+                        </div>
+                        <Input
+                          type="email"
+                          placeholder="admin@ptsc.knit.ac.in"
+                          className="pl-11"
+                          disabled={loading}
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-          </div>
 
-          <div className="flex flex-col gap-1.5 font-sans">
-            <div className="flex items-center justify-between font-sans">
-              <label className="text-xs font-semibold text-slate-300">
-                Password
-              </label>
-            </div>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                <FiLock className="size-4" />
-              </div>
-              <input
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-[#090B14] border border-white/15 rounded-md py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30 transition-colors font-sans"
-                required
-                disabled={loading}
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Password</FormLabel>
+                      <a href="#" className="text-xs font-bold text-[#FF355E] hover:underline transition-all font-sans">
+                        Forgot?
+                      </a>
+                    </div>
+                    <FormControl>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#8C93B0]">
+                          <FiLock className="size-4" />
+                        </div>
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          className="pl-11"
+                          disabled={loading}
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
+
+              <Button
+                type="submit"
+                variant="sleek"
+                size="lg"
+                className="w-full mt-2 justify-center shadow-lg gap-2 font-sans"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <FiLoader className="size-4 animate-spin" />
+                    Signing in...
+                  </>
+                ) : (
+                  <>
+                    Sign In <FiArrowRight className="size-4" />
+                  </>
+                )}
+              </Button>
+            </form>
+          </Form>
+
+          <div className="mt-6 text-center space-y-2 font-sans">
+            <p className="text-xs text-[#8C93B0] font-sans">
+              PTSC Executive Member?{" "}
+              <Link href="/admin/register" className="text-[#FF355E] font-bold hover:underline font-sans">
+                Register Here
+              </Link>
+            </p>
+            <p className="text-[11px] text-white/30 uppercase tracking-widest font-sans">
+              Authorized Personnel Only
+            </p>
           </div>
-
-          <button
-            type="submit"
-            className="w-full mt-2 py-2.5 rounded-md bg-white text-black font-semibold text-xs hover:bg-slate-200 transition-all flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <FiLoader className="size-3.5 animate-spin" />
-                Signing in...
-              </>
-            ) : (
-              <>
-                Sign In <FiArrowRight className="size-3.5" />
-              </>
-            )}
-          </button>
-        </form>
-
-        <div className="mt-6 text-center space-y-1.5 font-sans">
-          <p className="text-xs text-slate-400 font-sans">
-            PTSC Executive Member?{" "}
-            <Link href="/admin/register" className="text-white font-medium hover:underline">
-              Register Here
-            </Link>
-          </p>
-          <p className="text-[11px] text-slate-500 font-mono">
-            Authorized Personnel Only
-          </p>
         </div>
       </div>
     </div>

@@ -46,7 +46,7 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 
-  --color-pink-primary: #FF355E;
+  --color-pink-primary: #F47174;
   --color-gold-accent: #FFB800;
   --color-navy-dark: #0B0D19;
   --color-navy-card: #121526;
@@ -89,6 +89,7 @@
 }
 
 .dark {
+  color-scheme: dark;
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -248,7 +249,7 @@ body.has-custom-pointer [class*="cursor-pointer"] {
 
 /* Buttons matching Playgame theme */
 .playgame-btn-pink {
-  background-color: #FF355E;
+  background-color: #F47174;
   color: #FFFFFF;
   font-weight: 600;
   transition: all 0.2s ease-in-out;
@@ -293,4 +294,34 @@ body.has-custom-pointer [class*="cursor-pointer"] {
 
 .playgame-gold-link:hover {
   color: #FFC933;
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Date and datetime picker native indicator styling */
+input[type="date"],
+input[type="datetime-local"],
+input[type="time"] {
+  color-scheme: dark;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: brightness(0) invert(1);
+  opacity: 0.85;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover,
+input[type="time"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  transform: scale(1.1);
 }

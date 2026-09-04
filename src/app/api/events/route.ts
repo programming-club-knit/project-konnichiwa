@@ -95,7 +95,7 @@ export async function POST(request: Request) {
       eventType: eventType === "online" ? "online" : "offline",
       platform: eventType === "online" ? platform : undefined,
       meetLink: eventType === "online" ? meetLink : undefined,
-      registrationDeadline: registrationDeadline || undefined,
+      registrationDeadline: registrationDeadline ? new Date(registrationDeadline) : undefined,
       status,
       googleFormLink,
       whatsappGroupLink,

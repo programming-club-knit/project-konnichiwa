@@ -125,7 +125,7 @@ export function AchievementsSection() {
   }, [cards, activeFilter, searchQuery]);
 
   return (
-    <section id="achievements" className="relative bg-[#0B0D19] py-24 border-b border-white/5 font-sans">
+    <section id="achievements" className="relative bg-[#0f0f0f] py-24 border-b border-white/5 font-sans">
       {/* Vertical Dashed Guidelines Overlay */}
       <div className="pointer-events-none absolute inset-0 z-0 opacity-40">
         <div className="mx-auto h-full max-w-7xl px-6 lg:px-12 grid grid-cols-5 border-x border-dashed border-white/5">
@@ -141,8 +141,8 @@ export function AchievementsSection() {
         <div className="text-center mb-12">
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white font-sans leading-tight">
             We Build. We Ship.{" "}
-            <Highlighter action="underline" color="#FF355E" strokeWidth={4}>
-              <span className="text-[#FF355E]">We Win.</span>
+            <Highlighter action="underline" color="#F47174" strokeWidth={4}>
+              <span className="text-[#F47174]">We Win.</span>
             </Highlighter>
           </h1>
           <p className="mt-4 text-sm sm:text-base text-[#8C93B0] max-w-xl mx-auto font-sans">
@@ -158,7 +158,7 @@ export function AchievementsSection() {
               onClick={() => setActiveFilter(category)}
               className={`rounded-full px-5 py-2 text-xs font-black tracking-wider transition-all duration-200 ${
                 activeFilter === category
-                  ? "bg-[#FF355E] text-white shadow-none"
+                  ? "bg-[#F47174] text-white shadow-none"
                   : "bg-white/5 text-[#8C93B0] border border-white/10 hover:bg-white/10 hover:text-white"
               }`}
             >
@@ -174,7 +174,7 @@ export function AchievementsSection() {
               placeholder="Search member or event..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="rounded-full bg-white/5 border border-white/10 pl-10 pr-4 py-2 text-xs font-semibold text-white placeholder-[#8C93B0] outline-none focus:border-[#FF355E] transition-colors w-44 sm:w-56"
+              className="rounded-full bg-white/5 border border-white/10 pl-10 pr-4 py-2 text-xs font-semibold text-white placeholder-[#8C93B0] outline-none focus:border-[#F47174] transition-colors w-44 sm:w-56"
             />
           </div>
         </div>
@@ -182,7 +182,7 @@ export function AchievementsSection() {
         {/* Exact Original Member Cards Grid */}
         {loading ? (
           <div className="p-16 text-center border border-white/10 rounded-3xl bg-[#121526] text-white/50 text-xs font-mono flex items-center justify-center gap-2">
-            <FiLoader className="size-5 animate-spin text-[#FF355E]" /> Loading showcase achievements...
+            <FiLoader className="size-5 animate-spin text-[#F47174]" /> Loading showcase achievements...
           </div>
         ) : filteredMembers.length === 0 ? (
           <div className="p-16 text-center border border-white/10 rounded-3xl bg-[#121526] text-[#8C93B0] text-sm font-sans">

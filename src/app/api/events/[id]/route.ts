@@ -85,7 +85,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
         ...(eventType !== undefined ? { eventType: eventType === 'online' ? 'online' : 'offline' } : {}),
         platform: eventType === 'online' ? platform : '',
         meetLink: eventType === 'online' ? meetLink : '',
-        registrationDeadline: registrationDeadline || null,
+        registrationDeadline: registrationDeadline ? new Date(registrationDeadline) : null,
         ruleBookUrl,
         useCustomForm: Boolean(useCustomForm),
         ...(forceGoogleForm !== undefined

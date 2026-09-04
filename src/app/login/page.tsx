@@ -3,25 +3,54 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { FiMail, FiLock, FiArrowRight, FiArrowLeft, FiLoader } from "react-icons/fi";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+
+const loginSchema = z.object({
+  email: z
+    .string()
+    .min(1, "Email is required")
+    .email("Please enter a valid email address"),
+  password: z
+    .string()
+    .min(1, "Password is required")
+    .min(6, "Password must be at least 6 characters"),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = async (values: LoginFormValues) => {
+    setServerError(null);
 
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(values),
       });
 
       const data = await res.json();
@@ -31,110 +60,136 @@ export default function LoginPage() {
       }
 
       if (data.role === "admin") {
-        router.push("/admin/dashboard");
+        window.location.href = "/admin/dashboard";
       } else {
-        router.push("/profile");
+        window.location.href = "/profile";
       }
     } catch (err: any) {
-      setError(err.message || "Log in failed");
-    } finally {
-      setLoading(false);
+      setServerError(err.message || "Log in failed");
     }
   };
 
+  const loading = form.formState.isSubmitting;
+
   return (
-    <div className="min-h-screen w-full bg-[#090B14] text-white pt-16 pb-16 flex flex-col items-center justify-center relative overflow-hidden font-sans">
+    <div className="min-h-screen w-full bg-[#0f0f0f] text-white pt-16 pb-16 flex flex-col items-center justify-center relative overflow-hidden selection:bg-[#FF355E]/30 font-sans">
+      {/* Vertical Dashed Guidelines Overlay matching /people */}
+      <div className="pointer-events-none absolute inset-0 z-0 opacity-40">
+        <div className="mx-auto h-full max-w-7xl px-6 lg:px-12 grid grid-cols-5 border-x border-dashed border-white/5">
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+        </div>
+      </div>
+
       <div className="relative z-10 w-full max-w-md px-6 font-sans">
         
         {/* Back to Home Button */}
         <div className="mb-6">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md border border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 text-xs font-semibold tracking-wide transition-all group"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 bg-white/5 text-[#8C93B0] hover:text-white hover:border-[#FF355E]/50 hover:bg-[#FF355E]/10 text-xs font-bold uppercase tracking-wider transition-all shadow-md group"
           >
-            <FiArrowLeft className="size-3.5 group-hover:-translate-x-0.5 transition-transform" />
+            <FiArrowLeft className="size-4 group-hover:-translate-x-1 transition-transform text-[#FF355E]" />
             Back to Home
           </Link>
         </div>
 
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold tracking-tight text-white font-sans">
-            Member Log In
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-black tracking-tight text-white uppercase font-sans">
+            User Log In
           </h1>
-          <p className="mt-1 text-xs text-slate-400 font-sans">
+          <p className="mt-2 text-sm text-[#8C93B0] font-sans">
             Log in to manage your profile and event registrations.
           </p>
         </div>
 
-        <div className="rounded-lg border border-white/10 bg-[#121626] p-6 sm:p-7 font-sans">
-          {error && (
-            <div className="mb-5 p-3 rounded-md bg-red-500/10 border border-red-500/20 text-red-300 text-xs font-medium text-center">
-              {error}
+        <div className="rounded-2xl border border-white/10 bg-[#141414] p-8 shadow-2xl font-sans">
+          {serverError && (
+            <div className="mb-6 p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-[#FF4D70] text-xs font-sans font-bold text-center">
+              {serverError}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4 font-sans">
-            <div>
-              <label className="text-xs font-semibold text-slate-300 block mb-1">
-                Email Address
-              </label>
-              <div className="relative">
-                <FiMail className="size-4 absolute left-3.5 top-3 text-slate-400" />
-                <input
-                  type="email"
-                  required
-                  placeholder="name@knit.ac.in"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-[#090B14] border border-white/15 rounded-md py-2.5 pl-10 pr-4 text-sm text-white font-sans placeholder:text-slate-500 focus:outline-none focus:border-white/30"
-                />
-              </div>
-            </div>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 font-sans">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email Address</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <FiMail className="size-4 absolute left-3.5 top-3.5 text-[#8C93B0] pointer-events-none z-10" />
+                        <Input
+                          type="email"
+                          placeholder="name@knit.ac.in"
+                          className="pl-10"
+                          disabled={loading}
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div>
-              <label className="text-xs font-semibold text-slate-300 block mb-1">
-                Password
-              </label>
-              <div className="relative">
-                <FiLock className="size-4 absolute left-3.5 top-3 text-slate-400" />
-                <input
-                  type="password"
-                  required
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-[#090B14] border border-white/15 rounded-md py-2.5 pl-10 pr-4 text-sm text-white font-sans placeholder:text-slate-500 focus:outline-none focus:border-white/30"
-                />
-              </div>
-            </div>
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <FiLock className="size-4 absolute left-3.5 top-3.5 text-[#8C93B0] pointer-events-none z-10" />
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          className="pl-10"
+                          disabled={loading}
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full mt-2 py-2.5 rounded-md bg-white text-black font-semibold text-xs hover:bg-slate-200 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
-            >
-              {loading ? (
-                <>
-                  <FiLoader className="size-3.5 animate-spin" /> Authenticating...
-                </>
-              ) : (
-                <>
-                  Log In <FiArrowRight className="size-3.5" />
-                </>
-              )}
-            </button>
-          </form>
+              <Button
+                type="submit"
+                variant="sleek"
+                size="lg"
+                className="w-full mt-2 justify-center shadow-lg gap-2 font-sans"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <FiLoader className="size-4 animate-spin" /> Authenticating...
+                  </>
+                ) : (
+                  <>
+                    Log In <FiArrowRight className="size-4" />
+                  </>
+                )}
+              </Button>
+            </form>
+          </Form>
 
-          <div className="mt-5 pt-4 border-t border-white/10 text-center space-y-1.5 font-sans">
-            <p className="text-xs text-slate-400">
+          <div className="mt-6 pt-5 border-t border-white/10 text-center space-y-2 font-sans">
+            <p className="text-xs text-[#8C93B0]">
               Don&apos;t have an account?{" "}
-              <Link href="/register" className="text-white font-medium hover:underline">
+              <Link href="/register" className="text-[#FF355E] font-bold hover:underline">
                 Register here
               </Link>
             </p>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-[#8C93B0]">
               PTSC Admin?{" "}
-              <Link href="/admin" className="text-white font-medium hover:underline">
+              <Link href="/admin" className="text-white/80 font-bold hover:underline">
                 Admin Login
               </Link>
             </p>

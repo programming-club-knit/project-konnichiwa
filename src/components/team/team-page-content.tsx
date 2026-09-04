@@ -165,11 +165,15 @@ export function TeamPageContent() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#0B0D19] py-24 selection:bg-[#FF355E]/30">
-      {/* Background Grid Pattern */}
-      <div className="pointer-events-none absolute inset-0 z-0 opacity-[0.15]">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
-        <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-[#FF355E] opacity-20 blur-[100px]"></div>
+    <div className="relative min-h-screen bg-[#0f0f0f] py-24 selection:bg-[#FF355E]/30 font-sans">
+      {/* Vertical Dashed Guidelines Overlay matching /people */}
+      <div className="pointer-events-none absolute inset-0 z-0 opacity-40">
+        <div className="mx-auto h-full max-w-7xl px-6 lg:px-12 grid grid-cols-5 border-x border-dashed border-white/5">
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+        </div>
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-12 pt-12">
@@ -233,7 +237,7 @@ export function TeamPageContent() {
 
         {/* Loading State */}
         {loading ? (
-          <div className="py-24 text-center text-white/40 font-mono text-sm flex items-center justify-center gap-3 border border-white/10 rounded-2xl bg-[#121528]">
+          <div className="py-24 text-center text-white/40 font-mono text-sm flex items-center justify-center gap-3 border border-white/10 rounded-2xl bg-[#141414]">
             <FiLoader className="size-6 animate-spin text-[#FF355E]" /> Loading team hierarchy...
           </div>
         ) : groupedHierarchy.length > 0 ? (
@@ -245,7 +249,7 @@ export function TeamPageContent() {
               return (
                 <div
                   key={sectionTitle}
-                  className="rounded-2xl border border-white/10 bg-[#121528]/80 backdrop-blur-md overflow-hidden transition-all duration-300 hover:border-white/20"
+                  className="rounded-2xl border border-white/10 bg-[#141414]/80 backdrop-blur-md overflow-hidden transition-all duration-300 hover:border-white/20"
                 >
                   {/* Collapsible Section Header Bar */}
                   <button
@@ -290,16 +294,16 @@ export function TeamPageContent() {
                           return (
                             <div
                               key={person._id || person.id || index}
-                              className="group/card relative overflow-hidden rounded-2xl bg-[#0B0D19] border border-white/10 transition-all duration-300 hover:border-[#FF355E]/50 flex flex-col shadow-lg"
+                              className="group/card relative overflow-hidden rounded-2xl bg-[#141414] border border-white/10 transition-all duration-300 hover:border-[#FF355E]/50 flex flex-col shadow-lg"
                             >
                               {/* Top Image Section */}
-                              <div className="relative h-64 w-full overflow-hidden bg-[#070913]">
+                              <div className="relative h-64 w-full overflow-hidden bg-[#1a1a1a]">
                                 <img
                                   src={userImage}
                                   alt={fullName}
                                   className="h-full w-full object-cover transition-transform duration-500 group-hover/card:scale-105"
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#0B0D19] to-transparent opacity-90" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-[#141414] to-transparent opacity-90" />
                               </div>
 
                               {/* Info Section */}

@@ -41,20 +41,35 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Deadline check — skip for authenticated users
-    const user = await getCurrentUser();
-    const deadline = event.registrationDeadline
-      ? new Date(event.registrationDeadline)
-      : event.date
-      ? new Date(event.date)
-      : null;
+    // Strict Deadline & Concluded Checks (Enforced for all registrants)
+    const now = new Date();
 
-    if (!user && deadline && new Date() > deadline) {
+    if (event.status === "past" || Boolean(event.completed)) {
       return NextResponse.json(
-        { success: false, message: "Registration deadline has passed" },
+        { success: false, message: "Registrations are closed. This event has already concluded." },
         { status: 400 }
       );
     }
+
+    if (event.registrationDeadline) {
+      const deadline = new Date(event.registrationDeadline);
+      if (!isNaN(deadline.getTime()) && now > deadline) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: `Registration deadline passed on ${deadline.toLocaleString("en-US", {
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}. Registrations are now closed.`,
+          },
+          { status: 400 }
+        );
+      }
+    }
+
+    const user = await getCurrentUser();
 
     // Generate registration ID
     let registrationId: string;

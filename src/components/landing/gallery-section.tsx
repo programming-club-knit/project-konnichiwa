@@ -1,124 +1,182 @@
-import { FiCamera, FiImage } from "react-icons/fi";
-import { SectionHeader } from "./section-header";
+"use client";
 
-export type GalleryItem = {
-  id: string;
-  title: string;
-  category: string;
-  date: string;
-  imageSrc: string;
-  alt: string;
-};
+import { useRef, useState, useEffect } from "react";
+import Image from "next/image";
+import { Highlighter } from "@/components/ui/highlighter";
+import { useScroll, useSpring, motion, AnimatePresence } from "motion/react";
 
-export const GALLERY_ITEMS: GalleryItem[] = [
+const GALLERY_ITEMS = [
   {
     id: "g1",
-    title: "CodeStorm Overnight Hackathon",
-    category: "Hackathons",
-    date: "Annual Flagship",
-    imageSrc: "/images/gallery-hackathon.jpg",
-    alt: "CodeStorm Hackathon moments",
+    src: "https://images.unsplash.com/photo-1644329466213-6ff58fb5d9c3?q=80&w=1331&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    title: "Hackathon Night",
+    subtitle: "36 hours of pure adrenaline",
+    desc: "When the sun goes down, the real coding begins. Our annual hackathon brings together the sharpest minds on campus for a marathon of innovation — fueled by caffeine, collaboration, and the thrill of building something from nothing.",
   },
   {
     id: "g2",
-    title: "Weekly CP Contest & Editorial Session",
-    category: "Contests",
-    date: "Every Weekend",
-    imageSrc: "/images/gallery-cp.jpg",
-    alt: "Competitive programming contest",
+    src: "https://images.unsplash.com/photo-1581833971358-2c8b550f87b3?w=1200",
+    title: "Bootcamp Sessions",
+    subtitle: "From zero to deployed",
+    desc: "Eight-week intensive tracks that take students from writing their first line of code to shipping production-ready full-stack applications. Mentored by seniors, powered by real-world projects.",
   },
   {
     id: "g3",
-    title: "Full-Stack Dev Bootcamp Sprint",
-    category: "Workshops",
-    date: "8-Week Track",
-    imageSrc: "/images/gallery-bootcamp.jpg",
-    alt: "Dev Bootcamp workshop",
+    src: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1200",
+    title: "CP Showdown",
+    subtitle: "Where logic meets speed",
+    desc: "Weekly rated contests with custom problem sets, real-time leaderboards, and editorial deep-dives. Our competitive programmers consistently rank among the best in national-level competitions.",
   },
   {
     id: "g4",
-    title: "Alumni Tech Talk & Speaker AMAs",
-    category: "Talks",
-    date: "Monthly",
-    imageSrc: "/images/gallery-talks.jpg",
-    alt: "Tech Talk presentation",
-  },
-  {
-    id: "g5",
-    title: "Open Source Contribution Day",
-    category: "OSS",
-    date: "Sprint Night",
-    imageSrc: "/images/gallery-oss.jpg",
-    alt: "Open Source Sprint",
-  },
-  {
-    id: "g6",
-    title: "PTSC Annual Community Meetup",
-    category: "Community",
-    date: "KNIT Campus",
-    imageSrc: "/images/gallery-meetup.jpg",
-    alt: "PTSC community gathering",
+    src: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1200",
+    title: "Community Meetups",
+    subtitle: "Ideas, coffee, and code",
+    desc: "Monthly gatherings where members share project demos, discuss emerging tech trends, and collaborate on open-source contributions. The best ideas always start with a good conversation.",
   },
 ];
 
 export function GallerySection() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end end"],
+  });
+
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 80,
+    damping: 28,
+    restDelta: 0.0001,
+  });
+
+  useEffect(() => {
+    return smoothProgress.on("change", (latest) => {
+      const idx = Math.min(
+        GALLERY_ITEMS.length - 1,
+        Math.max(0, Math.floor(latest * GALLERY_ITEMS.length))
+      );
+      setActiveIndex(idx);
+    });
+  }, [smoothProgress]);
+
+  const current = GALLERY_ITEMS[activeIndex];
+
   return (
-    <section id="gallery" className="relative bg-[#0B0D19] py-24">
-      {/* Vertical Dashed Guidelines Overlay */}
-      <div className="pointer-events-none absolute inset-0 z-0 opacity-40">
-        <div className="mx-auto h-full max-w-7xl px-6 lg:px-12 grid grid-cols-5 border-x border-dashed border-white/5">
-          <div className="border-r border-dashed border-white/5 h-full" />
-          <div className="border-r border-dashed border-white/5 h-full" />
-          <div className="border-r border-dashed border-white/5 h-full" />
-          <div className="border-r border-dashed border-white/5 h-full" />
-        </div>
-      </div>
+    <section
+      ref={sectionRef}
+      id="gallery"
+      className="relative bg-transparent"
+      style={{ height: `${GALLERY_ITEMS.length * 100}vh` }}
+    >
+      {/* Sticky viewport container */}
+      <div className="sticky top-0 h-screen w-full overflow-hidden">
+        <div className="relative h-full w-full grid grid-cols-1 lg:grid-cols-2">
 
-      <div className="relative z-10 mx-auto max-w-6xl px-6">
-        <SectionHeader
-          eyebrow="Campus & Moments"
-          title="Life at PTSC · Photo Gallery"
-          desc="Moments from our hackathons, bootcamps, contest nights, and community meetups at KNIT Sultanpur."
-        />
-
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {GALLERY_ITEMS.map((item) => (
-            <div
-              key={item.id}
-              className="playgame-card group overflow-hidden rounded-2xl p-4 transition-all hover:-translate-y-1"
-            >
-              {/* Photo Placeholder Container */}
-              <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-[#16192C] border border-white/10 flex flex-col items-center justify-center text-center p-6 group-hover:border-[#FF355E]/40 transition-colors">
-                <div className="flex flex-col items-center justify-center gap-2 text-[#8C93B0] group-hover:text-white transition-colors">
-                  <div className="grid size-12 place-items-center rounded-xl bg-white/5 border border-white/10 group-hover:bg-[#FF355E]/10 group-hover:border-[#FF355E]/40 transition-colors">
-                    <FiImage className="size-6 text-[#FF355E]" />
-                  </div>
-                  <span className="text-xs font-semibold tracking-wide uppercase mt-1">
-                    Photo Placeholder
-                  </span>
-                  <span className="text-[11px] font-mono text-[#8C93B0]">
-                    {item.imageSrc}
-                  </span>
-                </div>
-
-                <div className="absolute top-3 left-3 rounded-lg bg-[#FF355E] px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wider text-white shadow-md">
-                  {item.category}
-                </div>
-              </div>
-
-              <div className="mt-4 px-2 pb-1">
-                <div className="flex items-center justify-between text-xs font-semibold text-[#8C93B0]">
-                  <span>{item.date}</span>
-                  <span className="flex items-center gap-1">
-                    <FiCamera className="size-3.5 text-[#FFB800]" /> PTSC Gallery
-                  </span>
-                </div>
-                <h3 className="mt-2 text-lg font-bold text-white tracking-tight group-hover:text-[#FF355E] transition-colors">
-                  {item.title}
-                </h3>
-              </div>
+          {/* ─── Left Column: Text Description ─── */}
+          <div className="relative z-10 flex flex-col justify-center px-8 sm:px-12 lg:px-16 xl:px-24  order-2 lg:order-1">
+            {/* Section label */}
+            <div className="relative z-10 mb-8">
+              <p className="text-xs font-mono font-bold text-[#F47174] uppercase tracking-widest mb-3">
+                Moments in Time
+              </p>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white font-sans leading-tight">
+                Our Club{" "}
+                <Highlighter action="underline" color="#F47174" strokeWidth={4}>
+                  <span className="text-white font-serif italic font-normal">Gallery</span>
+                </Highlighter>
+              </h2>
             </div>
-          ))}
+
+            {/* Active item content with AnimatePresence */}
+            <div className="relative z-10 min-h-[200px]">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={current.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                >
+                  {/* Counter */}
+                  <div className="flex items-center gap-3 mb-5">
+                    <span className="text-4xl font-black font-mono text-[#F47174]">
+                      {String(activeIndex + 1).padStart(2, "0")}
+                    </span>
+                    <span className="text-sm font-mono text-white/30">
+                      / {String(GALLERY_ITEMS.length).padStart(2, "0")}
+                    </span>
+                    <div className="flex-1 h-px bg-white/10 ml-3" />
+                  </div>
+
+                  {/* Title & Subtitle */}
+                  <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight mb-1">
+                    {current.title}
+                  </h3>
+                  <p className="text-sm font-medium text-[#00F0FF] mb-4 tracking-wide uppercase font-mono">
+                    {current.subtitle}
+                  </p>
+
+                  {/* Description */}
+                  <p className="text-base text-[#8C93B0] leading-relaxed max-w-lg">
+                    {current.desc}
+                  </p>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            {/* Progress dots */}
+            <div className="relative z-10 flex items-center gap-2 mt-10">
+              {GALLERY_ITEMS.map((item, idx) => (
+                <div
+                  key={item.id}
+                  className="relative h-1.5 rounded-full transition-all duration-500"
+                  style={{
+                    width: idx === activeIndex ? "40px" : "12px",
+                    backgroundColor:
+                      idx === activeIndex
+                        ? "#F47174"
+                        : "rgba(255, 255, 255, 0.15)",
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* ─── Right Column: Full-bleed Image ─── */}
+          <div className="relative h-full order-1 lg:order-2">
+            {/* All images stacked, crossfade via opacity */}
+            {GALLERY_ITEMS.map((item, idx) => (
+              <motion.div
+                key={item.id}
+                className="absolute inset-0"
+                initial={false}
+                animate={{
+                  opacity: idx === activeIndex ? 1 : 0,
+                  scale: idx === activeIndex ? 1 : 1.08,
+                }}
+                transition={{ duration: 0.8, ease: "easeInOut" }}
+              >
+                <Image
+                  src={item.src}
+                  alt={item.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  priority={idx === 0}
+                />
+                {/* Dark gradient overlay from left for text readability on mobile */}
+                <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-[#0B0D19] via-[#0B0D19]/60 to-transparent" />
+              </motion.div>
+            ))}
+
+            {/* Corner accent badge */}
+            <div className="absolute top-6 right-6 z-20 px-4 py-2 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 text-xs font-mono font-bold text-white/60 tracking-widest uppercase">
+              {current.title}
+            </div>
+          </div>
+
         </div>
       </div>
     </section>

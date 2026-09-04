@@ -45,7 +45,7 @@ export function PeopleCard({
   const formattedBatch = formatBatchYear(batch);
 
   return (
-    <div className="relative overflow-hidden rounded-xl bg-[#0B0D19] border border-white/10 aspect-[3/4.5] flex flex-col justify-between shadow-2xl">
+    <div className="relative overflow-hidden rounded-xl bg-[#0f0f0f] border border-white/10 aspect-[3/4.5] flex flex-col justify-between shadow-2xl">
       {/* Background Image */}
       <Image
         src={imageSrc || "/teams/default-avatar.png"}
@@ -60,7 +60,7 @@ export function PeopleCard({
 
       {/* Top Left Info: Alumni & Batch */}
       <div className="absolute top-5 left-5 z-10 flex flex-col gap-1">
-        <span className="text-[10px] font-extrabold tracking-widest text-[#FF355E] uppercase font-sans">
+        <span className="text-[10px] font-extrabold tracking-widest text-[#F47174] uppercase font-sans">
           {isPTSCAlumni !== false ? "PTSC ALUMNI" : "ALUMNI"}
         </span>
         <span className="text-xs font-semibold tracking-widest text-white/80 uppercase font-sans">
@@ -85,7 +85,7 @@ export function PeopleCard({
           <h3 className="text-4xl font-black text-white uppercase leading-none tracking-tight font-sans">
             {firstName}
           </h3>
-          <h3 className="text-4xl font-black text-white uppercase leading-none tracking-tight inline-block border-b-4 border-[#FF355E] pb-1 font-sans">
+          <h3 className="text-4xl font-black text-white uppercase leading-none tracking-tight inline-block border-b-4 border-[#F47174] pb-1 font-sans">
             {lastName}
           </h3>
         </div>
@@ -107,7 +107,7 @@ export function PeopleCard({
               rel="noopener noreferrer"
               className="flex items-center gap-2 text-xs font-semibold text-white/80 transition-colors hover:text-white group/social font-sans"
             >
-              <FiGithub className="size-4 group-hover/social:text-[#FF355E] transition-colors" /> GitHub
+              <FiGithub className="size-4 group-hover/social:text-[#F47174] transition-colors" /> GitHub
             </a>
           )}
           {linkedin && (
@@ -117,7 +117,7 @@ export function PeopleCard({
               rel="noopener noreferrer"
               className="flex items-center gap-2 text-xs font-semibold text-white/80 transition-colors hover:text-white group/social font-sans"
             >
-              <FiLinkedin className="size-4 group-hover/social:text-[#FF355E] transition-colors" /> LinkedIn
+              <FiLinkedin className="size-4 group-hover/social:text-[#F47174] transition-colors" /> LinkedIn
             </a>
           )}
         </div>

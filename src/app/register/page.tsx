@@ -3,52 +3,93 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FiArrowRight, FiArrowLeft, FiCheck, FiAlertCircle, FiLoader, FiUserCheck, FiZap, FiBookOpen } from "react-icons/fi";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { FiArrowRight, FiArrowLeft, FiCheck, FiAlertCircle, FiLoader, FiUserCheck, FiBookOpen } from "react-icons/fi";
 import { parseAcademicFromEmail, computeAcademicFromRoll } from "@/lib/academic";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+
+const studentRegisterSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  username: z.string().min(3, "Username must be at least 3 characters"),
+  email: z
+    .string()
+    .min(1, "Email is required")
+    .email("Invalid email address")
+    .refine(
+      (val) => val.toLowerCase().endsWith("@knit.ac.in"),
+      "General registration requires an official @knit.ac.in email address."
+    ),
+  mobile: z.string().min(10, "Mobile number must be at least 10 digits"),
+  rollNo: z.string().optional(),
+  batch: z.string().optional(),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+type StudentRegisterFormValues = z.infer<typeof studentRegisterSchema>;
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [mobile, setMobile] = useState("");
-  const [rollNo, setRollNo] = useState("");
-  const [password, setPassword] = useState("");
-  const [batch, setBatch] = useState("");
 
   const [allowSignup, setAllowSignup] = useState<boolean>(true);
   const [fetchingSettings, setFetchingSettings] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [serverError, setServerError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  const form = useForm<StudentRegisterFormValues>({
+    resolver: zodResolver(studentRegisterSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      username: "",
+      email: "",
+      mobile: "",
+      rollNo: "",
+      batch: "",
+      password: "",
+    },
+  });
+
+  const watchedEmail = form.watch("email");
+  const watchedRollNo = form.watch("rollNo");
 
   // Derive academic info from email (e.g. abhay.24305@knit.ac.in) or manual roll number entry
   const parsedAcademic = useMemo(() => {
-    const fromEmail = parseAcademicFromEmail(email);
+    const fromEmail = parseAcademicFromEmail(watchedEmail || "");
     if (fromEmail.valid) return fromEmail;
     
-    if (rollNo && /^\d{5,6}$/.test(rollNo.trim())) {
-      const fromRoll = computeAcademicFromRoll(rollNo);
+    if (watchedRollNo && /^\d{5,6}$/.test(watchedRollNo.trim())) {
+      const fromRoll = computeAcademicFromRoll(watchedRollNo);
       if (fromRoll.valid) {
-        const batchYear = rollNo.trim().length === 6 ? fromRoll.admissionYear + 3 : fromRoll.admissionYear + 4;
-        return { ...fromRoll, rollNumber: rollNo.trim(), batchYear };
+        const batchYear = watchedRollNo.trim().length === 6 ? fromRoll.admissionYear + 3 : fromRoll.admissionYear + 4;
+        return { ...fromRoll, rollNumber: watchedRollNo.trim(), batchYear };
       }
     }
     return { valid: false as const, reason: "No valid roll/email" };
-  }, [email, rollNo]);
+  }, [watchedEmail, watchedRollNo]);
 
   // Auto-sync rollNo & batch when email or roll is entered
   useEffect(() => {
     if (parsedAcademic.valid) {
-      if (parsedAcademic.rollNumber && !rollNo) {
-        setRollNo(parsedAcademic.rollNumber);
+      if (parsedAcademic.rollNumber && !form.getValues("rollNo")) {
+        form.setValue("rollNo", parsedAcademic.rollNumber, { shouldValidate: true });
       }
       if (parsedAcademic.batchYear) {
-        setBatch(String(parsedAcademic.batchYear));
+        form.setValue("batch", String(parsedAcademic.batchYear), { shouldValidate: true });
       }
     }
-  }, [parsedAcademic]);
+  }, [parsedAcademic, form]);
 
   const hasFetchedSettingsRef = useRef(false);
 
@@ -67,36 +108,28 @@ export default function RegisterPage() {
       .finally(() => setFetchingSettings(false));
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
+  const onSubmit = async (values: StudentRegisterFormValues) => {
+    setServerError(null);
     setSuccess(null);
 
     if (!allowSignup) {
-      setError("Registrations are currently closed by administrator.");
+      setServerError("Registrations are currently closed by administrator.");
       return;
     }
-
-    if (!email.toLowerCase().endsWith("@knit.ac.in")) {
-      setError("General student registration requires an official @knit.ac.in email address.");
-      return;
-    }
-
-    setLoading(true);
 
     try {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          firstName,
-          lastName,
-          username,
-          email,
-          mobile: Number(mobile),
-          rollNo,
-          password,
-          batch: batch ? Number(batch) : undefined,
+          firstName: values.firstName,
+          lastName: values.lastName,
+          username: values.username,
+          email: values.email,
+          mobile: Number(values.mobile),
+          rollNo: values.rollNo,
+          password: values.password,
+          batch: values.batch ? Number(values.batch) : undefined,
           registrationType: "general",
         }),
       });
@@ -112,106 +145,116 @@ export default function RegisterPage() {
         router.push("/login");
       }, 2000);
     } catch (err: any) {
-      setError(err.message || "Registration failed. Please try again.");
-    } finally {
-      setLoading(false);
+      setServerError(err.message || "Registration failed. Please try again.");
     }
   };
 
+  const loading = form.formState.isSubmitting;
+
   return (
-    <div className="min-h-screen w-full bg-[#090B14] text-white pt-12 pb-16 flex flex-col items-center justify-center relative overflow-hidden font-sans">
+    <div className="min-h-screen w-full bg-[#0f0f0f] text-white pt-12 pb-16 flex flex-col items-center justify-center relative overflow-hidden selection:bg-[#FF355E]/30 font-sans">
+      {/* Vertical Dashed Guidelines Overlay matching /people */}
+      <div className="pointer-events-none absolute inset-0 z-0 opacity-40">
+        <div className="mx-auto h-full max-w-7xl px-6 lg:px-12 grid grid-cols-5 border-x border-dashed border-white/5">
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+        </div>
+      </div>
+
       <div className="relative z-10 w-full max-w-4xl lg:max-w-5xl px-6">
         
         {/* Back to Home Button */}
         <div className="mb-6">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md border border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 text-xs font-semibold tracking-wide transition-all group"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 bg-white/5 text-[#8C93B0] hover:text-white hover:border-[#FF355E]/50 hover:bg-[#FF355E]/10 text-xs font-bold uppercase tracking-wider transition-all shadow-md group"
           >
-            <FiArrowLeft className="size-3.5 group-hover:-translate-x-0.5 transition-transform" />
+            <FiArrowLeft className="size-4 group-hover:-translate-x-1 transition-transform text-[#FF355E]" />
             Back to Home
           </Link>
         </div>
 
         {fetchingSettings ? (
-          <div className="p-16 text-center border border-white/10 rounded-lg bg-[#121626] flex items-center justify-center gap-3 text-xs text-slate-400 font-sans">
-            <FiLoader className="size-5 animate-spin text-white/60" /> Checking portal status...
+          <div className="p-16 text-center border border-white/10 rounded-3xl bg-[#141414] flex items-center justify-center gap-3 text-sm text-white/50 font-sans">
+            <FiLoader className="size-6 animate-spin text-[#FF355E]" /> Checking portal status...
           </div>
         ) : !allowSignup ? (
-          <div className="p-8 rounded-lg border border-red-500/20 bg-red-500/10 text-center space-y-4 font-sans max-w-md mx-auto">
-            <FiAlertCircle className="size-10 text-red-400 mx-auto" />
-            <h2 className="text-lg font-bold text-red-300 tracking-tight">Registrations Closed</h2>
+          <div className="p-10 rounded-3xl border border-red-500/20 bg-red-500/10 text-center space-y-4 font-sans max-w-xl mx-auto">
+            <FiAlertCircle className="size-12 text-red-400 mx-auto" />
+            <h2 className="text-xl font-bold text-red-300 uppercase tracking-wider font-sans">Registrations Closed</h2>
             <p className="text-xs text-red-300/80 leading-relaxed font-sans">
               Student registrations are currently disabled by administrator. Please check back later.
             </p>
-            <div className="pt-2">
-              <Link href="/login" className="inline-flex items-center gap-1.5 text-xs font-sans text-white underline hover:text-slate-200">
+            <div className="pt-4">
+              <Link href="/login" className="inline-flex items-center gap-2 text-xs font-sans text-white underline hover:text-[#FF355E]">
                 Already have an account? Log In <FiArrowRight className="size-3.5" />
               </Link>
             </div>
           </div>
         ) : (
-          /* Main Card: Landscape on Desktop (lg:flex-row), Portrait on Mobile (flex-col) */
-          <div className="rounded-lg border border-white/10 bg-[#121626] p-6 sm:p-8 flex flex-col lg:flex-row gap-8 lg:gap-10 items-stretch font-sans">
+          <div className="rounded-3xl border border-white/10 bg-[#141414] p-6 sm:p-10 shadow-2xl flex flex-col lg:flex-row gap-8 lg:gap-12 items-stretch font-sans">
             
             {/* Left Column: Info & Branding */}
-            <div className="flex-1 flex flex-col justify-between space-y-5 lg:border-r lg:border-white/10 lg:pr-8">
-              <div className="space-y-3">
-                <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-white/5 border border-white/10 text-slate-300 text-xs font-mono">
-                  <FiZap className="size-3" /> Student Portal
+            <div className="flex-1 flex flex-col justify-between space-y-6 lg:border-r lg:border-white/10 lg:pr-10">
+              <div className="space-y-4">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FF355E]/10 border border-[#FF355E]/20 text-[#FF355E] text-xs font-bold uppercase tracking-wider">
+                  <span className="size-2 rounded-full bg-[#FF355E] animate-pulse" />
+                  Student Portal
                 </div>
                 
-                <h1 className="text-2xl font-bold tracking-tight text-white leading-tight">
+                <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white uppercase font-sans leading-tight">
                   Student Registration
                 </h1>
                 
-                <p className="text-xs text-slate-400 leading-relaxed">
+                <p className="text-sm text-[#8C93B0] leading-relaxed">
                   Join PTSC KNIT with your official <strong className="text-white">@knit.ac.in</strong> email address. Your roll number, branch, and batch are managed automatically!
                 </p>
 
-                <div className="space-y-3 pt-2">
-                  <div className="flex items-start gap-3 text-xs text-slate-300">
-                    <div className="grid size-6 place-items-center rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 shrink-0 mt-0.5">
+                <div className="space-y-3 pt-4">
+                  <div className="flex items-start gap-3 text-xs text-white/80">
+                    <div className="grid size-6 place-items-center rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 shrink-0 mt-0.5">
                       <FiCheck className="size-3.5" />
                     </div>
                     <div>
-                      <strong className="block text-white font-semibold">Instant Account Activation</strong>
-                      <span className="text-slate-400">KNIT students log in directly with no waiting period.</span>
+                      <strong className="block text-white font-bold">Instant Account Activation</strong>
+                      <span>KNIT students log in directly with no waiting period.</span>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3 text-xs text-slate-300">
-                    <div className="grid size-6 place-items-center rounded bg-white/5 border border-white/10 text-slate-300 shrink-0 mt-0.5">
+                  <div className="flex items-start gap-3 text-xs text-white/80">
+                    <div className="grid size-6 place-items-center rounded-lg bg-[#FF355E]/10 border border-[#FF355E]/20 text-[#FF355E] shrink-0 mt-0.5">
                       <FiBookOpen className="size-3.5" />
                     </div>
                     <div>
-                      <strong className="block text-white font-semibold">Automatic Academic Detection</strong>
-                      <span className="text-slate-400">Roll No, Branch & Batch year are parsed from roll number or email.</span>
+                      <strong className="block text-white font-bold">Automatic Roll & Academic Parsing</strong>
+                      <span>Roll No, Branch & Batch year are parsed from roll number or email.</span>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3 text-xs text-slate-300">
-                    <div className="grid size-6 place-items-center rounded bg-white/5 border border-white/10 text-slate-300 shrink-0 mt-0.5">
+                  <div className="flex items-start gap-3 text-xs text-white/80">
+                    <div className="grid size-6 place-items-center rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 shrink-0 mt-0.5">
                       <FiUserCheck className="size-3.5" />
                     </div>
                     <div>
-                      <strong className="block text-white font-semibold">Personalized Profile</strong>
-                      <span className="text-slate-400">Manage profile photo, view announcements and event history.</span>
+                      <strong className="block text-white font-bold">Personalized Profile</strong>
+                      <span>Manage profile photo, view club announcements and event history.</span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-white/10 space-y-1 text-xs">
-                <p className="text-slate-400">
+              <div className="pt-6 border-t border-white/10 space-y-2">
+                <p className="text-xs text-[#8C93B0]">
                   Already registered?{" "}
-                  <Link href="/login" className="text-white font-semibold hover:underline">
+                  <Link href="/login" className="text-[#FF355E] font-bold hover:underline">
                     Log In
                   </Link>
                 </p>
-                <p className="text-slate-400">
+                <p className="text-xs text-[#8C93B0]">
                   PTSC Executive Member?{" "}
-                  <Link href="/admin/register" className="text-slate-300 font-medium hover:underline">
+                  <Link href="/admin/register" className="text-white/80 font-bold hover:underline">
                     Executive Registration
                   </Link>
                 </p>
@@ -219,157 +262,173 @@ export default function RegisterPage() {
             </div>
 
             {/* Right Column: Registration Form */}
-            <div className="flex-1 flex flex-col justify-center space-y-4">
-              {error && (
-                <div className="p-3 rounded-md bg-red-500/10 border border-red-500/20 text-red-300 text-xs font-medium text-center">
-                  {error}
+            <div className="flex-1 flex flex-col justify-center space-y-5">
+              {serverError && (
+                <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-[#FF4D70] text-xs font-bold text-center">
+                  {serverError}
                 </div>
               )}
 
               {success && (
-                <div className="p-3 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs font-medium text-center flex items-center justify-center gap-2">
-                  <FiCheck className="size-3.5" /> {success}
+                <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs font-bold text-center flex items-center justify-center gap-2">
+                  <FiCheck className="size-4" /> {success}
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-3.5">
-                <div className="grid grid-cols-2 gap-3.5">
-                  <div>
-                    <label className="text-xs font-semibold text-slate-300 block mb-1">
-                      First Name *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Rahul"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                      className="w-full bg-[#090B14] border border-white/15 rounded-md py-2.5 px-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30"
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="firstName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>First Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Rahul" disabled={loading} {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold text-slate-300 block mb-1">
-                      Last Name *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Sharma"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                      className="w-full bg-[#090B14] border border-white/15 rounded-md py-2.5 px-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                  <div>
-                    <label className="text-xs font-semibold text-slate-300 block mb-1">
-                      Username *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. rahul_knit"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      className="w-full bg-[#090B14] border border-white/15 rounded-md py-2.5 px-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30"
+                    <FormField
+                      control={form.control}
+                      name="lastName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Last Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Sharma" disabled={loading} {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
                   </div>
 
-                  <div>
-                    <label className="text-xs font-semibold text-slate-300 block mb-1">
-                      Mobile Number *
-                    </label>
-                    <input
-                      type="tel"
-                      required
-                      placeholder="e.g. 9876543210"
-                      value={mobile}
-                      onChange={(e) => setMobile(e.target.value)}
-                      className="w-full bg-[#090B14] border border-white/15 rounded-md py-2.5 px-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30"
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="username"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Username</FormLabel>
+                          <FormControl>
+                            <Input placeholder="rahul_knit" disabled={loading} {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="mobile"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Mobile Number</FormLabel>
+                          <FormControl>
+                            <Input type="tel" placeholder="9876543210" disabled={loading} {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
                   </div>
-                </div>
 
-                <div>
-                  <label className="text-xs font-semibold text-slate-300 block mb-1">
-                    KNIT Email (@knit.ac.in) *
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    placeholder="e.g. abhay.24305@knit.ac.in"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-[#090B14] border border-white/15 rounded-md py-2.5 px-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30"
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>KNIT Email (@knit.ac.in)</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="email"
+                            placeholder="abhay.24305@knit.ac.in"
+                            disabled={loading}
+                            {...field}
+                          />
+                        </FormControl>
+                        {parsedAcademic.valid && (
+                          <p className="mt-1.5 text-[11px] text-emerald-400 font-sans flex items-center gap-1 font-medium">
+                            <FiCheck className="size-3.5 shrink-0" />
+                            Auto-detected: <strong>{parsedAcademic.branch}</strong> • Batch {parsedAcademic.batchYear} (Year {parsedAcademic.year})
+                          </p>
+                        )}
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                  {parsedAcademic.valid && (
-                    <p className="mt-1 text-xs text-emerald-400 font-sans flex items-center gap-1 font-medium">
-                      <FiCheck className="size-3 shrink-0" />
-                      Auto-detected: <strong>{parsedAcademic.branch}</strong> • Batch {parsedAcademic.batchYear} (Year {parsedAcademic.year})
-                    </p>
-                  )}
-                </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                  <div>
-                    <label className="text-xs font-semibold text-slate-300 block mb-1">
-                      Roll Number
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. 24305"
-                      value={rollNo}
-                      onChange={(e) => setRollNo(e.target.value)}
-                      className="w-full bg-[#090B14] border border-white/15 rounded-md py-2.5 px-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30"
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="rollNo"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Roll Number</FormLabel>
+                          <FormControl>
+                            <Input placeholder="24305" disabled={loading} {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="batch"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Batch Year</FormLabel>
+                          <FormControl>
+                            <Input type="number" placeholder="2028" disabled={loading} {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
                   </div>
-                  <div>
-                    <label className="text-xs font-semibold text-slate-300 block mb-1">
-                      Batch Year
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="e.g. 2028"
-                      value={batch}
-                      onChange={(e) => setBatch(e.target.value)}
-                      className="w-full bg-[#090B14] border border-white/15 rounded-md py-2.5 px-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30"
-                    />
-                  </div>
-                </div>
 
-                <div>
-                  <label className="text-xs font-semibold text-slate-300 block mb-1">
-                    Password *
-                  </label>
-                  <input
-                    type="password"
-                    required
-                    minLength={6}
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-[#090B14] border border-white/15 rounded-md py-2.5 px-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-white/30"
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="••••••••"
+                            disabled={loading}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full mt-3 py-2.5 rounded-md bg-white text-black font-semibold text-xs hover:bg-slate-200 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
-                >
-                  {loading ? (
-                    <>
-                      <FiLoader className="size-3.5 animate-spin" /> Registering...
-                    </>
-                  ) : (
-                    <>
-                      Complete Registration <FiArrowRight className="size-3.5" />
-                    </>
-                  )}
-                </button>
-              </form>
+                  <Button
+                    type="submit"
+                    variant="sleek"
+                    size="lg"
+                    className="w-full mt-4 justify-center shadow-lg gap-2 font-sans"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>
+                        <FiLoader className="size-4 animate-spin" /> Registering...
+                      </>
+                    ) : (
+                      <>
+                        Complete Registration <FiArrowRight className="size-4" />
+                      </>
+                    )}
+                  </Button>
+                </form>
+              </Form>
             </div>
           </div>
         )}

@@ -131,7 +131,7 @@ export function SupportUsSection() {
   };
 
   return (
-    <section className="relative bg-[#0B0D19] py-20 border-b border-white/5">
+    <section className="relative bg-[#0f0f0f] py-20 border-b border-white/5">
       {/* Vertical Dashed Guidelines Overlay */}
       <div className="pointer-events-none absolute inset-0 z-0 opacity-40">
         <div className="mx-auto h-full max-w-7xl px-6 lg:px-12 grid grid-cols-5 border-x border-dashed border-white/5">
@@ -145,57 +145,65 @@ export function SupportUsSection() {
       <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-12">
         {/* Main Section Header */}
         <div className="text-center mb-16">
-
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white font-sans leading-tight">
             Support{" "}
-            <Highlighter action="underline" color="#FF355E" strokeWidth={4}>
-              <span className="text-[#FF355E]">PTSC</span>
+            <Highlighter action="underline" color="#F47174" strokeWidth={4}>
+              <span className="text-[#F47174]">PTSC</span>
             </Highlighter>
           </h1>
           <p className="mt-4 text-sm sm:text-base text-[#8C93B0] max-w-2xl mx-auto font-sans leading-relaxed">
-            Powering student technical excellence at KNIT Sultanpur. Every single rupee donated directly funds hackathon prize pools, cloud servers, and open-source workshops.
+            Powering student technical excellence at KNIT Sultanpur. Every
+            single rupee donated directly funds hackathon prize pools, cloud
+            servers, and open-source workshops.
           </p>
         </div>
 
         {/* Financial Transparency Overview Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
-          <div className="rounded-2xl bg-[#121526] border border-white/10 p-5 text-center">
+          <div className="rounded-2xl bg-zinc-950 border border-white/10 p-5 text-center">
             <div className="flex items-center justify-center gap-1.5 text-xs font-semibold text-[#8C93B0] uppercase tracking-wider mb-1">
               <FiTrendingUp className="size-4 text-[#00E5FF]" /> Total Raised
             </div>
-            <div className="text-2xl sm:text-3xl font-black text-white font-mono">₹1,85,000</div>
-          </div>
-
-          <div className="rounded-2xl bg-[#121526] border border-white/10 p-5 text-center">
-            <div className="flex items-center justify-center gap-1.5 text-xs font-semibold text-[#8C93B0] uppercase tracking-wider mb-1">
-              <FiPieChart className="size-4 text-[#FF355E]" /> Total Spent
+            <div className="text-2xl sm:text-3xl font-black text-white font-mono">
+              ₹1,85,000
             </div>
-            <div className="text-2xl sm:text-3xl font-black text-white font-mono">₹1,24,500</div>
           </div>
 
-          <div className="rounded-2xl bg-[#121526] border border-white/10 p-5 text-center">
+          <div className="rounded-2xl bg-zinc-950 border border-white/10 p-5 text-center">
+            <div className="flex items-center justify-center gap-1.5 text-xs font-semibold text-[#8C93B0] uppercase tracking-wider mb-1">
+              <FiPieChart className="size-4 text-[#F47174]" /> Total Spent
+            </div>
+            <div className="text-2xl sm:text-3xl font-black text-white font-mono">
+              ₹1,24,500
+            </div>
+          </div>
+
+          <div className="rounded-2xl bg-zinc-950 border border-white/10 p-5 text-center">
             <div className="flex items-center justify-center gap-1.5 text-xs font-semibold text-[#8C93B0] uppercase tracking-wider mb-1">
               <FiDollarSign className="size-4 text-[#FFB800]" /> Fund Balance
             </div>
-            <div className="text-2xl sm:text-3xl font-black text-white font-mono">₹60,500</div>
+            <div className="text-2xl sm:text-3xl font-black text-white font-mono">
+              ₹60,500
+            </div>
           </div>
 
-          <div className="rounded-2xl bg-[#121526] border border-white/10 p-5 text-center">
+          <div className="rounded-2xl bg-zinc-950 border border-white/10 p-5 text-center">
             <div className="flex items-center justify-center gap-1.5 text-xs font-semibold text-[#8C93B0] uppercase tracking-wider mb-1">
               <FiUsers className="size-4 text-[#00E5FF]" /> Alumni & Donors
             </div>
-            <div className="text-2xl sm:text-3xl font-black text-white font-mono">48+</div>
+            <div className="text-2xl sm:text-3xl font-black text-white font-mono">
+              48+
+            </div>
           </div>
         </div>
 
         {/* Two-Column Main Content: Left Donation Form, Right Bank/UPI Details */}
         <div className="grid gap-8 lg:grid-cols-12 mb-20">
-
           {/* Left Column: Direct Donation Box */}
-          <div className="lg:col-span-7 rounded-3xl bg-[#121526] border border-white/10 p-6 sm:p-8 flex flex-col justify-between">
+          <div className="lg:col-span-7 rounded-3xl bg-zinc-950 border border-white/10 p-6 sm:p-8 flex flex-col justify-between">
             <div>
               <div className="flex items-center gap-3 mb-6">
-                <div className="grid size-10 place-items-center rounded-xl bg-[#FF355E]/15 text-[#FF355E] border border-[#FF355E]/30">
+                <div className="grid size-10 place-items-center rounded-xl bg-zinc-950 text-[#F47174] border border-[#F47174]/30">
                   <FiHeart className="size-5" />
                 </div>
                 <div>
@@ -215,10 +223,11 @@ export function SupportUsSection() {
                     key={amt}
                     type="button"
                     onClick={() => setCustomAmount(amt)}
-                    className={`rounded-xl py-3 text-sm font-extrabold font-mono transition-all ${customAmount === amt
-                        ? "bg-[#FF355E] text-white shadow-none"
-                        : "bg-white/5 text-[#8C93B0] border border-white/10 hover:bg-white/10 hover:text-white"
-                      }`}
+                    className={`rounded-xl py-3 text-sm font-extrabold font-mono transition-all ${
+                      customAmount === amt
+                        ? "bg-[#F47174] text-white shadow-none"
+                        : "bg-zinc-950 text-[#8C93B0] border border-white/10 hover:bg-white/10 hover:text-white"
+                    }`}
                   >
                     ₹{amt}
                   </button>
@@ -231,12 +240,14 @@ export function SupportUsSection() {
                   Amount (INR)
                 </label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 font-mono font-bold text-white">₹</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 font-mono font-bold text-white">
+                    ₹
+                  </span>
                   <input
                     type="number"
                     value={customAmount}
                     onChange={(e) => setCustomAmount(e.target.value)}
-                    className="w-full rounded-xl bg-white/5 border border-white/10 pl-9 pr-4 py-3 text-sm font-mono font-bold text-white outline-none focus:border-[#FF355E] transition-colors"
+                    className="w-full rounded-xl bg-white/5 border border-white/10 pl-9 pr-4 py-3 text-sm font-mono font-bold text-white outline-none focus:border-[#F47174] transition-colors"
                   />
                 </div>
               </div>
@@ -244,64 +255,76 @@ export function SupportUsSection() {
 
             {/* Direct Pay Action Button */}
             <a
-              href={`upi://pay?pa=ptsc.knit@upi&pn=PTSC%20KNIT&am=${customAmount}&cu=INR`}
-              className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#FF355E] py-4 text-sm font-black uppercase tracking-wider text-white shadow-none hover:bg-[#FF4D70] active:scale-[0.98] transition-all"
+              href={`upi://pay?pa=9198347345@ptsbi&pn=Ishaan&am=${customAmount}&cu=INR`}
+              className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#F47174] py-4 text-sm font-black uppercase tracking-wider text-white shadow-none hover:bg-[#FF4D70] active:scale-[0.98] transition-all"
             >
-              Donate ₹{customAmount} via UPI <FiArrowUpRight className="size-4" />
+              Donate ₹{customAmount} via UPI{" "}
+              <FiArrowUpRight className="size-4" />
             </a>
           </div>
 
           {/* Right Column: Bank & UPI Verification Details */}
-          <div className="lg:col-span-5 rounded-3xl bg-[#121526] border border-white/10 p-6 sm:p-8 flex flex-col justify-between">
+          <div className="lg:col-span-5 rounded-3xl bg-zinc-950 border border-white/10 p-6 sm:p-8 flex flex-col justify-between">
             <div>
               <h3 className="text-xl font-extrabold text-white tracking-tight mb-4">
-                Official Account Details
+                JS Account Details
               </h3>
 
               {/* UPI Box */}
-              <div className="rounded-2xl bg-[#0B0D19]/90 border border-white/10 p-4 mb-4">
+              <div className="rounded-2xl bg-zinc-950 border border-white/10 p-4 mb-4">
                 <div className="text-xs font-semibold text-[#8C93B0] uppercase tracking-wider mb-1">
-                  Official UPI ID
+                  JS UPI ID
                 </div>
                 <div className="flex items-center justify-between font-mono font-bold text-white text-base">
-                  <span>ptsc.knit@upi</span>
+                  <span>9198347345@ptsbi</span>
                   <button
                     type="button"
                     onClick={handleCopyUpi}
                     className="grid size-8 place-items-center rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors"
                     aria-label="Copy UPI ID"
                   >
-                    {copiedUpi ? <FiCheck className="size-4 text-[#00E5FF]" /> : <FiCopy className="size-4" />}
+                    {copiedUpi ? (
+                      <FiCheck className="size-4 text-[#00E5FF]" />
+                    ) : (
+                      <FiCopy className="size-4" />
+                    )}
                   </button>
                 </div>
               </div>
 
               {/* Bank Transfer Box */}
-              <div className="rounded-2xl bg-[#0B0D19]/90 border border-white/10 p-4 space-y-2 font-sans text-xs text-[#8C93B0]">
+              <div className="rounded-2xl bg-zinc-950 border border-white/10 p-4 space-y-2 font-sans text-xs text-[#8C93B0]">
                 <div className="text-xs font-semibold text-[#8C93B0] uppercase tracking-wider mb-2">
                   Direct Bank Transfer
                 </div>
                 <div className="flex justify-between border-b border-white/5 pb-1.5">
                   <span>Account Name:</span>
-                  <span className="font-bold text-white">Programming & Tech Skills Club</span>
+                  <span className="font-bold text-white">Ishaan Pandey</span>
                 </div>
                 <div className="flex justify-between border-b border-white/5 pb-1.5">
                   <span>Account No:</span>
-                  <span className="font-mono font-bold text-white">1234 5678 9012</span>
+                  <span className="font-mono font-bold text-white">
+                    45858100009948
+                  </span>
                 </div>
                 <div className="flex justify-between border-b border-white/5 pb-1.5">
                   <span>IFSC Code:</span>
-                  <span className="font-mono font-bold text-white">SBIN0001234</span>
+                  <span className="font-mono font-bold text-white">
+                    BARB0KNISUL
+                  </span>
                 </div>
                 <div className="flex justify-between pt-0.5">
                   <span>Bank Branch:</span>
-                  <span className="font-semibold text-white">SBI KNIT Campus Branch</span>
+                  <span className="font-semibold text-white">
+                    KNIT Campus, Uttar Pradesh
+                  </span>
                 </div>
               </div>
             </div>
 
             <p className="mt-4 text-[11px] text-[#8C93B0] leading-relaxed">
-              * Note: All donations are logged automatically in our public ledger below upon verification.
+              * Note: All donations are logged automatically in our public
+              ledger below upon verification.
             </p>
           </div>
         </div>
@@ -314,29 +337,32 @@ export function SupportUsSection() {
                 Transparent Financial Ledger
               </h2>
               <p className="text-xs sm:text-sm text-[#8C93B0] mt-1">
-                Real-time tracking of all community contributions and expense receipts
+                Real-time tracking of all community contributions and expense
+                receipts
               </p>
             </div>
 
             {/* Switcher Tabs */}
-            <div className="inline-flex rounded-full bg-[#121526] p-1 border border-white/10">
+            <div className="inline-flex rounded-full bg-zinc-950 p-1 border border-white/10">
               <button
                 type="button"
                 onClick={() => setActiveLedgerTab("donations")}
-                className={`rounded-full px-5 py-2 text-xs font-extrabold uppercase tracking-wider transition-all ${activeLedgerTab === "donations"
-                    ? "bg-[#FF355E] text-white shadow-none"
+                className={`rounded-full px-5 py-2 text-xs font-extrabold uppercase tracking-wider transition-all ${
+                  activeLedgerTab === "donations"
+                    ? "bg-[#F47174] text-white shadow-none"
                     : "text-[#8C93B0] hover:text-white bg-transparent"
-                  }`}
+                }`}
               >
                 Recent Donors ({RECENT_DONORS.length})
               </button>
               <button
                 type="button"
                 onClick={() => setActiveLedgerTab("spend")}
-                className={`rounded-full px-5 py-2 text-xs font-extrabold uppercase tracking-wider transition-all ${activeLedgerTab === "spend"
-                    ? "bg-[#FF355E] text-white shadow-none"
+                className={`rounded-full px-5 py-2 text-xs font-extrabold uppercase tracking-wider transition-all ${
+                  activeLedgerTab === "spend"
+                    ? "bg-[#F47174] text-white shadow-none"
                     : "text-[#8C93B0] hover:text-white bg-transparent"
-                  }`}
+                }`}
               >
                 Spend History ({SPEND_HISTORY.length})
               </button>
@@ -344,7 +370,7 @@ export function SupportUsSection() {
           </div>
 
           {/* Ledger Table Container */}
-          <div className="overflow-x-auto rounded-3xl bg-[#121526] border border-white/10">
+          <div className="overflow-x-auto rounded-3xl bg-zinc-950 border border-white/10">
             {activeLedgerTab === "donations" ? (
               <table className="w-full text-left border-collapse">
                 <thead>
@@ -358,11 +384,22 @@ export function SupportUsSection() {
                 </thead>
                 <tbody className="divide-y divide-white/5 text-xs sm:text-sm font-sans">
                   {RECENT_DONORS.map((donor) => (
-                    <tr key={donor.id} className="hover:bg-white/[0.02] transition-colors">
-                      <td className="p-4 sm:p-5 font-bold text-white">{donor.name}</td>
-                      <td className="p-4 sm:p-5 text-[#8C93B0]">{donor.badge}</td>
-                      <td className="p-4 sm:p-5 text-[#00E5FF] font-semibold">{donor.purpose}</td>
-                      <td className="p-4 sm:p-5 text-[#8C93B0] font-mono text-xs">{donor.date}</td>
+                    <tr
+                      key={donor.id}
+                      className="hover:bg-white/[0.02] transition-colors"
+                    >
+                      <td className="p-4 sm:p-5 font-bold text-white">
+                        {donor.name}
+                      </td>
+                      <td className="p-4 sm:p-5 text-[#8C93B0]">
+                        {donor.badge}
+                      </td>
+                      <td className="p-4 sm:p-5 text-[#00E5FF] font-semibold">
+                        {donor.purpose}
+                      </td>
+                      <td className="p-4 sm:p-5 text-[#8C93B0] font-mono text-xs">
+                        {donor.date}
+                      </td>
                       <td className="p-4 sm:p-5 text-right font-mono font-black text-white text-base">
                         {donor.amount}
                       </td>
@@ -383,15 +420,24 @@ export function SupportUsSection() {
                 </thead>
                 <tbody className="divide-y divide-white/5 text-xs sm:text-sm font-sans">
                   {SPEND_HISTORY.map((spend) => (
-                    <tr key={spend.id} className="hover:bg-white/[0.02] transition-colors">
+                    <tr
+                      key={spend.id}
+                      className="hover:bg-white/[0.02] transition-colors"
+                    >
                       <td className="p-4 sm:p-5 font-bold text-white flex items-center gap-2">
-                        <FiFileText className="size-4 text-[#FF355E]" />
+                        <FiFileText className="size-4 text-[#F47174]" />
                         {spend.category}
                       </td>
-                      <td className="p-4 sm:p-5 text-[#8C93B0]">{spend.details}</td>
-                      <td className="p-4 sm:p-5 font-mono text-xs text-[#FFB800]">{spend.invoiceRef}</td>
-                      <td className="p-4 sm:p-5 text-[#8C93B0] font-mono text-xs">{spend.date}</td>
-                      <td className="p-4 sm:p-5 text-right font-mono font-black text-[#FF355E] text-base">
+                      <td className="p-4 sm:p-5 text-[#8C93B0]">
+                        {spend.details}
+                      </td>
+                      <td className="p-4 sm:p-5 font-mono text-xs text-[#FFB800]">
+                        {spend.invoiceRef}
+                      </td>
+                      <td className="p-4 sm:p-5 text-[#8C93B0] font-mono text-xs">
+                        {spend.date}
+                      </td>
+                      <td className="p-4 sm:p-5 text-right font-mono font-black text-[#F47174] text-base">
                         {spend.amount}
                       </td>
                     </tr>

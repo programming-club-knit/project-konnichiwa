@@ -96,7 +96,10 @@ export function PeopleSection() {
   }, [members, selectedBatch]);
 
   return (
-    <section id="people" className="relative bg-[#0B0D19] py-24 border-b border-white/5 font-sans">
+    <section
+      id="people"
+      className="relative bg-[#0f0f0f] py-24 border-b border-white/5 font-sans"
+    >
       {/* Vertical Dashed Guidelines Overlay */}
       <div className="pointer-events-none absolute inset-0 z-0 opacity-40">
         <div className="mx-auto h-full max-w-7xl px-6 lg:px-12 grid grid-cols-5 border-x border-dashed border-white/5">
@@ -112,12 +115,13 @@ export function PeopleSection() {
         <div className="text-center mb-12">
           <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white font-sans leading-tight">
             Cracked Minds of{" "}
-            <Highlighter action="underline" color="#FF355E" strokeWidth={4}>
-              <span className="text-[#FF355E]">KNIT</span>
+            <Highlighter action="underline" color="#F47174" strokeWidth={4}>
+              <span className="text-[#F47174]">KNIT</span>
             </Highlighter>
           </h2>
           <p className="mt-4 text-sm sm:text-base text-[#8C93B0] max-w-2xl mx-auto font-sans leading-relaxed">
-            Spotlighting top cracked seniors, alumni, and high achievers driving engineering excellence across top tech companies worldwide.
+            Spotlighting top cracked seniors, alumni, and high achievers driving
+            engineering excellence across top tech companies worldwide.
           </p>
         </div>
 
@@ -129,12 +133,14 @@ export function PeopleSection() {
                 key={batch}
                 onClick={() => setSelectedBatch(batch)}
                 className={`relative pb-4 -mb-[1px] text-xs font-black uppercase tracking-widest transition-colors duration-300 ${
-                  selectedBatch === batch ? "text-white" : "text-[#8C93B0] hover:text-white/80"
+                  selectedBatch === batch
+                    ? "text-white"
+                    : "text-[#8C93B0] hover:text-white/80"
                 }`}
               >
                 {batch}
                 {selectedBatch === batch && (
-                  <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#FF355E] shadow-[0_0_15px_rgba(255,53,94,0.6)] rounded-t-full" />
+                  <span className="absolute bottom-0 left-0 w-full h-[3px] bg-[#F47174] shadow-[0_0_15px_rgba(244,113,116,0.6)] rounded-t-full" />
                 )}
               </button>
             ))}
