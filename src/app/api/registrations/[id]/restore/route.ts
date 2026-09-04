@@ -7,7 +7,7 @@ type Params = { params: Promise<{ id: string }> };
 
 // PATCH /api/registrations/[id]/restore — restore soft-deleted registration
 export async function PATCH(_request: NextRequest, { params }: Params) {
-  const { response } = await requireAuth(["admin"]);
+  const { response } = await requireAuth(["admin", "member"]);
   if (response) return response;
 
   try {

@@ -1,9 +1,26 @@
 "use client";
 
-import React from 'react';
-import { FiSearch, FiPlus, FiLoader, FiCalendar } from 'react-icons/fi';
+import React, { useState, useMemo } from 'react';
+import { 
+  FiSearch, 
+  FiPlus, 
+  FiLoader, 
+  FiCalendar, 
+  FiClock, 
+  FiEdit2, 
+  FiTrash2, 
+  FiAward, 
+  FiUsers, 
+  FiUser, 
+  FiExternalLink, 
+  FiBookOpen, 
+  FiMessageCircle,
+  FiGlobe,
+  FiMapPin
+} from 'react-icons/fi';
 import { EventType } from '../types';
 import { EventForm } from './event-form';
+import { ResultModal } from './result-modal';
 import { getEventDynamicStatus } from '@/lib/event-status';
 
 interface EventsTabProps {
@@ -25,6 +42,7 @@ interface EventsTabProps {
   resources: { label: string; url: string }[];
   setResources: React.Dispatch<React.SetStateAction<{ label: string; url: string }[]>>;
   onFormSubmit: (e: React.FormEvent) => void;
+  onRefreshEvents?: () => void;
 }
 
 export function EventsTab({
@@ -46,7 +64,33 @@ export function EventsTab({
   resources,
   setResources,
   onFormSubmit,
+  onRefreshEvents,
 }: EventsTabProps) {
+  const [selectedResultEvent, setSelectedResultEvent] = useState<EventType | null>(null);
+  const [categoryFilter, setCategoryFilter] = useState<'all' | 'live' | 'upcoming' | 'past'>('all');
+
+  // Filter events based on active category tab & search
+  const displayedEvents = useMemo(() => {
+    return filteredEvents.filter((event) => {
+      const timing = getEventDynamicStatus(event as any);
+      if (categoryFilter === 'live' && timing.status !== 'live') return false;
+      if (categoryFilter === 'upcoming' && timing.status !== 'upcoming') return false;
+      if (categoryFilter === 'past' && timing.status !== 'past') return false;
+      return true;
+    });
+  }, [filteredEvents, categoryFilter]);
+
+  const counts = useMemo(() => {
+    let live = 0, upcoming = 0, past = 0;
+    filteredEvents.forEach((e) => {
+      const timing = getEventDynamicStatus(e as any);
+      if (timing.status === 'live') live++;
+      else if (timing.status === 'upcoming') upcoming++;
+      else past++;
+    });
+    return { all: filteredEvents.length, live, upcoming, past };
+  }, [filteredEvents]);
+
   if (eventFormMode !== 'list') {
     return (
       <EventForm
@@ -67,12 +111,19 @@ export function EventsTab({
   }
 
   return (
-    <div className="space-y-5">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-6 font-sans">
+      {/* Top Header & Action Controls */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-white/10">
         <div>
-          <h1 className="text-xl font-bold text-white tracking-tight">Events Management</h1>
-          <p className="text-xs text-white/50 mt-0.5">Create, update or remove club events.</p>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-white tracking-tight">Manage Events</h1>
+            <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-white/10 text-white/80 border border-white/10 font-bold">
+              {filteredEvents.length}
+            </span>
+          </div>
+          <p className="text-xs text-white/50 mt-1">
+            Create, update or remove club events, configure dynamic registration fields, and declare podium winners.
+          </p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -83,52 +134,96 @@ export function EventsTab({
               placeholder="Search events..."
               value={eventSearch}
               onChange={e => setEventSearch(e.target.value)}
-              className="bg-[#0E101A] border border-white/10 rounded-lg py-2 pl-9 pr-3 text-xs text-white placeholder:text-white/30 focus:outline-none focus:border-white/30 font-mono w-48 sm:w-60"
+              className="bg-[#0f0f0f] border border-white/10 rounded-xl py-2 pl-9 pr-3 text-xs text-white placeholder:text-white/30 focus:outline-none focus:border-[#FF355E]/50 font-sans w-48 sm:w-64 transition-all"
             />
           </div>
 
           <button
             onClick={onCreateClick}
-            className="px-4 py-2 bg-white text-black hover:bg-white/90 text-xs font-mono font-semibold rounded-lg transition-all flex items-center gap-1.5 shrink-0 shadow-sm"
+            className="px-4 py-2 bg-white text-black hover:bg-white/90 text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-all flex items-center gap-2 shrink-0 shadow-lg"
           >
-            <FiPlus className="size-3.5" /> New Event
+            <FiPlus className="size-4" /> Create Event
           </button>
         </div>
       </div>
 
-      {/* Events Table */}
+      {/* Filter Tabs Bar */}
+      <div className="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={() => setCategoryFilter('all')}
+          className={`px-3 py-1.5 rounded-xl text-xs font-mono transition-all flex items-center gap-1.5 ${
+            categoryFilter === 'all'
+              ? 'bg-white text-black font-bold shadow-md'
+              : 'bg-[#141414] border border-white/10 text-white/60 hover:text-white hover:border-white/20'
+          }`}
+        >
+          All Events ({counts.all})
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setCategoryFilter('live')}
+          className={`px-3 py-1.5 rounded-xl text-xs font-mono transition-all flex items-center gap-1.5 ${
+            categoryFilter === 'live'
+              ? 'bg-emerald-500 text-black font-bold shadow-md'
+              : 'bg-[#141414] border border-white/10 text-white/60 hover:text-white hover:border-white/20'
+          }`}
+        >
+          <span className="size-2 rounded-full bg-emerald-400 animate-pulse" />
+          Live Now ({counts.live})
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setCategoryFilter('upcoming')}
+          className={`px-3 py-1.5 rounded-xl text-xs font-mono transition-all flex items-center gap-1.5 ${
+            categoryFilter === 'upcoming'
+              ? 'bg-blue-500 text-white font-bold shadow-md'
+              : 'bg-[#141414] border border-white/10 text-white/60 hover:text-white hover:border-white/20'
+          }`}
+        >
+          Upcoming ({counts.upcoming})
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setCategoryFilter('past')}
+          className={`px-3 py-1.5 rounded-xl text-xs font-mono transition-all flex items-center gap-1.5 ${
+            categoryFilter === 'past'
+              ? 'bg-white/20 text-white font-bold shadow-md'
+              : 'bg-[#141414] border border-white/10 text-white/60 hover:text-white hover:border-white/20'
+          }`}
+        >
+          Archived / Past ({counts.past})
+        </button>
+      </div>
+
+      {/* Events Cards List */}
       {dataLoading ? (
-        <div className="py-16 text-center text-white/40 font-mono text-xs flex items-center justify-center gap-2 border border-white/10 rounded-xl bg-[#0E101A]">
-          <FiLoader className="size-4 animate-spin text-white/60" /> Loading events directory...
+        <div className="py-20 text-center text-white/40 font-mono text-xs flex flex-col items-center justify-center gap-3 border border-white/10 rounded-2xl bg-[#141414]">
+          <FiLoader className="size-6 animate-spin text-[#FF355E]" />
+          <span>Loading events directory...</span>
         </div>
-      ) : filteredEvents.length > 0 ? (
-        <div className="border border-white/10 rounded-xl bg-[#0E101A] overflow-hidden shadow-sm">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-white/10 text-[10px] font-mono uppercase tracking-wider text-white/40 bg-white/[0.02]">
-                <th className="py-3 px-4">Title</th>
-                <th className="py-3 px-4">Date</th>
-                <th className="py-3 px-4">Type</th>
-                <th className="py-3 px-4">Status</th>
-                <th className="py-3 px-4">Registration</th>
-                <th className="py-3 px-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/[0.06] text-xs text-white/80">
-              {filteredEvents.map(e => {
-                const timing = getEventDynamicStatus(e as any);
-                const { isLive, isUpcoming, label } = timing;
-                return (
-                  <tr key={e._id} className="hover:bg-white/[0.02] transition-colors">
-                    <td className="py-3.5 px-4 font-medium text-white">{e.title}</td>
-                    <td className="py-3.5 px-4 font-mono text-[11px] text-white/50">
-                      {e.date ? new Date(e.date).toLocaleDateString() : 'N/A'}
-                    </td>
-                    <td className="py-3.5 px-4 font-mono text-[11px] text-white/50 uppercase">
-                      {e.registrationType || 'individual'}
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono border ${
+      ) : displayedEvents.length > 0 ? (
+        <div className="space-y-4">
+          {displayedEvents.map((event) => {
+            const timing = getEventDynamicStatus(event as any);
+            const { isLive, isUpcoming, isPast, label } = timing;
+            const hasWinners = Boolean((event as any).winners?.overall?.length > 0 || (event as any).winners?.published);
+
+            return (
+              <div
+                key={event._id}
+                className="p-6 rounded-2xl border border-white/10 bg-[#141414] hover:border-white/20 transition-all shadow-md group relative flex flex-col justify-between gap-5"
+              >
+                <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
+                  {/* Left Main Details */}
+                  <div className="flex-1 space-y-3">
+                    {/* Badges Row */}
+                    <div className="flex flex-wrap items-center gap-2">
+                      {/* Timing Status Badge */}
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-semibold border uppercase ${
                         isLive 
                           ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300' 
                           : isUpcoming 
@@ -140,46 +235,212 @@ export function EventsTab({
                         }`} />
                         {label}
                       </span>
-                    </td>
-                    <td className="py-3.5 px-4 font-mono text-[11px]">
+
+                      {/* Registration Open/Closed Badge */}
                       {timing.isRegistrationClosed ? (
-                        <span className="text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded-md inline-block">
-                          Closed
+                        <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full text-red-300 bg-red-500/10 border border-red-500/20 uppercase font-semibold">
+                          Registration Closed
                         </span>
-                      ) : e.registrationDeadline ? (
-                        <span className="text-amber-300 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md inline-block" title={`Closes: ${timing.registrationDeadlineLabel}`}>
-                          Until {new Date(e.registrationDeadline).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                      ) : event.registrationDeadline ? (
+                        <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full text-amber-300 bg-amber-500/10 border border-amber-500/20 font-semibold">
+                          Deadline: {new Date(event.registrationDeadline).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
                         </span>
                       ) : (
-                        <span className="text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md inline-block">
-                          Open
+                        <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 font-semibold uppercase">
+                          Registrations Open
                         </span>
                       )}
-                    </td>
-                    <td className="py-3.5 px-4 text-right space-x-2">
-                      <button
-                        onClick={() => onEditClick(e)}
-                        className="px-3 py-1 bg-white/10 hover:bg-white/20 border border-white/15 text-white rounded-md text-[11px] font-mono transition-all"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => onDeleteClick(e._id)}
-                        className="px-3 py-1 bg-white/5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/30 text-white/60 hover:text-red-400 rounded-md text-[11px] font-mono transition-all"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+
+                      {/* Registration Type Badge */}
+                      <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full text-white/70 bg-white/5 border border-white/10 uppercase flex items-center gap-1">
+                        {event.registrationType === 'team' ? (
+                          <>
+                            <FiUsers className="size-3 text-blue-400" />
+                            Team ({event.teamMinSize || 2}–{event.teamMaxSize || 4})
+                          </>
+                        ) : (
+                          <>
+                            <FiUser className="size-3 text-emerald-400" />
+                            Solo Entry
+                          </>
+                        )}
+                      </span>
+
+                      {/* Custom Form Badge */}
+                      {event.useCustomForm && (
+                        <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full text-[#FF355E] bg-[#FF355E]/10 border border-[#FF355E]/30 font-semibold">
+                          Custom Form
+                        </span>
+                      )}
+
+                      {/* Google Form Badge */}
+                      {event.forceGoogleForm && (
+                        <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full text-amber-400 bg-amber-500/10 border border-amber-500/20 font-semibold">
+                          Google Form
+                        </span>
+                      )}
+
+                      {/* Results Declared Badge */}
+                      {hasWinners && (
+                        <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full text-amber-300 bg-amber-500/10 border border-amber-500/30 font-bold flex items-center gap-1">
+                          <FiAward className="size-3 text-amber-400" />
+                          Results Published
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Event Title */}
+                    <div>
+                      <h2 className="text-xl font-bold text-white tracking-tight group-hover:text-white transition-colors">
+                        {event.title}
+                      </h2>
+                      {event.description && (
+                        <p className="text-xs text-white/60 line-clamp-2 leading-relaxed mt-1 font-sans">
+                          {event.description}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Schedule & Links Meta Row */}
+                    <div className="flex flex-wrap items-center gap-4 text-xs font-mono text-white/50 pt-1">
+                      <div className="flex items-center gap-1.5 text-white/80">
+                        <FiCalendar className="size-3.5 text-[#FF355E]" />
+                        <span>{event.date ? new Date(event.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : 'Date TBA'}</span>
+                      </div>
+
+                      {event.time && (
+                        <div className="flex items-center gap-1.5 text-white/80">
+                          <FiClock className="size-3.5 text-amber-400" />
+                          <span>{event.time}</span>
+                        </div>
+                      )}
+
+                      {event.eventType && (
+                        <div className="flex items-center gap-1.5 text-white/60 capitalize">
+                          {event.eventType === 'online' ? <FiGlobe className="size-3.5 text-blue-400" /> : <FiMapPin className="size-3.5 text-emerald-400" />}
+                          <span>{event.eventType}</span>
+                        </div>
+                      )}
+
+                      {event.ruleBookUrl && (
+                        <a 
+                          href={event.ruleBookUrl} 
+                          target="_blank" 
+                          rel="noreferrer" 
+                          className="flex items-center gap-1 text-[#FF355E] hover:underline"
+                        >
+                          <FiBookOpen className="size-3.5" /> Rule Book
+                        </a>
+                      )}
+
+                      {event.whatsappGroupLink && (
+                        <a 
+                          href={event.whatsappGroupLink} 
+                          target="_blank" 
+                          rel="noreferrer" 
+                          className="flex items-center gap-1 text-emerald-400 hover:underline"
+                        >
+                          <FiMessageCircle className="size-3.5" /> WhatsApp
+                        </a>
+                      )}
+                    </div>
+
+                    {/* Additional Custom Fields Tag Pills */}
+                    {event.registrationFields && event.registrationFields.length > 0 && (
+                      <div className="pt-2 border-t border-white/5 space-y-1.5">
+                        <span className="text-[10px] font-mono uppercase tracking-widest text-white/40 block font-semibold">
+                          Custom Form Fields ({event.registrationFields.length}):
+                        </span>
+                        <div className="flex flex-wrap gap-1.5">
+                          {event.registrationFields.map((field: any, idx: number) => (
+                            <span
+                              key={idx}
+                              className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-white/5 text-white/70 border border-white/10"
+                            >
+                              {field.label} {field.required ? <span className="text-[#FF355E]">*</span> : ''}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Right Action Buttons Toolbar */}
+                  <div className="flex sm:flex-row lg:flex-col items-center gap-2 shrink-0 pt-2 lg:pt-0">
+                    {/* Manage Results / Winners Trophy Button */}
+                    <button
+                      type="button"
+                      onClick={() => setSelectedResultEvent(event)}
+                      className={`p-2.5 rounded-xl border transition-all flex items-center justify-center gap-1.5 text-xs font-mono font-medium shadow-sm w-full sm:w-auto lg:w-36 ${
+                        hasWinners 
+                          ? 'border-amber-500/40 bg-amber-500/15 text-amber-300 hover:bg-amber-500/25' 
+                          : 'border-amber-500/20 bg-amber-500/10 text-amber-400/80 hover:text-amber-300 hover:bg-amber-500/20 hover:border-amber-500/40'
+                      }`}
+                      title="Declare &amp; publish event winners"
+                    >
+                      <FiAward className="size-4 text-amber-400" />
+                      <span>{hasWinners ? 'Edit Results' : 'Results'}</span>
+                    </button>
+
+                    {/* Edit Event Button */}
+                    <button
+                      type="button"
+                      onClick={() => onEditClick(event)}
+                      className="p-2.5 rounded-xl border border-white/10 bg-white/5 text-white/80 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all flex items-center justify-center gap-1.5 text-xs font-mono w-full sm:w-auto lg:w-36"
+                      title="Edit Event Details"
+                    >
+                      <FiEdit2 className="size-4 text-blue-400" />
+                      <span>Edit</span>
+                    </button>
+
+                    {/* Delete Event Button */}
+                    <button
+                      type="button"
+                      onClick={() => onDeleteClick(event._id)}
+                      className="p-2.5 rounded-xl border border-white/10 bg-white/5 text-white/50 hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/30 transition-all flex items-center justify-center gap-1.5 text-xs font-mono w-full sm:w-auto lg:w-36"
+                      title="Delete Event"
+                    >
+                      <FiTrash2 className="size-4" />
+                      <span>Delete</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       ) : (
-        <div className="py-16 text-center border border-white/10 rounded-xl bg-[#0E101A] text-white/40 font-mono text-xs">
-          No matching events found.
+        /* Empty State */
+        <div className="py-20 text-center border border-white/10 rounded-2xl bg-[#141414] space-y-3 font-sans">
+          <FiCalendar className="size-12 text-white/20 mx-auto" />
+          <p className="text-base font-bold text-white tracking-tight">No events found</p>
+          <p className="text-xs text-white/50 max-w-sm mx-auto font-mono">
+            {eventSearch
+              ? `No events matched your search "${eventSearch}". Try clearing your search query.`
+              : 'No events found in this category. Click "+ Create Event" to create your first event!'}
+          </p>
+          {eventSearch && (
+            <button
+              type="button"
+              onClick={() => setEventSearch('')}
+              className="mt-2 px-4 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-mono text-white transition-all"
+            >
+              Clear Search
+            </button>
+          )}
         </div>
+      )}
+
+      {/* Result / Podium Modal */}
+      {selectedResultEvent && (
+        <ResultModal
+          event={selectedResultEvent}
+          onClose={() => setSelectedResultEvent(null)}
+          onSuccess={() => {
+            setSelectedResultEvent(null);
+            onRefreshEvents?.();
+          }}
+        />
       )}
     </div>
   );

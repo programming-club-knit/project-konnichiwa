@@ -21,7 +21,9 @@ export async function getEvents(): Promise<EventItem[]> {
 export async function getEventBySlug(slug: string): Promise<EventItem | null> {
   try {
     await connectDB();
-    const event = await Event.findOne({ slug }).lean();
+    const isObjectId = /^[0-9a-fA-F]{24}$/.test(slug);
+    const query = isObjectId ? { $or: [{ slug }, { _id: slug }] } : { slug };
+    const event = await Event.findOne(query).lean();
     if (!event) return null;
     return JSON.parse(JSON.stringify(event)) as EventItem;
   } catch (err) {

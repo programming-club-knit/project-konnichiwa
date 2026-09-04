@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { 
@@ -14,7 +14,8 @@ import {
   FiGlobe, 
   FiSearch, 
   FiBookOpen, 
-  FiAward
+  FiAward,
+  FiLoader
 } from "react-icons/fi";
 import { Highlighter } from "@/components/ui/highlighter";
 import { type EventItem, getEventDynamicStatus } from "@/lib/event-status";
@@ -35,9 +36,41 @@ export function EventsPageContent({
     "all" | "live" | "upcoming" | "past" | "online" | "offline"
   >("all");
 
+  const [clientEvents, setClientEvents] = useState<EventItem[] | null>(null);
+  const [loadingLive, setLoadingLive] = useState<boolean>(false);
+  const initialServerCount = liveEvents.length + upcomingEvents.length + pastEvents.length;
+  const hasFetchedRef = useRef(false);
+
+  useEffect(() => {
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
+
+    // Background live sync ensures latest events on Vercel deployment even if edge cache is stale
+    if (initialServerCount === 0) {
+      setLoadingLive(true);
+    }
+
+    fetch("/api/events")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.success && Array.isArray(data.events) && data.events.length > 0) {
+          setClientEvents(data.events);
+        }
+      })
+      .catch((err) => {
+        console.error("Events live sync error:", err);
+      })
+      .finally(() => {
+        setLoadingLive(false);
+      });
+  }, [initialServerCount]);
+
   const allEvents = useMemo(() => {
+    if (clientEvents && clientEvents.length > 0) {
+      return clientEvents;
+    }
     return [...liveEvents, ...upcomingEvents, ...pastEvents];
-  }, [liveEvents, upcomingEvents, pastEvents]);
+  }, [clientEvents, liveEvents, upcomingEvents, pastEvents]);
 
   // Dynamically partition and track timing
   const liveList = useMemo(() => {
@@ -542,6 +575,12 @@ export function EventsPageContent({
                   </div>
                 );
               })}
+            </div>
+          ) : loadingLive ? (
+            <div className="py-20 text-center border border-white/10 rounded-2xl bg-[#121626] space-y-3">
+              <FiLoader className="size-8 text-[#FF355E] animate-spin mx-auto" />
+              <p className="text-sm font-mono text-slate-300">Fetching latest events...</p>
+              <p className="text-xs font-mono text-slate-500">Connecting to live database schedule...</p>
             </div>
           ) : (
             <div className="py-20 text-center border border-white/10 rounded-2xl bg-[#121626] space-y-3">

@@ -3,6 +3,9 @@ import { EventDetailContent } from "@/components/events/event-detail-content";
 import { getEventBySlug } from "@/lib/events";
 import type { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 type Params = {
   params: Promise<{ slug: string }>;
 };

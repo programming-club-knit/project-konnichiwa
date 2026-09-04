@@ -5,9 +5,9 @@ import Event from "@/models/event";
 
 type Params = { params: Promise<{ id: string }> };
 
-// PATCH /api/events/[id]/winners — admin only, assign winners
+// PATCH /api/events/[id]/winners — admin/member, assign winners
 export async function PATCH(request: NextRequest, { params }: Params) {
-  const { response } = await requireAuth(["admin"]);
+  const { response } = await requireAuth(["admin", "member"]);
   if (response) return response;
 
   try {

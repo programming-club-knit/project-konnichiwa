@@ -34,6 +34,37 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  React.useEffect(() => {
+    let isCancelled = false;
+
+    fetch("/api/auth/me", { cache: "no-store" })
+      .then((res) => {
+        if (!res.ok) throw new Error("Not logged in");
+        return res.json();
+      })
+      .then((data) => {
+        if (!isCancelled && data.success && data.user) {
+          if (data.user.role === "admin" || data.user.role === "member") {
+            window.location.href = "/admin/dashboard";
+          } else {
+            window.location.href = "/profile";
+          }
+        } else if (!isCancelled) {
+          setCheckingAuth(false);
+        }
+      })
+      .catch(() => {
+        if (!isCancelled) {
+          setCheckingAuth(false);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -59,7 +90,7 @@ export default function LoginPage() {
         throw new Error(data.message || "Invalid credentials");
       }
 
-      if (data.role === "admin") {
+      if (data.role === "admin" || data.role === "member") {
         window.location.href = "/admin/dashboard";
       } else {
         window.location.href = "/profile";
@@ -70,6 +101,19 @@ export default function LoginPage() {
   };
 
   const loading = form.formState.isSubmitting;
+
+  if (checkingAuth) {
+    return (
+      <div className="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden bg-[#0f0f0f] font-sans">
+        <div className="flex flex-col items-center gap-3">
+          <FiLoader className="size-7 animate-spin text-[#FF355E]" />
+          <p className="text-xs text-[#8C93B0] uppercase tracking-wider font-mono">
+            Verifying session...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen w-full bg-[#0f0f0f] text-white pt-16 pb-16 flex flex-col items-center justify-center relative overflow-hidden selection:bg-[#FF355E]/30 font-sans">

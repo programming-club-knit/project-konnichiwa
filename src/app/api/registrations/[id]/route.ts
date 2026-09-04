@@ -7,9 +7,9 @@ import { computeAcademicFromRoll } from "@/lib/academic";
 
 type Params = { params: Promise<{ id: string }> };
 
-// DELETE /api/registrations/[id] — admin only, soft-delete registration
+// DELETE /api/registrations/[id] — admin/member, soft-delete registration
 export async function DELETE(_request: NextRequest, { params }: Params) {
-  const { response } = await requireAuth(["admin"]);
+  const { response } = await requireAuth(["admin", "member"]);
   if (response) return response;
 
   try {
@@ -40,9 +40,9 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
   }
 }
 
-// PATCH /api/registrations/[id] — admin only, edit registration
+// PATCH /api/registrations/[id] — admin/member, edit registration
 export async function PATCH(request: NextRequest, { params }: Params) {
-  const { response } = await requireAuth(["admin"]);
+  const { response } = await requireAuth(["admin", "member"]);
   if (response) return response;
 
   try {

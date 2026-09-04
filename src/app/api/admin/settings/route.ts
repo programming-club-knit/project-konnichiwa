@@ -4,7 +4,7 @@ import Setting from "@/models/setting";
 import { requireAuth } from "@/lib/auth";
 
 export async function GET() {
-  const { user, response } = await requireAuth(["admin"]);
+  const { user, response } = await requireAuth(["admin", "member"]);
   if (response) return response;
 
   try {

@@ -37,10 +37,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 3. Ensure role is admin
-    if (user.role !== "admin") {
+    // 3. Ensure role is admin or member (executive)
+    if (user.role !== "admin" && user.role !== "member") {
       return NextResponse.json(
-        { success: false, message: "Access denied. Admin role required." },
+        { success: false, message: "Access denied. Admin or executive member role required." },
         { status: 403 }
       );
     }

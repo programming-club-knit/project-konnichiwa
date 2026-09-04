@@ -160,14 +160,25 @@ export function EventForm({
             </div>
 
             <div className="space-y-1.5">
-              <Label className="flex items-center gap-1.5">
-                <FiClock className="size-4 text-white/60" /> Event Time
-              </Label>
+              <div className="flex items-center justify-between">
+                <Label className="flex items-center gap-1.5">
+                  <FiClock className="size-4 text-white/60" /> Event Time
+                </Label>
+                {eventForm.time && (
+                  <button
+                    type="button"
+                    onClick={() => setEventForm((prev: any) => ({ ...prev, time: '' }))}
+                    className="text-[11px] font-mono text-red-400 hover:text-red-300 underline cursor-pointer"
+                  >
+                    Clear Time
+                  </button>
+                )}
+              </div>
               <Input
-                type="text"
-                value={eventForm.time}
+                type="time"
+                value={eventForm.time || ''}
                 onChange={e => setEventForm((prev: any) => ({ ...prev, time: e.target.value }))}
-                placeholder="e.g. 5:00 PM IST"
+                className="cursor-pointer [color-scheme:dark]"
               />
             </div>
           </div>

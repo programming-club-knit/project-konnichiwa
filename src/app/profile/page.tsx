@@ -393,7 +393,7 @@ export default function ProfilePage() {
 
             {/* Admin Dashboard & Logout Links */}
             <div className="pt-4 border-t border-white/10 space-y-2 font-sans">
-              {user.role === "admin" && (
+              {(user.role === "admin" || user.role === "member") && (
                 <Link
                   href="/admin/dashboard"
                   className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-colors"

@@ -6,10 +6,8 @@ import { DEFAULT_PEOPLE_MEMBERS } from "@/app/api/people/route";
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await requireAuth(["admin"]);
-    if (!user) {
-      return NextResponse.json({ success: false, message: "Unauthorized. Admin required." }, { status: 401 });
-    }
+    const { response } = await requireAuth(["admin", "member"]);
+    if (response) return response;
 
     await connectDB();
     const body = await request.json().catch(() => ({}));

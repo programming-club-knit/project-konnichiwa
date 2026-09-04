@@ -5,7 +5,7 @@ import { requireAuth } from "@/lib/auth";
 
 // GET /api/admin/users — fetch all users
 export async function GET() {
-  const { response } = await requireAuth(["admin"]);
+  const { response } = await requireAuth(["admin", "member"]);
   if (response) return response;
 
   try {

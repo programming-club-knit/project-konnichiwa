@@ -9,6 +9,9 @@ import { getEvents } from "@/lib/events";
 import { getEventDynamicStatus } from "@/lib/event-status";
 import { TeamSection } from "@/components/landing/team-section";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 // Fetch events once at the server level — prioritize live and upcoming
 export default async function Home() {
   const allEvents = await getEvents();

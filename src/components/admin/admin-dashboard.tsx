@@ -28,6 +28,29 @@ function toDatetimeLocal(val?: string | Date | null): string {
   return `${Y}-${M}-${D}T${h}:${m}`;
 }
 
+function toTimeInputValue(val?: string | null): string {
+  if (!val) return '';
+  const trimmed = val.trim();
+  if (/^([01]\d|2[0-3]):[0-5]\d$/.test(trimmed)) {
+    return trimmed;
+  }
+  if (/^\d:[0-5]\d$/.test(trimmed)) {
+    return '0' + trimmed;
+  }
+  const match = trimmed.match(/^(\d{1,2}):(\d{2})\s*(am|pm)?/i);
+  if (match) {
+    let [ , hStr, mStr, meridiem ] = match;
+    let h = parseInt(hStr, 10);
+    const m = mStr;
+    if (meridiem) {
+      if (meridiem.toLowerCase() === 'pm' && h < 12) h += 12;
+      if (meridiem.toLowerCase() === 'am' && h === 12) h = 0;
+    }
+    return `${h.toString().padStart(2, '0')}:${m}`;
+  }
+  return '';
+}
+
 export function AdminDashboard() {
   const router = useRouter();
   const [adminUser, setAdminUser] = useState<UserType | null>(null);
@@ -113,8 +136,8 @@ export function AdminDashboard() {
         if (!res.ok) throw new Error("Unauthorized");
         const data = await res.json();
         
-        if (!data.success || data.user?.role !== 'admin') {
-          throw new Error("Access denied. Admin required.");
+        if (!data.success || (data.user?.role !== 'admin' && data.user?.role !== 'member')) {
+          throw new Error("Access denied. Admin or Executive Member required.");
         }
         
         if (!isCancelled) {
@@ -365,7 +388,7 @@ export function AdminDashboard() {
       title: event.title || '',
       description: event.description || '',
       date: formattedDate,
-      time: event.time || '',
+      time: toTimeInputValue(event.time),
       status: event.status || 'upcoming',
       coverImageUrl: event.coverImageUrl || '',
       googleFormLink: event.googleFormLink || '',
@@ -571,6 +594,7 @@ export function AdminDashboard() {
             resources={resources}
             setResources={setResources}
             onFormSubmit={handleEventFormSubmit}
+            onRefreshEvents={fetchInitialData}
           />
         )}
 
@@ -580,11 +604,7 @@ export function AdminDashboard() {
             events={events}
             selectedEventId={selectedEventId}
             setSelectedEventId={setSelectedEventId}
-            filteredRegistrations={filteredRegistrations}
-            registrationSearch={registrationSearch}
-            setRegistrationSearch={setRegistrationSearch}
-            dataLoading={dataLoading}
-            onExportCSV={handleExportCSV}
+            adminUser={adminUser}
           />
         )}
 
@@ -594,7 +614,6 @@ export function AdminDashboard() {
             events={events}
             selectedEventId={selectedEventId}
             setSelectedEventId={setSelectedEventId}
-            registrations={registrations}
           />
         )}
 
@@ -604,13 +623,6 @@ export function AdminDashboard() {
             events={events}
             selectedEventId={selectedEventId}
             setSelectedEventId={setSelectedEventId}
-            mailSubject={mailSubject}
-            setMailSubject={setMailSubject}
-            mailBody={mailBody}
-            setMailBody={setMailBody}
-            mailSending={mailSending}
-            mailMessage={mailMessage}
-            onSendMail={handleSendMail}
           />
         )}
 
@@ -630,6 +642,7 @@ export function AdminDashboard() {
             onApproveUser={handleApproveUser}
             onDenyUser={handleDenyUser}
             onUpdateUser={handleUpdateUser}
+            onRefresh={fetchInitialData}
           />
         )}
 

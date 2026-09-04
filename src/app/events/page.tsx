@@ -3,6 +3,9 @@ import { getEvents } from "@/lib/events";
 import { getEventDynamicStatus } from "@/lib/event-status";
 import type { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Events | PTSC KNIT Sultanpur",
   description:

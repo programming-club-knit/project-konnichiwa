@@ -8,10 +8,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await requireAuth(["admin"]);
-    if (!user) {
-      return NextResponse.json({ success: false, message: "Unauthorized. Admin required." }, { status: 401 });
-    }
+    const { response } = await requireAuth(["admin", "member"]);
+    if (response) return response;
 
     await connectDB();
     const { id } = await params;
@@ -34,10 +32,8 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await requireAuth(["admin"]);
-    if (!user) {
-      return NextResponse.json({ success: false, message: "Unauthorized. Admin required." }, { status: 401 });
-    }
+    const { response } = await requireAuth(["admin", "member"]);
+    if (response) return response;
 
     await connectDB();
     const { id } = await params;

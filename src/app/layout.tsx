@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, Space_Grotesk, Geist } from "next/font/google";
+import { Geist_Mono, Space_Grotesk, Geist } from "next/font/google";
 import "./globals.css";
 
 import { SiteHeader } from "@/components/site-header";
@@ -14,10 +14,9 @@ const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
 });
 
-const ibmPlexMono = IBM_Plex_Mono({
-  variable: "--font-ibm-plex-mono",
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
@@ -35,7 +34,7 @@ export default function RootLayout({
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={cn("dark", "h-full", "antialiased", spaceGrotesk.variable, ibmPlexMono.variable, "font-sans", geist.variable)}
+      className={cn("dark", "h-full", "antialiased", spaceGrotesk.variable, geistMono.variable, "font-sans", geist.variable)}
     >
       <body className="flex min-h-screen flex-col bg-[#0f0f0f] text-foreground relative">
         <GlobalPointer />

@@ -4,6 +4,9 @@ import { requireAuth } from "@/lib/auth";
 import Event from "@/models/event";
 import { slugify, ensureUniqueSlug } from "@/lib/slug";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 // GET /api/events — public, fetch all events
 export async function GET() {
   try {
