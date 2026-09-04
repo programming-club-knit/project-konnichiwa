@@ -3,25 +3,54 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { FiMail, FiLock, FiArrowRight, FiArrowLeft, FiLoader } from "react-icons/fi";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+
+const loginSchema = z.object({
+  email: z
+    .string()
+    .min(1, "Email is required")
+    .email("Please enter a valid email address"),
+  password: z
+    .string()
+    .min(1, "Password is required")
+    .min(6, "Password must be at least 6 characters"),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = async (values: LoginFormValues) => {
+    setServerError(null);
 
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(values),
       });
 
       const data = await res.json();
@@ -36,11 +65,11 @@ export default function LoginPage() {
         window.location.href = "/profile";
       }
     } catch (err: any) {
-      setError(err.message || "Log in failed");
-    } finally {
-      setLoading(false);
+      setServerError(err.message || "Log in failed");
     }
   };
+
+  const loading = form.formState.isSubmitting;
 
   return (
     <div className="min-h-screen w-full bg-[#0f0f0f] text-white pt-16 pb-16 flex flex-col items-center justify-center relative overflow-hidden selection:bg-[#FF355E]/30 font-sans">
@@ -77,63 +106,79 @@ export default function LoginPage() {
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-[#141414] p-8 shadow-2xl font-sans">
-          {error && (
-            <div className="mb-6 p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-sans font-bold text-center">
-              {error}
+          {serverError && (
+            <div className="mb-6 p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-[#FF4D70] text-xs font-sans font-bold text-center">
+              {serverError}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5 font-sans">
-            <div>
-              <label className="text-[11px] font-sans font-bold text-[#8C93B0] uppercase tracking-wider block mb-1.5">
-                Email Address
-              </label>
-              <div className="relative">
-                <FiMail className="size-4 absolute left-3.5 top-3.5 text-[#8C93B0]" />
-                <input
-                  type="email"
-                  required
-                  placeholder="name@knit.ac.in"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-3 pl-10 pr-4 text-sm text-white font-sans focus:outline-none focus:border-[#FF355E]"
-                />
-              </div>
-            </div>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 font-sans">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email Address</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <FiMail className="size-4 absolute left-3.5 top-3.5 text-[#8C93B0] pointer-events-none z-10" />
+                        <Input
+                          type="email"
+                          placeholder="name@knit.ac.in"
+                          className="pl-10"
+                          disabled={loading}
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div>
-              <label className="text-[11px] font-sans font-bold text-[#8C93B0] uppercase tracking-wider block mb-1.5">
-                Password
-              </label>
-              <div className="relative">
-                <FiLock className="size-4 absolute left-3.5 top-3.5 text-[#8C93B0]" />
-                <input
-                  type="password"
-                  required
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-3 pl-10 pr-4 text-sm text-white font-sans focus:outline-none focus:border-[#FF355E]"
-                />
-              </div>
-            </div>
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <FiLock className="size-4 absolute left-3.5 top-3.5 text-[#8C93B0] pointer-events-none z-10" />
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          className="pl-10"
+                          disabled={loading}
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full mt-2 py-3 rounded-xl bg-[#FF355E] text-white font-sans font-bold text-xs uppercase tracking-wider shadow-lg flex items-center justify-center gap-2 hover:bg-[#FF4D70] transition-colors disabled:opacity-50"
-            >
-              {loading ? (
-                <>
-                  <FiLoader className="size-4 animate-spin" /> Authenticating...
-                </>
-              ) : (
-                <>
-                  Log In <FiArrowRight className="size-4" />
-                </>
-              )}
-            </button>
-          </form>
+              <Button
+                type="submit"
+                variant="sleek"
+                size="lg"
+                className="w-full mt-2 justify-center shadow-lg gap-2 font-sans"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <FiLoader className="size-4 animate-spin" /> Authenticating...
+                  </>
+                ) : (
+                  <>
+                    Log In <FiArrowRight className="size-4" />
+                  </>
+                )}
+              </Button>
+            </form>
+          </Form>
 
           <div className="mt-6 pt-5 border-t border-white/10 text-center space-y-2 font-sans">
             <p className="text-xs text-[#8C93B0]">

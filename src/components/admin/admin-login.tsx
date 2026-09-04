@@ -4,26 +4,54 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { FiLock, FiMail, FiArrowRight, FiArrowLeft, FiLoader } from 'react-icons/fi';
 import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+
+const adminLoginSchema = z.object({
+  email: z
+    .string()
+    .min(1, "Email is required")
+    .email("Please enter a valid email address"),
+  password: z
+    .string()
+    .min(1, "Password is required")
+    .min(6, "Password must be at least 6 characters"),
+});
+
+type AdminLoginFormValues = z.infer<typeof adminLoginSchema>;
 
 export function AdminLoginForm() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
+  const form = useForm<AdminLoginFormValues>({
+    resolver: zodResolver(adminLoginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = async (values: AdminLoginFormValues) => {
+    setServerError(null);
 
     try {
       const res = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(values),
       });
 
       const data = await res.json();
@@ -35,11 +63,11 @@ export function AdminLoginForm() {
       // On success, redirect to the admin dashboard with fresh page load
       window.location.href = "/admin/dashboard";
     } catch (err: any) {
-      setError(err.message || "An unexpected error occurred");
-    } finally {
-      setLoading(false);
+      setServerError(err.message || "An unexpected error occurred");
     }
   };
+
+  const loading = form.formState.isSubmitting;
 
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden bg-[#0f0f0f] font-sans">
@@ -84,88 +112,102 @@ export function AdminLoginForm() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-8 rounded-2xl border border-white/10 bg-[#141414] shadow-xl font-sans">
-          {error && (
-            <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold font-sans uppercase tracking-wider text-center">
-              {error}
+        <div className="p-8 rounded-2xl border border-white/10 bg-[#141414] shadow-xl font-sans">
+          {serverError && (
+            <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-[#FF4D70] text-xs font-semibold font-sans uppercase tracking-wider text-center">
+              {serverError}
             </div>
           )}
 
-          <div className="flex flex-col gap-2 font-sans">
-            <label className="text-xs font-black text-[#8C93B0] uppercase tracking-widest ml-0.5 font-sans">
-              Email Address
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#8C93B0]">
-                <FiMail className="size-4" />
-              </div>
-              <input
-                type="email"
-                placeholder="admin@ptsc.knit.ac.in"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-3 pl-11 pr-4 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF355E] transition-colors font-sans"
-                required
-                disabled={loading}
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5 font-sans">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email Address</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#8C93B0]">
+                          <FiMail className="size-4" />
+                        </div>
+                        <Input
+                          type="email"
+                          placeholder="admin@ptsc.knit.ac.in"
+                          className="pl-11"
+                          disabled={loading}
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-          </div>
 
-          <div className="flex flex-col gap-2 font-sans">
-            <div className="flex items-center justify-between ml-0.5 font-sans">
-              <label className="text-xs font-black text-[#8C93B0] uppercase tracking-widest font-sans">
-                Password
-              </label>
-              <a href="#" className="text-xs font-bold text-[#FF355E] hover:underline transition-all font-sans">
-                Forgot?
-              </a>
-            </div>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#8C93B0]">
-                <FiLock className="size-4" />
-              </div>
-              <input
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-3 pl-11 pr-4 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF355E] transition-colors font-sans"
-                required
-                disabled={loading}
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Password</FormLabel>
+                      <a href="#" className="text-xs font-bold text-[#FF355E] hover:underline transition-all font-sans">
+                        Forgot?
+                      </a>
+                    </div>
+                    <FormControl>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#8C93B0]">
+                          <FiLock className="size-4" />
+                        </div>
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          className="pl-11"
+                          disabled={loading}
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
+
+              <Button
+                type="submit"
+                variant="sleek"
+                size="lg"
+                className="w-full mt-2 justify-center shadow-lg gap-2 font-sans"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <FiLoader className="size-4 animate-spin" />
+                    Signing in...
+                  </>
+                ) : (
+                  <>
+                    Sign In <FiArrowRight className="size-4" />
+                  </>
+                )}
+              </Button>
+            </form>
+          </Form>
+
+          <div className="mt-6 text-center space-y-2 font-sans">
+            <p className="text-xs text-[#8C93B0] font-sans">
+              PTSC Executive Member?{" "}
+              <Link href="/admin/register" className="text-[#FF355E] font-bold hover:underline font-sans">
+                Register Here
+              </Link>
+            </p>
+            <p className="text-[11px] text-white/30 uppercase tracking-widest font-sans">
+              Authorized Personnel Only
+            </p>
           </div>
-
-          <Button
-            type="submit"
-            variant="sleek"
-            size="lg"
-            className="w-full mt-2 justify-center shadow-lg gap-2 font-sans"
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <FiLoader className="size-4 animate-spin" />
-                Signing in...
-              </>
-            ) : (
-              <>
-                Sign In <FiArrowRight className="size-4" />
-              </>
-            )}
-          </Button>
-        </form>
-
-        <div className="mt-6 text-center space-y-2 font-sans">
-          <p className="text-xs text-[#8C93B0] font-sans">
-            PTSC Executive Member?{" "}
-            <Link href="/admin/register" className="text-[#FF355E] font-bold hover:underline font-sans">
-              Register Here
-            </Link>
-          </p>
-          <p className="text-[11px] text-white/30 uppercase tracking-widest font-sans">
-            Authorized Personnel Only
-          </p>
         </div>
       </div>
     </div>

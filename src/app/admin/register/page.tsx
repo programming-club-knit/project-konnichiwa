@@ -3,8 +3,21 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FiArrowRight, FiArrowLeft, FiCheck, FiAlertCircle, FiLoader, FiShield, FiUserCheck, FiAward, FiBookOpen } from "react-icons/fi";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { FiArrowRight, FiArrowLeft, FiCheck, FiAlertCircle, FiLoader, FiShield, FiAward, FiBookOpen } from "react-icons/fi";
 import { parseAcademicFromEmail, computeAcademicFromRoll } from "@/lib/academic";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const POSTS = [
   "Joint Secretary",
@@ -19,49 +32,74 @@ const POSTS = [
   "Executive members",
 ];
 
+const adminRegisterSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  username: z.string().min(3, "Username must be at least 3 characters"),
+  email: z
+    .string()
+    .min(1, "Email is required")
+    .email("Invalid email address"),
+  mobile: z.string().min(10, "Mobile number must be at least 10 digits"),
+  rollNo: z.string().optional(),
+  batch: z.string().optional(),
+  post: z.string().min(1, "Please select your PTSC Executive post"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+type AdminRegisterFormValues = z.infer<typeof adminRegisterSchema>;
+
 export default function AdminRegisterPage() {
   const router = useRouter();
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [mobile, setMobile] = useState("");
-  const [rollNo, setRollNo] = useState("");
-  const [password, setPassword] = useState("");
-  const [batch, setBatch] = useState("");
-  const [post, setPost] = useState("");
 
   const [allowSignup, setAllowSignup] = useState<boolean>(true);
   const [fetchingSettings, setFetchingSettings] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [serverError, setServerError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  const form = useForm<AdminRegisterFormValues>({
+    resolver: zodResolver(adminRegisterSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      username: "",
+      email: "",
+      mobile: "",
+      rollNo: "",
+      batch: "",
+      post: "",
+      password: "",
+    },
+  });
+
+  const watchedEmail = form.watch("email");
+  const watchedRollNo = form.watch("rollNo");
 
   // Derive academic details from email or manual roll number entry
   const parsedAcademic = useMemo(() => {
-    const fromEmail = parseAcademicFromEmail(email);
+    const fromEmail = parseAcademicFromEmail(watchedEmail || "");
     if (fromEmail.valid) return fromEmail;
     
-    if (rollNo && /^\d{5,6}$/.test(rollNo.trim())) {
-      const fromRoll = computeAcademicFromRoll(rollNo);
+    if (watchedRollNo && /^\d{5,6}$/.test(watchedRollNo.trim())) {
+      const fromRoll = computeAcademicFromRoll(watchedRollNo);
       if (fromRoll.valid) {
-        const batchYear = rollNo.trim().length === 6 ? fromRoll.admissionYear + 3 : fromRoll.admissionYear + 4;
-        return { ...fromRoll, rollNumber: rollNo.trim(), batchYear };
+        const batchYear = watchedRollNo.trim().length === 6 ? fromRoll.admissionYear + 3 : fromRoll.admissionYear + 4;
+        return { ...fromRoll, rollNumber: watchedRollNo.trim(), batchYear };
       }
     }
     return { valid: false as const, reason: "No valid roll/email" };
-  }, [email, rollNo]);
+  }, [watchedEmail, watchedRollNo]);
 
   useEffect(() => {
     if (parsedAcademic.valid) {
-      if (parsedAcademic.rollNumber && !rollNo) {
-        setRollNo(parsedAcademic.rollNumber);
+      if (parsedAcademic.rollNumber && !form.getValues("rollNo")) {
+        form.setValue("rollNo", parsedAcademic.rollNumber, { shouldValidate: true });
       }
       if (parsedAcademic.batchYear) {
-        setBatch(String(parsedAcademic.batchYear));
+        form.setValue("batch", String(parsedAcademic.batchYear), { shouldValidate: true });
       }
     }
-  }, [parsedAcademic]);
+  }, [parsedAcademic, form]);
 
   const hasFetchedSettingsRef = useRef(false);
 
@@ -80,37 +118,29 @@ export default function AdminRegisterPage() {
       .finally(() => setFetchingSettings(false));
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
+  const onSubmit = async (values: AdminRegisterFormValues) => {
+    setServerError(null);
     setSuccess(null);
 
     if (!allowSignup) {
-      setError("Executive registrations are currently closed by administrator.");
+      setServerError("Executive registrations are currently closed by administrator.");
       return;
     }
-
-    if (!post) {
-      setError("Please select your PTSC Executive post.");
-      return;
-    }
-
-    setLoading(true);
 
     try {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          firstName,
-          lastName,
-          username,
-          email,
-          mobile: Number(mobile),
-          rollNo,
-          password,
-          batch: batch ? Number(batch) : undefined,
-          post,
+          firstName: values.firstName,
+          lastName: values.lastName,
+          username: values.username,
+          email: values.email,
+          mobile: Number(values.mobile),
+          rollNo: values.rollNo,
+          password: values.password,
+          batch: values.batch ? Number(values.batch) : undefined,
+          post: values.post,
           registrationType: "executive",
         }),
       });
@@ -126,11 +156,11 @@ export default function AdminRegisterPage() {
         router.push("/admin");
       }, 2500);
     } catch (err: any) {
-      setError(err.message || "Registration failed. Please try again.");
-    } finally {
-      setLoading(false);
+      setServerError(err.message || "Registration failed. Please try again.");
     }
   };
+
+  const loading = form.formState.isSubmitting;
 
   return (
     <div className="min-h-screen w-full bg-[#0f0f0f] text-white pt-12 pb-16 flex flex-col items-center justify-center relative overflow-hidden selection:bg-[#FF355E]/30 font-sans">
@@ -175,7 +205,6 @@ export default function AdminRegisterPage() {
             </div>
           </div>
         ) : (
-          /* Main Card: Landscape on Desktop (lg:flex-row), Portrait on Mobile (flex-col) */
           <div className="rounded-3xl border border-white/10 bg-[#141414] p-6 sm:p-10 shadow-2xl flex flex-col lg:flex-row gap-8 lg:gap-12 items-stretch font-sans">
             
             {/* Left Column: Executive Info & Branding */}
@@ -244,9 +273,9 @@ export default function AdminRegisterPage() {
 
             {/* Right Column: Executive Form Inputs */}
             <div className="flex-1 flex flex-col justify-center space-y-5">
-              {error && (
-                <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold text-center">
-                  {error}
+              {serverError && (
+                <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-[#FF4D70] text-xs font-bold text-center">
+                  {serverError}
                 </div>
               )}
 
@@ -256,163 +285,185 @@ export default function AdminRegisterPage() {
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-[11px] font-bold text-[#8C93B0] uppercase tracking-wider block mb-1.5">
-                      First Name
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Ankit"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                      className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="firstName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>First Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Ankit" disabled={loading} {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                  </div>
-                  <div>
-                    <label className="text-[11px] font-bold text-[#8C93B0] uppercase tracking-wider block mb-1.5">
-                      Last Name
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Singh"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                      className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-[11px] font-bold text-[#8C93B0] uppercase tracking-wider block mb-1.5">
-                      Username
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="ankit_ptsc"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                    <FormField
+                      control={form.control}
+                      name="lastName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Last Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Singh" disabled={loading} {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
                   </div>
 
-                  <div>
-                    <label className="text-[11px] font-bold text-[#8C93B0] uppercase tracking-wider block mb-1.5">
-                      Mobile Number
-                    </label>
-                    <input
-                      type="tel"
-                      required
-                      placeholder="9876543210"
-                      value={mobile}
-                      onChange={(e) => setMobile(e.target.value)}
-                      className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="username"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Username</FormLabel>
+                          <FormControl>
+                            <Input placeholder="ankit_ptsc" disabled={loading} {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="mobile"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Mobile Number</FormLabel>
+                          <FormControl>
+                            <Input type="tel" placeholder="9876543210" disabled={loading} {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
                   </div>
-                </div>
 
-                <div>
-                  <label className="text-[11px] font-bold text-[#8C93B0] uppercase tracking-wider block mb-1.5">
-                    Email Address
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    placeholder="executive.23201@knit.ac.in"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email Address</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="email"
+                            placeholder="executive.23201@knit.ac.in"
+                            disabled={loading}
+                            {...field}
+                          />
+                        </FormControl>
+                        {parsedAcademic.valid && (
+                          <p className="mt-1.5 text-[11px] text-emerald-400 font-sans flex items-center gap-1 font-medium">
+                            <FiCheck className="size-3.5 shrink-0" />
+                            Auto-detected: <strong>{parsedAcademic.branch}</strong> • Batch {parsedAcademic.batchYear} (Year {parsedAcademic.year})
+                          </p>
+                        )}
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                  {parsedAcademic.valid && (
-                    <p className="mt-1.5 text-[11px] text-emerald-400 font-sans flex items-center gap-1 font-medium">
-                      <FiCheck className="size-3.5 shrink-0" />
-                      Auto-detected: <strong>{parsedAcademic.branch}</strong> • Batch {parsedAcademic.batchYear} (Year {parsedAcademic.year})
-                    </p>
-                  )}
-                </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-[11px] font-bold text-[#8C93B0] uppercase tracking-wider block mb-1.5">
-                      Roll Number
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="23201"
-                      value={rollNo}
-                      onChange={(e) => setRollNo(e.target.value)}
-                      className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="rollNo"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Roll Number</FormLabel>
+                          <FormControl>
+                            <Input placeholder="23201" disabled={loading} {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="batch"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Batch Year</FormLabel>
+                          <FormControl>
+                            <Input type="number" placeholder="2027" disabled={loading} {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
                   </div>
-                  <div>
-                    <label className="text-[11px] font-bold text-[#8C93B0] uppercase tracking-wider block mb-1.5">
-                      Batch Year
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="2027"
-                      value={batch}
-                      onChange={(e) => setBatch(e.target.value)}
-                      className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
-                    />
-                  </div>
-                </div>
 
-                <div>
-                  <label className="text-[11px] font-bold text-[#8C93B0] uppercase tracking-wider block mb-1.5">
-                    PTSC Executive Post
-                  </label>
-                  <select
-                    required
-                    value={post}
-                    onChange={(e) => setPost(e.target.value)}
-                    className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                  <FormField
+                    control={form.control}
+                    name="post"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>PTSC Executive Post</FormLabel>
+                        <FormControl>
+                          <select
+                            disabled={loading}
+                            className="flex h-11 w-full rounded-xl border border-white/10 bg-[#0f0f0f] px-4 py-2.5 text-sm text-white transition-all outline-none focus:border-[#FF355E] focus:ring-1 focus:ring-[#FF355E]/50 font-sans [color-scheme:dark]"
+                            {...field}
+                          >
+                            <option value="">Select Post...</option>
+                            {POSTS.map((p) => (
+                              <option key={p} value={p}>
+                                {p}
+                              </option>
+                            ))}
+                          </select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="••••••••"
+                            disabled={loading}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button
+                    type="submit"
+                    variant="sleek"
+                    size="lg"
+                    className="w-full mt-4 justify-center shadow-lg gap-2 font-sans"
+                    disabled={loading}
                   >
-                    <option value="">Select Post...</option>
-                    {POSTS.map((p) => (
-                      <option key={p} value={p}>
-                        {p}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="text-[11px] font-bold text-[#8C93B0] uppercase tracking-wider block mb-1.5">
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    required
-                    minLength={6}
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full mt-4 py-3.5 rounded-xl bg-[#FF355E] text-white font-bold text-xs uppercase tracking-wider shadow-lg flex items-center justify-center gap-2 hover:bg-[#FF4D70] transition-colors disabled:opacity-50"
-                >
-                  {loading ? (
-                    <>
-                      <FiLoader className="size-4 animate-spin" /> Submitting...
-                    </>
-                  ) : (
-                    <>
-                      Submit Executive Application <FiArrowRight className="size-4" />
-                    </>
-                  )}
-                </button>
-              </form>
+                    {loading ? (
+                      <>
+                        <FiLoader className="size-4 animate-spin" /> Submitting...
+                      </>
+                    ) : (
+                      <>
+                        Submit Executive Application <FiArrowRight className="size-4" />
+                      </>
+                    )}
+                  </Button>
+                </form>
+              </Form>
             </div>
           </div>
         )}

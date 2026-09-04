@@ -9,6 +9,30 @@ import {
 } from "react-icons/fi";
 import { MyAchievementsSection } from "@/components/profile/my-achievements-section";
 import { OpenToWorkSection } from "@/components/profile/open-to-work-section";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+
+const profileEditSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  username: z.string().min(3, "Username must be at least 3 characters"),
+  mobile: z.string().min(10, "Mobile must be at least 10 digits"),
+  rollNo: z.string().optional(),
+  imageSrc: z.string().optional(),
+  password: z.string().optional(),
+});
+
+type ProfileEditFormValues = z.infer<typeof profileEditSchema>;
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -20,15 +44,20 @@ export default function ProfilePage() {
 
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
-
-  // Form states for profile editing
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [username, setUsername] = useState("");
-  const [mobile, setMobile] = useState("");
-  const [rollNo, setRollNo] = useState("");
-  const [password, setPassword] = useState("");
   const [imageSrc, setImageSrc] = useState("");
+
+  const profileForm = useForm<ProfileEditFormValues>({
+    resolver: zodResolver(profileEditSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      username: "",
+      mobile: "",
+      rollNo: "",
+      imageSrc: "",
+      password: "",
+    },
+  });
 
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,11 +73,15 @@ export default function ProfilePage() {
       const data = await res.json();
       if (data.success && data.user) {
         setUser(data.user);
-        setFirstName(data.user.firstName || "");
-        setLastName(data.user.lastName || "");
-        setUsername(data.user.username || "");
-        setMobile(String(data.user.mobile || ""));
-        setRollNo(data.user.rollNo || "");
+        profileForm.reset({
+          firstName: data.user.firstName || "",
+          lastName: data.user.lastName || "",
+          username: data.user.username || "",
+          mobile: String(data.user.mobile || ""),
+          rollNo: data.user.rollNo || "",
+          imageSrc: data.user.imageSrc || "",
+          password: "",
+        });
         setImageSrc(data.user.imageSrc || "");
       } else {
         router.push("/login");
@@ -155,8 +188,7 @@ export default function ProfilePage() {
     }
   };
 
-  const handleUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleUpdate = async (values: ProfileEditFormValues) => {
     setSaving(true);
     setError(null);
     setSuccess(null);
@@ -166,13 +198,13 @@ export default function ProfilePage() {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          firstName,
-          lastName,
-          username,
-          mobile: Number(mobile),
-          rollNo,
-          password: password ? password : undefined,
-          imageSrc,
+          firstName: values.firstName,
+          lastName: values.lastName,
+          username: values.username,
+          mobile: Number(values.mobile),
+          rollNo: values.rollNo,
+          password: values.password ? values.password : undefined,
+          imageSrc: values.imageSrc,
         }),
       });
 
@@ -180,9 +212,9 @@ export default function ProfilePage() {
       if (!res.ok) throw new Error(data.message || "Failed to update profile");
 
       setUser(data.user);
+      setImageSrc(data.user.imageSrc || "");
       setSuccess("Profile updated successfully!");
       setEditing(false);
-      setPassword("");
     } catch (err: any) {
       setError(err.message || "Failed to update profile");
     } finally {
@@ -415,121 +447,135 @@ export default function ProfilePage() {
                 </div>
 
                 {editing ? (
-                  <form onSubmit={handleUpdate} className="space-y-4 font-sans">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-[11px] font-bold text-[#8C93B0] uppercase block mb-1">
-                          First Name
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={firstName}
-                          onChange={(e) => setFirstName(e.target.value)}
-                          className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#F47174]"
+                  <Form {...profileForm}>
+                    <form onSubmit={profileForm.handleSubmit(handleUpdate)} className="space-y-4 font-sans">
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={profileForm.control}
+                          name="firstName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>First Name</FormLabel>
+                              <FormControl>
+                                <Input disabled={saving} {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={profileForm.control}
+                          name="lastName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Last Name</FormLabel>
+                              <FormControl>
+                                <Input disabled={saving} {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
                         />
                       </div>
-                      <div>
-                        <label className="text-[11px] font-bold text-[#8C93B0] uppercase block mb-1">
-                          Last Name
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={lastName}
-                          onChange={(e) => setLastName(e.target.value)}
-                          className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#F47174]"
-                        />
-                      </div>
-                    </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-[11px] font-bold text-[#8C93B0] uppercase block mb-1">
-                          Username
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={username}
-                          onChange={(e) => setUsername(e.target.value)}
-                          className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#F47174]"
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <FormField
+                          control={profileForm.control}
+                          name="username"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Username</FormLabel>
+                              <FormControl>
+                                <Input disabled={saving} {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={profileForm.control}
+                          name="mobile"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Mobile Number</FormLabel>
+                              <FormControl>
+                                <Input type="tel" disabled={saving} {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
                         />
                       </div>
-                      <div>
-                        <label className="text-[11px] font-bold text-[#8C93B0] uppercase block mb-1">
-                          Mobile Number
-                        </label>
-                        <input
-                          type="tel"
-                          required
-                          value={mobile}
-                          onChange={(e) => setMobile(e.target.value)}
-                          className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#F47174]"
-                        />
-                      </div>
-                    </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-[11px] font-bold text-[#8C93B0] uppercase block mb-1">
-                          Roll Number
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="24305"
-                          value={rollNo}
-                          onChange={(e) => setRollNo(e.target.value)}
-                          className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#F47174]"
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <FormField
+                          control={profileForm.control}
+                          name="rollNo"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Roll Number</FormLabel>
+                              <FormControl>
+                                <Input placeholder="24305" disabled={saving} {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={profileForm.control}
+                          name="imageSrc"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Profile Photo URL</FormLabel>
+                              <FormControl>
+                                <Input type="url" placeholder="https://example.com/avatar.jpg" disabled={saving} {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
                         />
                       </div>
-                      <div>
-                        <label className="text-[11px] font-bold text-[#8C93B0] uppercase block mb-1">
-                          Profile Photo URL
-                        </label>
-                        <input
-                          type="url"
-                          placeholder="https://example.com/avatar.jpg"
-                          value={imageSrc}
-                          onChange={(e) => setImageSrc(e.target.value)}
-                          className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#F47174]"
-                        />
-                      </div>
-                    </div>
 
-                    <div>
-                      <label className="text-[11px] font-bold text-[#8C93B0] uppercase block mb-1">
-                        New Password (leave blank to keep current)
-                      </label>
-                      <input
-                        type="password"
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#F47174]"
+                      <FormField
+                        control={profileForm.control}
+                        name="password"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>New Password (leave blank to keep current)</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="password"
+                                placeholder="••••••••"
+                                disabled={saving}
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                    </div>
 
-                    <div className="flex items-center gap-3 pt-2">
-                      <button
-                        type="submit"
-                        disabled={saving}
-                        className="px-5 py-2.5 rounded-xl bg-[#F47174] text-white text-xs font-bold uppercase tracking-wider hover:bg-[#FF4D70] transition-colors disabled:opacity-50 flex items-center gap-2"
-                      >
-                        {saving ? <FiLoader className="size-4 animate-spin" /> : "Save Changes"}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setEditing(false);
-                          setError(null);
-                        }}
-                        className="px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white/70 text-xs font-bold uppercase hover:bg-white/10 transition-colors"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </form>
+                      <div className="flex items-center gap-3 pt-2">
+                        <button
+                          type="submit"
+                          disabled={saving}
+                          className="px-5 py-2.5 rounded-xl bg-[#F47174] text-white text-xs font-bold uppercase tracking-wider hover:bg-[#FF4D70] transition-colors disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+                        >
+                          {saving ? <FiLoader className="size-4 animate-spin" /> : "Save Changes"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditing(false);
+                            setError(null);
+                          }}
+                          className="px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white/70 text-xs font-bold uppercase hover:bg-white/10 transition-colors cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
+                  </Form>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-[#0f0f0f] p-6 rounded-2xl border border-white/10 font-sans text-xs">
                     <div>

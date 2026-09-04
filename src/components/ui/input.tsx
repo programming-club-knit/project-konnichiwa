@@ -1,19 +1,26 @@
-import * as React from "react"
-import { Input as InputPrimitive } from "@base-ui/react/input"
-import { cn } from "cn"
+"use client"
 
-function Input({ className, type, ...props }: React.ComponentProps<"input">) {
-  return (
-    <InputPrimitive
-      type={type}
-      data-slot="input"
-      className={cn(
-        "h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40",
-        className
-      )}
-      {...props}
-    />
-  )
-}
+import * as React from "react"
+import { cn } from "@/lib/utils"
+
+export interface InputProps extends React.ComponentProps<"input"> {}
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, type, ...props }, ref) => {
+    return (
+      <input
+        type={type}
+        data-slot="input"
+        ref={ref}
+        className={cn(
+          "flex h-11 w-full rounded-xl border border-white/10 bg-[#0f0f0f] px-4 py-2.5 text-sm text-white placeholder:text-white/30 transition-all outline-none file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-white focus:border-[#FF355E] focus:ring-1 focus:ring-[#FF355E]/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-[#FF4D70] aria-invalid:ring-1 aria-invalid:ring-[#FF4D70]/40 font-sans [color-scheme:dark]",
+          className
+        )}
+        {...props}
+      />
+    )
+  }
+)
+Input.displayName = "Input"
 
 export { Input }

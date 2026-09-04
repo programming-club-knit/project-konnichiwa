@@ -4,6 +4,33 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { FiPlus, FiSearch, FiEdit2, FiTrash2, FiLoader, FiCheck, FiRefreshCw, FiArrowLeft, FiUser, FiZap, FiGithub, FiLinkedin } from "react-icons/fi";
 import { ImageUpload } from "@/components/admin/image-upload";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+
+const personSchema = z.object({
+  name: z.string().min(1, "Full name is required"),
+  batch: z.string().optional(),
+  company: z.string().min(1, "Company / Organization is required"),
+  role: z.string().min(1, "Job role is required"),
+  domain: z.string().min(1, "Domain / Tech field is required"),
+  imageSrc: z.string().optional(),
+  github: z.string().optional(),
+  linkedin: z.string().optional(),
+  isPTSCAlumni: z.boolean(),
+  order: z.number().optional(),
+});
+
+type PersonFormValues = z.infer<typeof personSchema>;
 
 export type PersonMember = {
   _id?: string;
@@ -49,17 +76,20 @@ export function PeopleTab() {
   const [submitting, setSubmitting] = useState(false);
   const [seeding, setSeeding] = useState(false);
 
-  const [form, setForm] = useState({
-    name: "",
-    batch: "",
-    company: "",
-    role: "",
-    domain: "",
-    imageSrc: "",
-    github: "",
-    linkedin: "",
-    isPTSCAlumni: true,
-    order: 0,
+  const personForm = useForm<PersonFormValues>({
+    resolver: zodResolver(personSchema),
+    defaultValues: {
+      name: "",
+      batch: "",
+      company: "",
+      role: "",
+      domain: "",
+      imageSrc: "",
+      github: "",
+      linkedin: "",
+      isPTSCAlumni: true,
+      order: 0,
+    },
   });
 
   const showToast = (msg: string) => {
@@ -113,7 +143,7 @@ export function PeopleTab() {
 
   const handleOpenAdd = () => {
     setEditingId(null);
-    setForm({
+    personForm.reset({
       name: "",
       batch: "",
       company: "",
@@ -141,7 +171,7 @@ export function PeopleTab() {
       yearVal = "";
     }
 
-    setForm({
+    personForm.reset({
       name: p.name || "",
       batch: yearVal,
       company: p.company || "",
@@ -173,13 +203,12 @@ export function PeopleTab() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (values: PersonFormValues) => {
     setSubmitting(true);
 
-    const formattedBatch = formatBatchYear(form.batch);
+    const formattedBatch = formatBatchYear(values.batch);
     const payload = {
-      ...form,
+      ...values,
       batch: formattedBatch,
     };
 
@@ -222,10 +251,11 @@ export function PeopleTab() {
 
   // Render Full Landscape Add/Edit Page View
   if (formMode === "form") {
-    const splitName = form.name ? form.name.split(" ") : ["First", "Last"];
+    const formValues = personForm.watch();
+    const splitName = formValues.name ? formValues.name.split(" ") : ["First", "Last"];
     const firstName = splitName[0] || "First";
     const lastName = splitName.slice(1).join(" ") || "Last";
-    const previewBatch = formatBatchYear(form.batch);
+    const previewBatch = formatBatchYear(formValues.batch);
 
     return (
       <div className="space-y-6 font-sans">
@@ -234,7 +264,7 @@ export function PeopleTab() {
           <button
             type="button"
             onClick={() => setFormMode("list")}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 bg-white/5 text-[#8C93B0] hover:text-white hover:border-[#FF355E]/50 hover:bg-[#FF355E]/10 text-xs font-bold uppercase tracking-wider transition-all shadow-md group"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 bg-white/5 text-[#8C93B0] hover:text-white hover:border-[#FF355E]/50 hover:bg-[#FF355E]/10 text-xs font-bold uppercase tracking-wider transition-all shadow-md group cursor-pointer"
           >
             <FiArrowLeft className="size-4 group-hover:-translate-x-1 transition-transform text-[#FF355E]" />
             Back to People Directory
@@ -267,10 +297,10 @@ export function PeopleTab() {
                 Live Poster Card Preview
               </span>
               <div className="relative overflow-hidden rounded-xl bg-[#0B0D19] border border-white/10 aspect-[3/4] max-w-xs mx-auto lg:mx-0 flex flex-col justify-between shadow-2xl">
-                {form.imageSrc ? (
+                {formValues.imageSrc ? (
                   <Image
-                    src={form.imageSrc}
-                    alt={form.name || "Preview"}
+                    src={formValues.imageSrc}
+                    alt={formValues.name || "Preview"}
                     fill
                     className="object-cover"
                   />
@@ -285,7 +315,7 @@ export function PeopleTab() {
 
                 <div className="absolute top-4 left-4 z-10 flex flex-col gap-1">
                   <span className="text-[9px] font-extrabold tracking-widest text-[#FF355E] uppercase">
-                    {form.isPTSCAlumni ? "PTSC ALUMNI" : "ALUMNI"}
+                    {formValues.isPTSCAlumni ? "PTSC ALUMNI" : "ALUMNI"}
                   </span>
                   <span className="text-[10px] font-semibold tracking-widest text-white/80 uppercase font-sans">
                     {previewBatch.toUpperCase()}
@@ -303,15 +333,15 @@ export function PeopleTab() {
                   </div>
 
                   <p className="text-xs font-medium text-white/90">
-                    {form.role || "Job Role"}
+                    {formValues.role || "Job Role"}
                   </p>
                   <p className="text-xs font-black text-[#FFB800] uppercase tracking-wider mt-0.5">
-                    {form.company || "Company / Org"}
+                    {formValues.company || "Company / Org"}
                   </p>
 
                   <div className="mt-3 pt-3 flex items-center gap-3 border-t border-white/20 text-[10px] text-white/70 font-mono">
-                    {form.github && <span className="flex items-center gap-1"><FiGithub className="size-3 text-[#FF355E]" /> GitHub</span>}
-                    {form.linkedin && <span className="flex items-center gap-1"><FiLinkedin className="size-3 text-[#FF355E]" /> LinkedIn</span>}
+                    {formValues.github && <span className="flex items-center gap-1"><FiGithub className="size-3 text-[#FF355E]" /> GitHub</span>}
+                    {formValues.linkedin && <span className="flex items-center gap-1"><FiLinkedin className="size-3 text-[#FF355E]" /> LinkedIn</span>}
                   </div>
                 </div>
               </div>
@@ -320,153 +350,200 @@ export function PeopleTab() {
 
           {/* Right Column: Horizontal Form Inputs */}
           <div className="flex-1 flex flex-col justify-center space-y-5">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="text-[11px] font-bold text-[#8C93B0] uppercase block mb-1.5">
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Aseem Srivastava"
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+            <Form {...personForm}>
+              <form onSubmit={personForm.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={personForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Full Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Aseem Srivastava"
+                          disabled={submitting}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-[11px] font-bold text-[#8C93B0] uppercase block mb-1.5">
-                    Graduation Year <span className="text-white/40 font-normal">(Optional)</span>
-                  </label>
-                  <input
-                    type="number"
-                    min={1950}
-                    max={2100}
-                    placeholder="e.g. 2021 (Leave empty for 'Other')"
-                    value={form.batch}
-                    onChange={(e) => setForm({ ...form, batch: e.target.value })}
-                    className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <FormField
+                    control={personForm.control}
+                    name="batch"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Graduation Year (Optional)</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            min={1950}
+                            max={2100}
+                            placeholder="e.g. 2021"
+                            disabled={submitting}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={personForm.control}
+                    name="company"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Company / Organization</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="MBZUAI / Google / Bloomberg"
+                            disabled={submitting}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
                 </div>
 
-                <div>
-                  <label className="text-[11px] font-bold text-[#8C93B0] uppercase block mb-1.5">
-                    Company / Organization
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="MBZUAI / Google / Bloomberg"
-                    value={form.company}
-                    onChange={(e) => setForm({ ...form, company: e.target.value })}
-                    className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <FormField
+                    control={personForm.control}
+                    name="role"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Job Role</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Software Engineer / Researcher"
+                            disabled={submitting}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={personForm.control}
+                    name="domain"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Domain / Tech Field</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="AI & LLMs / High-Performance Systems"
+                            disabled={submitting}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
                 </div>
-              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-[11px] font-bold text-[#8C93B0] uppercase block mb-1.5">
-                    Job Role
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Software Engineer / Researcher"
-                    value={form.role}
-                    onChange={(e) => setForm({ ...form, role: e.target.value })}
-                    className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-[11px] font-bold text-[#8C93B0] uppercase block mb-1.5">
-                    Domain / Tech Field
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="AI & LLMs / High-Performance Systems"
-                    value={form.domain}
-                    onChange={(e) => setForm({ ...form, domain: e.target.value })}
-                    className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="text-[11px] font-bold text-[#8C93B0] uppercase block mb-1.5">
-                  Profile Photo / Image Upload
-                </label>
-                <ImageUpload
-                  value={form.imageSrc}
-                  onChange={(url) => setForm({ ...form, imageSrc: url })}
+                <FormField
+                  control={personForm.control}
+                  name="imageSrc"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Profile Photo / Image Upload</FormLabel>
+                      <FormControl>
+                        <ImageUpload
+                          value={field.value || ""}
+                          onChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-[11px] font-bold text-[#8C93B0] uppercase block mb-1.5">
-                    GitHub Profile URL
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="https://github.com/..."
-                    value={form.github}
-                    onChange={(e) => setForm({ ...form, github: e.target.value })}
-                    className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <FormField
+                    control={personForm.control}
+                    name="github"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>GitHub Profile URL</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="https://github.com/..."
+                            disabled={submitting}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={personForm.control}
+                    name="linkedin"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>LinkedIn Profile URL</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="https://linkedin.com/in/..."
+                            disabled={submitting}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
                 </div>
 
-                <div>
-                  <label className="text-[11px] font-bold text-[#8C93B0] uppercase block mb-1.5">
-                    LinkedIn Profile URL
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="https://linkedin.com/in/..."
-                    value={form.linkedin}
-                    onChange={(e) => setForm({ ...form, linkedin: e.target.value })}
-                    className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 py-3 px-4 rounded-xl bg-[#0B0D19] border border-white/10">
-                <input
-                  type="checkbox"
-                  id="isPTSCAlumni"
-                  checked={form.isPTSCAlumni}
-                  onChange={(e) => setForm({ ...form, isPTSCAlumni: e.target.checked })}
-                  className="size-4 rounded bg-[#121528] border-white/20 text-[#FF355E] focus:ring-0 cursor-pointer"
+                <FormField
+                  control={personForm.control}
+                  name="isPTSCAlumni"
+                  render={({ field }) => (
+                    <div className="flex items-center gap-3 py-3 px-4 rounded-xl bg-[#0f0f0f] border border-white/10">
+                      <input
+                        type="checkbox"
+                        id="isPTSCAlumni"
+                        checked={field.value}
+                        onChange={field.onChange}
+                        className="size-4 rounded bg-[#141414] border-white/20 text-[#FF355E] focus:ring-0 cursor-pointer"
+                      />
+                      <label htmlFor="isPTSCAlumni" className="text-xs font-bold text-white cursor-pointer select-none">
+                        PTSC Alumni Member?{" "}
+                        <span className="text-[#8C93B0] font-normal font-mono text-[11px]">
+                          (Checked: &quot;PTSC ALUMNI&quot; • Unchecked: &quot;ALUMNI&quot;)
+                        </span>
+                      </label>
+                    </div>
+                  )}
                 />
-                <label htmlFor="isPTSCAlumni" className="text-xs font-bold text-white cursor-pointer select-none">
-                  PTSC Alumni Member?{" "}
-                  <span className="text-[#8C93B0] font-normal font-mono text-[11px]">
-                    (Checked: &quot;PTSC ALUMNI&quot; • Unchecked: &quot;ALUMNI&quot;)
-                  </span>
-                </label>
-              </div>
 
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
-                <button
-                  type="button"
-                  onClick={() => setFormMode("list")}
-                  className="px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-white/70 text-xs font-bold uppercase hover:bg-white/10 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="px-6 py-3 rounded-xl bg-[#FF355E] text-white text-xs font-bold uppercase tracking-wider hover:bg-[#FF4D70] transition-colors disabled:opacity-50 flex items-center gap-2 shadow-lg"
-                >
-                  {submitting ? <FiLoader className="size-4 animate-spin" /> : editingId ? "Save Changes" : "Create Alumni Member"}
-                </button>
-              </div>
-            </form>
+                <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
+                  <button
+                    type="button"
+                    onClick={() => setFormMode("list")}
+                    className="px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-white/70 text-xs font-bold uppercase hover:bg-white/10 transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="px-6 py-3 rounded-xl bg-[#FF355E] text-white text-xs font-bold uppercase tracking-wider hover:bg-[#FF4D70] transition-colors disabled:opacity-50 flex items-center gap-2 shadow-lg cursor-pointer"
+                  >
+                    {submitting ? <FiLoader className="size-4 animate-spin" /> : editingId ? "Save Changes" : "Create Alumni Member"}
+                  </button>
+                </div>
+              </form>
+            </Form>
           </div>
         </div>
       </div>
