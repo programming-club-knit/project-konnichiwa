@@ -1,7 +1,9 @@
 export const POSTS = [
+  "Secretary",
   "Joint Secretary",
-  "Competitive Programming Head",
   "Web Development Head",
+  "Competitive Programming Head",
+  "Cyber Security Head",
   "Data Science Head",
   "GenAI Head",
   "App Dev Head",
@@ -30,6 +32,8 @@ export type UserType = {
 export type EventType = {
   _id: string;
   title: string;
+  name?: string;
+  eventType?: string;
   slug: string;
   description: string;
   date: string;

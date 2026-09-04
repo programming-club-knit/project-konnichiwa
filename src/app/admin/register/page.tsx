@@ -20,9 +20,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 const POSTS = [
+  "Secretary",
   "Joint Secretary",
-  "Competitive Programming Head",
   "Web Development Head",
+  "Competitive Programming Head",
+  "Cyber Security Head",
   "Data Science Head",
   "GenAI Head",
   "App Dev Head",

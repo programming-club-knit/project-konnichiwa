@@ -46,9 +46,11 @@ const userSchema = new mongoose.Schema({
   post: {
     type: String,
     enum: [
+      "Secretary",
       "Joint Secretary",
-      "Competitive Programming Head",
       "Web Development Head",
+      "Competitive Programming Head",
+      "Cyber Security Head",
       "Data Science Head",
       "GenAI Head",
       "App Dev Head",

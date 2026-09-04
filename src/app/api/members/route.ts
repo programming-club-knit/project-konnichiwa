@@ -1,20 +1,41 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import User from "@/models/user";
 
-export async function GET() {
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+export async function GET(request: NextRequest) {
   try {
     await connectDB();
+    const { searchParams } = new URL(request.url);
+    const coreOnly = searchParams.get("coreOnly") === "true";
 
-    // Fetch approved executive members who have a post assigned or admin/member role
-    const members = await User.find({
-      $or: [
+    const filter: Record<string, any> = {
+      status: "approved",
+    };
+
+    if (coreOnly) {
+      filter.post = {
+        $in: [
+          "Secretary",
+          "Joint Secretary",
+          "Web Development Head",
+          "Competitive Programming Head",
+          "Cyber Security Head",
+        ],
+      };
+    } else {
+      filter.$or = [
         { post: { $exists: true, $ne: "" } },
-        { role: { $in: ["admin", "member"] } }
-      ],
-      status: "approved"
-    })
-      .select("firstName lastName username email mobile batch post role status imageSrc")
+        { role: { $in: ["admin", "member"] } },
+      ];
+    }
+
+    // Strictly exclude sensitive fields (mobile, email, password, username, rollNo)
+    // Only return public portfolio fields
+    const members = await User.find(filter)
+      .select("firstName lastName post role batch imageSrc github linkedin")
       .sort({ batch: -1, firstName: 1 })
       .lean();
 
