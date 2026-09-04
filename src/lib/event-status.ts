@@ -10,6 +10,9 @@ export interface EventTimingInfo {
   isPast: boolean;
   startTime?: Date;
   endTime?: Date;
+  isRegistrationClosed: boolean;
+  registrationDeadlineDate?: Date;
+  registrationDeadlineLabel?: string;
 }
 
 export type EventItem = {
@@ -47,59 +50,89 @@ export function getEventDynamicStatus(
 ): EventTimingInfo {
   const statusLower = (event?.status || "").trim().toLowerCase();
 
+  let registrationDeadlineDate: Date | undefined;
+  let registrationDeadlineLabel: string | undefined;
+  let isDeadlinePassed = false;
+
+  if (event?.registrationDeadline) {
+    const d = new Date(event.registrationDeadline);
+    if (!isNaN(d.getTime())) {
+      registrationDeadlineDate = d;
+      registrationDeadlineLabel = d.toLocaleString("en-US", {
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      if (now.getTime() > d.getTime()) {
+        isDeadlinePassed = true;
+      }
+    }
+  }
+
+  const buildResult = (
+    status: EventDynamicStatus,
+    label: string,
+    badgeClass: string,
+    dotClass?: string,
+    startTime?: Date,
+    endTime?: Date
+  ): EventTimingInfo => ({
+    status,
+    label,
+    badgeClass,
+    dotClass,
+    isLive: status === "live",
+    isUpcoming: status === "upcoming",
+    isPast: status === "past",
+    startTime,
+    endTime,
+    isRegistrationClosed: status === "past" || isDeadlinePassed,
+    registrationDeadlineDate,
+    registrationDeadlineLabel,
+  });
+
   // If marked explicitly completed, past, or cancelled
   if (Boolean(event?.completed) || statusLower === "completed" || statusLower === "past") {
-    return {
-      status: "past",
-      label: "Concluded",
-      badgeClass: "bg-slate-900/90 border border-white/20 text-slate-300",
-      isLive: false,
-      isUpcoming: false,
-      isPast: true,
-    };
+    return buildResult(
+      "past",
+      "Concluded",
+      "bg-slate-900/90 border border-white/20 text-slate-300"
+    );
   }
 
   if (statusLower === "cancelled") {
-    return {
-      status: "past",
-      label: "Cancelled",
-      badgeClass: "bg-red-950/60 border border-red-500/30 text-red-400",
-      isLive: false,
-      isUpcoming: false,
-      isPast: true,
-    };
+    return buildResult(
+      "past",
+      "Cancelled",
+      "bg-red-950/60 border border-red-500/30 text-red-400"
+    );
   }
 
   // Without a date, fallback to manual status
   if (!event || !event.date) {
     const isLiveManual = statusLower === "live" || statusLower === "ongoing";
-    return {
-      status: isLiveManual ? "live" : "upcoming",
-      label: isLiveManual ? "Live Now" : "Upcoming",
-      badgeClass: isLiveManual
+    return buildResult(
+      isLiveManual ? "live" : "upcoming",
+      isLiveManual ? "Live Now" : "Upcoming",
+      isLiveManual
         ? "bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.25)]"
         : "bg-[#FF355E] border border-transparent text-white shadow-[0_4px_12px_rgba(255,53,94,0.3)]",
-      dotClass: isLiveManual ? "bg-emerald-400 animate-ping" : undefined,
-      isLive: isLiveManual,
-      isUpcoming: !isLiveManual,
-      isPast: false,
-    };
+      isLiveManual ? "bg-emerald-400 animate-ping" : undefined
+    );
   }
 
   const rawDate = new Date(event.date);
   if (isNaN(rawDate.getTime())) {
     const isLiveManual = statusLower === "live" || statusLower === "ongoing";
-    return {
-      status: isLiveManual ? "live" : "upcoming",
-      label: isLiveManual ? "Live Now" : "Upcoming",
-      badgeClass: isLiveManual
+    return buildResult(
+      isLiveManual ? "live" : "upcoming",
+      isLiveManual ? "Live Now" : "Upcoming",
+      isLiveManual
         ? "bg-emerald-500/20 border border-emerald-500/40 text-emerald-300"
         : "bg-[#FF355E] border border-transparent text-white",
-      dotClass: isLiveManual ? "bg-emerald-400 animate-ping" : undefined,
-      isLive: isLiveManual,
-      isUpcoming: !isLiveManual,
-      isPast: false,
-    };
+      isLiveManual ? "bg-emerald-400 animate-ping" : undefined
+    );
   }
 
   let year = rawDate.getFullYear();
@@ -176,42 +209,35 @@ export function getEventDynamicStatus(
   const nowMs = now.getTime();
 
   if (nowMs > endTime.getTime()) {
-    return {
-      status: "past",
-      label: "Concluded",
-      badgeClass: "bg-slate-900/90 border border-white/20 text-slate-300",
-      isLive: false,
-      isUpcoming: false,
-      isPast: true,
+    return buildResult(
+      "past",
+      "Concluded",
+      "bg-slate-900/90 border border-white/20 text-slate-300",
+      undefined,
       startTime,
-      endTime,
-    };
+      endTime
+    );
   }
 
   if (nowMs >= startTime.getTime() && nowMs <= endTime.getTime()) {
-    return {
-      status: "live",
-      label: "Live Now",
-      badgeClass: "bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.3)]",
-      dotClass: "bg-emerald-400 animate-ping",
-      isLive: true,
-      isUpcoming: false,
-      isPast: false,
+    return buildResult(
+      "live",
+      "Live Now",
+      "bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.3)]",
+      "bg-emerald-400 animate-ping",
       startTime,
-      endTime,
-    };
+      endTime
+    );
   }
 
-  return {
-    status: "upcoming",
-    label: "Upcoming",
-    badgeClass: "bg-[#FF355E] border border-transparent text-white shadow-[0_4px_12px_rgba(255,53,94,0.3)]",
-    isLive: false,
-    isUpcoming: true,
-    isPast: false,
+  return buildResult(
+    "upcoming",
+    "Upcoming",
+    "bg-[#FF355E] border border-transparent text-white shadow-[0_4px_12px_rgba(255,53,94,0.3)]",
+    undefined,
     startTime,
-    endTime,
-  };
+    endTime
+  );
 }
 
 /** Returns just the dynamic status string: "upcoming" | "live" | "past" */

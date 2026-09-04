@@ -15,6 +15,19 @@ import { UsersTab } from './tabs/users-tab';
 import { PeopleTab } from './tabs/people-tab';
 import { ProfileTab } from './tabs/profile-tab';
 
+function toDatetimeLocal(val?: string | Date | null): string {
+  if (!val) return '';
+  const d = new Date(val);
+  if (isNaN(d.getTime())) return '';
+  const pad = (n: number) => n.toString().padStart(2, '0');
+  const Y = d.getFullYear();
+  const M = pad(d.getMonth() + 1);
+  const D = pad(d.getDate());
+  const h = pad(d.getHours());
+  const m = pad(d.getMinutes());
+  return `${Y}-${M}-${D}T${h}:${m}`;
+}
+
 export function AdminDashboard() {
   const router = useRouter();
   const [adminUser, setAdminUser] = useState<UserType | null>(null);
@@ -61,6 +74,7 @@ export function AdminDashboard() {
     googleFormLink: '',
     whatsappGroupLink: '',
     ruleBookUrl: '',
+    registrationDeadline: '',
     forceGoogleForm: false,
     useCustomForm: false,
     registrationType: 'individual',
@@ -357,6 +371,7 @@ export function AdminDashboard() {
       googleFormLink: event.googleFormLink || '',
       whatsappGroupLink: event.whatsappGroupLink || '',
       ruleBookUrl: event.ruleBookUrl || '',
+      registrationDeadline: toDatetimeLocal(event.registrationDeadline),
       forceGoogleForm: !!event.forceGoogleForm,
       useCustomForm: !!event.useCustomForm,
       registrationType: event.registrationType || 'individual',
@@ -383,6 +398,7 @@ export function AdminDashboard() {
       googleFormLink: '',
       whatsappGroupLink: '',
       ruleBookUrl: '',
+      registrationDeadline: '',
       forceGoogleForm: false,
       useCustomForm: false,
       registrationType: 'individual',
@@ -423,6 +439,9 @@ export function AdminDashboard() {
 
     const payload = {
       ...eventForm,
+      registrationDeadline: eventForm.registrationDeadline
+        ? new Date(eventForm.registrationDeadline).toISOString()
+        : null,
       registrationFields: eventForm.useCustomForm ? registrationFields : [],
       participantFields: eventForm.registrationType === 'team' && eventForm.useCustomForm ? participantFields : [],
       resources: resources.filter(r => r.label.trim() && r.url.trim()),

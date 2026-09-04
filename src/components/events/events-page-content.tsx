@@ -246,9 +246,9 @@ export function EventsPageContent({
               </span>
             </div>
 
-            <div className="relative overflow-hidden rounded-3xl bg-[#121626] border border-white/15 hover:border-white/25 transition-all shadow-2xl group flex flex-col lg:flex-row items-stretch">
+            <div className="relative overflow-hidden rounded-3xl bg-[#141414] border border-white/15 hover:border-white/25 transition-all shadow-2xl group flex flex-col lg:flex-row items-stretch">
               {/* Left: Poster / Cover Showcase */}
-              <div className="relative lg:w-1/2 min-h-[280px] sm:min-h-[340px] bg-[#070913] flex items-center justify-center overflow-hidden border-b lg:border-b-0 lg:border-r border-white/10">
+              <div className="relative lg:w-1/2 min-h-[280px] sm:min-h-[340px] bg-[#1a1a1a] flex items-center justify-center overflow-hidden border-b lg:border-b-0 lg:border-r border-white/10">
                 {featuredEvent.coverImageUrl ? (
                   <Image
                     src={featuredEvent.coverImageUrl}
@@ -337,11 +337,25 @@ export function EventsPageContent({
                   </p>
 
                   {/* Deadline Notice */}
-                  {featuredEvent.registrationDeadline && (
-                    <div className="p-3 rounded-xl bg-[#090B14] border border-amber-500/20 flex items-center gap-2.5 text-xs text-amber-300">
-                      <FiClock className="size-4 shrink-0 text-amber-400 animate-pulse" />
+                  {featuredEvent.registrationDeadline && !featuredTiming.isPast && (
+                    <div
+                      className={`p-3 rounded-xl border flex items-center gap-2.5 text-xs ${
+                        featuredTiming.isRegistrationClosed
+                          ? "bg-red-500/10 border-red-500/30 text-red-300"
+                          : "bg-[#0f0f0f] border-amber-500/30 text-amber-300"
+                      }`}
+                    >
+                      <FiClock
+                        className={`size-4 shrink-0 ${
+                          featuredTiming.isRegistrationClosed
+                            ? "text-red-400"
+                            : "text-amber-400 animate-pulse"
+                        }`}
+                      />
                       <span>
-                        Registration Closes: {new Date(featuredEvent.registrationDeadline).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                        {featuredTiming.isRegistrationClosed
+                          ? `Registration Closed (Deadline was ${featuredTiming.registrationDeadlineLabel})`
+                          : `Registration Closes: ${featuredTiming.registrationDeadlineLabel}`}
                       </span>
                     </div>
                   )}
@@ -363,6 +377,8 @@ export function EventsPageContent({
                       ? "Enter Live Event & Details"
                       : featuredTiming.isPast
                       ? "View Archived Event"
+                      : featuredTiming.isRegistrationClosed
+                      ? "View Event Details"
                       : "View Details & Register"}{" "}
                     <FiArrowRight className="size-4" />
                   </Link>

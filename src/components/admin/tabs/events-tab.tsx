@@ -110,6 +110,7 @@ export function EventsTab({
                 <th className="py-3 px-4">Date</th>
                 <th className="py-3 px-4">Type</th>
                 <th className="py-3 px-4">Status</th>
+                <th className="py-3 px-4">Registration</th>
                 <th className="py-3 px-4 text-right">Actions</th>
               </tr>
             </thead>
@@ -139,6 +140,21 @@ export function EventsTab({
                         }`} />
                         {label}
                       </span>
+                    </td>
+                    <td className="py-3.5 px-4 font-mono text-[11px]">
+                      {timing.isRegistrationClosed ? (
+                        <span className="text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded-md inline-block">
+                          Closed
+                        </span>
+                      ) : e.registrationDeadline ? (
+                        <span className="text-amber-300 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md inline-block" title={`Closes: ${timing.registrationDeadlineLabel}`}>
+                          Until {new Date(e.registrationDeadline).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                        </span>
+                      ) : (
+                        <span className="text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md inline-block">
+                          Open
+                        </span>
+                      )}
                     </td>
                     <td className="py-3.5 px-4 text-right space-x-2">
                       <button

@@ -151,7 +151,7 @@ export function EventForm({
                 type="date"
                 value={eventForm.date}
                 onChange={e => setEventForm((prev: any) => ({ ...prev, date: e.target.value }))}
-                className="w-full px-3.5 py-2.5 bg-[#0B0D19] border border-white/10 rounded-md text-xs md:text-sm text-white focus:outline-none focus:border-white/30"
+                className="w-full px-3.5 py-2.5 bg-[#0B0D19] border border-white/10 rounded-md text-xs md:text-sm text-white [color-scheme:dark] focus:outline-none focus:border-white/30 cursor-pointer"
                 required
               />
             </div>
@@ -241,6 +241,33 @@ export function EventForm({
                 </div>
               </>
             )}
+          </div>
+
+          {/* Registration Deadline */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-medium text-white/90 flex items-center gap-1.5">
+                <FiClock className="size-4 text-white/60" /> Registration Deadline
+              </label>
+              {eventForm.registrationDeadline && (
+                <button
+                  type="button"
+                  onClick={() => setEventForm((prev: any) => ({ ...prev, registrationDeadline: '' }))}
+                  className="text-[11px] font-mono text-red-400 hover:text-red-300 underline"
+                >
+                  Clear Deadline
+                </button>
+              )}
+            </div>
+            <input
+              type="datetime-local"
+              value={eventForm.registrationDeadline || ''}
+              onChange={e => setEventForm((prev: any) => ({ ...prev, registrationDeadline: e.target.value }))}
+              className="w-full px-3.5 py-2.5 bg-[#0f0f0f] border border-white/10 rounded-md text-xs md:text-sm text-white [color-scheme:dark] focus:outline-none focus:border-white/30 cursor-pointer"
+            />
+            <p className="text-[11px] font-mono text-white/40">
+              Optional: Once this date &amp; time passes, registrations will automatically lock and reject new entries.
+            </p>
           </div>
 
           <div className="space-y-1.5">
