@@ -62,7 +62,7 @@ export const NAV: NavItem[] = [
   // { label: "CP", href: "/cp" },
   { label: "Team", href: "/team" },
   { label: "Alumni", href: "/people" },
-  { label: "Achievements", href: "/achievements" },
+  // { label: "Achievements", href: "/achievements" },
   { label: "Support", href: "/support-us" },
   { label: "Hire Us", href: "/hire-us" },
 ];

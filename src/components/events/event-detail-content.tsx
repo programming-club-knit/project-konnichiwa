@@ -23,6 +23,7 @@ import {
   FiCheckCircle
 } from "react-icons/fi";
 import { type EventItem, getEventDynamicStatus } from "@/lib/event-status";
+import { EventCoverImage } from "@/components/events/event-cover-image";
 
 interface EventDetailContentProps {
   event: EventItem;
@@ -90,26 +91,15 @@ export function EventDetailContent({ event }: EventDetailContentProps) {
 
         {/* Hero Artwork Banner */}
         <div className="relative w-full h-64 sm:h-96 md:h-[420px] rounded-3xl overflow-hidden mb-10 border border-white/15 shadow-2xl bg-[#070913] flex items-center justify-center">
-          {event.coverImageUrl ? (
-            <Image
-              src={event.coverImageUrl}
-              alt={event.title}
-              fill
-              priority
-              className="object-cover"
-              sizes="(max-width: 1200px) 100vw, 1200px"
-            />
-          ) : (
-            <div className="size-full flex flex-col items-center justify-center p-8 text-center bg-[#0B0E1A]">
-              <div className="grid size-20 place-items-center rounded-3xl bg-white/5 border border-white/10">
-                <FiAward className="size-10 text-[#FF355E]" />
-              </div>
-              <span className="mt-4 text-xs font-semibold tracking-wide text-slate-400 uppercase">
-                PTSC Flagship Competition
-              </span>
-            </div>
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#090B14] via-[#090B14]/40 to-transparent" />
+          <EventCoverImage
+            src={event.coverImageUrl}
+            alt={event.title}
+            title={event.title}
+            variant="hero"
+            priority
+            sizes="(max-width: 1200px) 100vw, 1200px"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#090B14] via-[#090B14]/40 to-transparent pointer-events-none" />
 
           {/* Floating Badges */}
           <div className="absolute top-5 left-5 right-5 flex flex-wrap items-center justify-between gap-3 pointer-events-none">

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FiArrowRight, FiCalendar, FiMapPin, FiImage } from "react-icons/fi";
 import { type EventItem, getEventDynamicStatus } from "@/lib/event-status";
+import { EventCoverImage } from "@/components/events/event-cover-image";
 
 interface UpcomingEventSectionProps {
   event: EventItem | null;
@@ -32,24 +33,14 @@ export function UpcomingEventSection({ event }: UpcomingEventSectionProps) {
 
           {/* Left: Poster Image / Placeholder */}
           <div className="relative min-h-[360px] lg:min-h-[440px] overflow-hidden rounded-2xl border border-white/10 bg-[#121528] flex flex-col items-center justify-center group">
-            {event.coverImageUrl ? (
-              <Image
-                src={event.coverImageUrl}
-                alt={event.title}
-                fill
-                className="object-cover group-hover:scale-105 transition-transform duration-500"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-              />
-            ) : (
-              <div className="flex flex-col items-center gap-4 text-center px-8">
-                <div className="grid size-20 place-items-center rounded-2xl bg-white/5 border border-dashed border-white/20 group-hover:bg-[#FF355E]/5 group-hover:border-[#FF355E]/30 transition-all duration-300">
-                  <FiImage className="size-9 text-white/20 group-hover:text-[#FF355E]/50 transition-colors duration-300" />
-                </div>
-                <p className="text-xs font-mono text-white/40 uppercase tracking-widest leading-relaxed">
-                  {event.title}
-                </p>
-              </div>
-            )}
+            <EventCoverImage
+              src={event.coverImageUrl}
+              alt={event.title}
+              title={event.title}
+              variant="spotlight"
+              className="group-hover:scale-105 transition-transform duration-500"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+            />
 
             {/* Status Badge */}
             <div

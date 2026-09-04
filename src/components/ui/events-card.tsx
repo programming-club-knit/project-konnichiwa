@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import type { EventItem } from "@/lib/event-status";
 import { getEventDynamicStatus } from "@/lib/event-status";
+import { EventCoverImage } from "@/components/events/event-cover-image";
 import Link from "next/link";
 
 interface Card5Props {
@@ -35,21 +36,13 @@ const Card5 = ({ event }: Card5Props) => {
       <div className="relative z-10">
         <CardContent className="px-0 relative overflow-hidden m-2 rounded-2xl">
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl">
-            {event.coverImageUrl ? (
-              <img
-                src={event.coverImageUrl}
-                alt={event.title}
-                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-              />
-            ) : (
-              <div className="h-full w-full flex flex-col items-center justify-center p-4 text-center bg-gradient-to-br from-[#1A1033] to-[#0f0f0f]">
-                <div className="grid size-16 place-items-center rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm shadow-[0_0_15px_rgba(244,113,116,0.3)]">
-                  <span className="text-[#F47174] font-bold tracking-widest">
-                    PTSC
-                  </span>
-                </div>
-              </div>
-            )}
+            <EventCoverImage
+              src={event.coverImageUrl}
+              alt={event.title}
+              title={event.title}
+              variant="card"
+              className="transition-transform duration-700 group-hover:scale-110"
+            />
 
             {/* Playful Overlay Gradient */}
             <div className="absolute inset-0 bg-gradient-to-t from-[#141414] via-transparent to-transparent opacity-80" />

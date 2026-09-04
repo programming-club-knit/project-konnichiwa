@@ -19,6 +19,7 @@ import {
 } from "react-icons/fi";
 import { Highlighter } from "@/components/ui/highlighter";
 import { type EventItem, getEventDynamicStatus } from "@/lib/event-status";
+import { EventCoverImage } from "@/components/events/event-cover-image";
 
 interface EventsPageContentProps {
   upcomingEvents: EventItem[];
@@ -212,9 +213,9 @@ export function EventsPageContent({
           </p>
         </div>
 
-        {/* Search & Filter Controls Bar */}
+        {/* Search & Filter Controls Bar (commented out for now) */}
+        {/*
         <div className="mt-10 mb-10 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 p-2 rounded-2xl bg-[#121626] border border-white/10 shadow-lg">
-          {/* Filter Pills */}
           <div className="flex items-center gap-1.5 overflow-x-auto p-1 scrollbar-none">
             {filterTabs.map((tab) => (
               <button
@@ -248,7 +249,6 @@ export function EventsPageContent({
             ))}
           </div>
 
-          {/* Search Bar */}
           <div className="relative min-w-[240px] md:max-w-xs px-1">
             <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 size-3.5 text-slate-400 pointer-events-none" />
             <input
@@ -260,6 +260,7 @@ export function EventsPageContent({
             />
           </div>
         </div>
+        */}
 
         {/* FEATURED FLAGSHIP SPOTLIGHT (Shown when filter is 'all', 'live', or 'upcoming' and no search query) */}
         {!searchQuery && (filterType === "all" || filterType === "live" || filterType === "upcoming") && featuredEvent && featuredTiming && (
@@ -282,26 +283,16 @@ export function EventsPageContent({
             <div className="relative overflow-hidden rounded-3xl bg-[#141414] border border-white/15 hover:border-white/25 transition-all shadow-2xl group flex flex-col lg:flex-row items-stretch">
               {/* Left: Poster / Cover Showcase */}
               <div className="relative lg:w-1/2 min-h-[280px] sm:min-h-[340px] bg-[#1a1a1a] flex items-center justify-center overflow-hidden border-b lg:border-b-0 lg:border-r border-white/10">
-                {featuredEvent.coverImageUrl ? (
-                  <Image
-                    src={featuredEvent.coverImageUrl}
-                    alt={featuredEvent.title}
-                    fill
-                    priority
-                    className="object-cover group-hover:scale-105 transition-transform duration-700"
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                  />
-                ) : (
-                  <div className="size-full flex flex-col items-center justify-center p-6 text-center bg-[#0B0E1A]">
-                    <div className="grid size-16 place-items-center rounded-2xl bg-white/5 border border-white/10">
-                      <FiImage className="size-8 text-[#FF355E]" />
-                    </div>
-                    <span className="mt-3 text-xs font-semibold text-slate-400">
-                      Official Flagship Poster
-                    </span>
-                  </div>
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#121626] via-transparent to-transparent lg:bg-gradient-to-r opacity-60" />
+                <EventCoverImage
+                  src={featuredEvent.coverImageUrl}
+                  alt={featuredEvent.title}
+                  title={featuredEvent.title}
+                  variant="spotlight"
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="group-hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#121626] via-transparent to-transparent lg:bg-gradient-to-r opacity-60 pointer-events-none" />
 
                 {/* Floating Format Badges */}
                 <div className="absolute top-4 left-4 flex flex-wrap gap-2 pointer-events-none">
@@ -464,25 +455,15 @@ export function EventsPageContent({
                   >
                     {/* Event Banner Container */}
                     <div className="relative w-full h-48 bg-[#090B14] border-b border-white/10 overflow-hidden flex items-center justify-center">
-                      {event.coverImageUrl ? (
-                        <Image
-                          src={event.coverImageUrl}
-                          alt={event.title}
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-500"
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        />
-                      ) : (
-                        <div className="size-full flex flex-col items-center justify-center p-4 text-center bg-[#070913]">
-                          <div className="grid size-12 place-items-center rounded-xl bg-white/5 border border-white/10">
-                            <FiImage className="size-6 text-slate-500" />
-                          </div>
-                          <span className="mt-2 text-xs font-medium text-slate-500">
-                            PTSC Event
-                          </span>
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#121626] via-transparent to-transparent opacity-60" />
+                      <EventCoverImage
+                        src={event.coverImageUrl}
+                        alt={event.title}
+                        title={event.title}
+                        variant="card"
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#121626] via-transparent to-transparent opacity-60 pointer-events-none" />
 
                       {/* Top Glass Badges */}
                       <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 pointer-events-none">
