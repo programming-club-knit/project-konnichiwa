@@ -4,6 +4,7 @@ import React from 'react';
 import { FiSearch, FiPlus, FiLoader, FiCalendar } from 'react-icons/fi';
 import { EventType } from '../types';
 import { EventForm } from './event-form';
+import { getEventDynamicStatus } from '@/lib/event-status';
 
 interface EventsTabProps {
   eventFormMode: 'list' | 'create' | 'edit';
@@ -114,8 +115,8 @@ export function EventsTab({
             </thead>
             <tbody className="divide-y divide-white/[0.06] text-xs text-white/80">
               {filteredEvents.map(e => {
-                const isUpcoming = e.status === 'upcoming';
-                const isOngoing = e.status === 'ongoing';
+                const timing = getEventDynamicStatus(e as any);
+                const { isLive, isUpcoming, label } = timing;
                 return (
                   <tr key={e._id} className="hover:bg-white/[0.02] transition-colors">
                     <td className="py-3.5 px-4 font-medium text-white">{e.title}</td>
@@ -127,16 +128,16 @@ export function EventsTab({
                     </td>
                     <td className="py-3.5 px-4">
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono border ${
-                        isUpcoming 
+                        isLive 
                           ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300' 
-                          : isOngoing 
-                          ? 'border-amber-500/30 bg-amber-500/10 text-amber-300' 
+                          : isUpcoming 
+                          ? 'border-blue-500/30 bg-blue-500/10 text-blue-300' 
                           : 'border-white/10 bg-white/5 text-white/50'
                       }`}>
                         <span className={`size-1.5 rounded-full ${
-                          isUpcoming ? 'bg-emerald-400' : isOngoing ? 'bg-amber-400' : 'bg-white/40'
+                          isLive ? 'bg-emerald-400 animate-ping' : isUpcoming ? 'bg-blue-400' : 'bg-white/40'
                         }`} />
-                        {e.status}
+                        {label}
                       </span>
                     </td>
                     <td className="py-3.5 px-4 text-right space-x-2">

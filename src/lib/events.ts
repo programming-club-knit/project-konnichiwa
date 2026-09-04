@@ -1,29 +1,8 @@
 import { connectDB } from "@/lib/mongodb";
 import Event from "@/models/event";
+import type { EventItem } from "@/lib/event-status";
 
-export type EventItem = {
-  _id: string;
-  title: string;
-  slug: string;
-  description: string;
-  date: string;
-  time?: string;
-  status: string;
-  completed?: boolean;
-  venue?: string;
-  eventType?: "offline" | "online";
-  platform?: string;
-  meetLink?: string;
-  registrationDeadline?: string;
-  coverImageUrl?: string;
-  registrationType?: string;
-  teamMinSize?: number;
-  teamMaxSize?: number;
-  googleFormLink?: string;
-  ruleBookUrl?: string;
-  whatsappGroupLink?: string;
-  resources?: { label: string; url: string }[];
-};
+export * from "@/lib/event-status";
 
 /** Fetch all events directly from MongoDB (server-side only). */
 export async function getEvents(): Promise<EventItem[]> {

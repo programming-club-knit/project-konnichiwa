@@ -32,8 +32,8 @@ export function AdminLoginForm() {
         throw new Error(data.message || "Failed to log in");
       }
 
-      // On success, redirect to the admin dashboard
-      router.push("/admin/dashboard");
+      // On success, redirect to the admin dashboard with fresh page load
+      window.location.href = "/admin/dashboard";
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred");
     } finally {
@@ -42,9 +42,9 @@ export function AdminLoginForm() {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden bg-[#0B0D19] font-sans">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden bg-[#0f0f0f] font-sans">
       {/* Vertical Dashed Guidelines Overlay to match UI layout style */}
-      <div className="pointer-events-none absolute inset-0 z-0">
+      <div className="pointer-events-none absolute inset-0 z-0 opacity-40">
         <div className="mx-auto h-full max-w-7xl px-6 lg:px-12 grid grid-cols-5 border-x border-dashed border-white/5">
           <div className="border-r border-dashed border-white/5 h-full" />
           <div className="border-r border-dashed border-white/5 h-full" />
@@ -67,7 +67,7 @@ export function AdminLoginForm() {
         </div>
 
         <div className="flex flex-col items-center mb-8">
-          <div className="grid size-16 place-items-center rounded-2xl border border-white/10 bg-[#121528] shadow-xl mb-6">
+          <div className="grid size-16 place-items-center rounded-2xl border border-white/10 bg-[#141414] shadow-xl mb-6">
             <Image
               src="/logo.png"
               alt="PTSC logo"
@@ -84,7 +84,7 @@ export function AdminLoginForm() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-8 rounded-2xl border border-white/10 bg-[#121528] shadow-xl font-sans">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-8 rounded-2xl border border-white/10 bg-[#141414] shadow-xl font-sans">
           {error && (
             <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold font-sans uppercase tracking-wider text-center">
               {error}
@@ -104,7 +104,7 @@ export function AdminLoginForm() {
                 placeholder="admin@ptsc.knit.ac.in"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-3 pl-11 pr-4 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF355E] transition-colors font-sans"
+                className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-3 pl-11 pr-4 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF355E] transition-colors font-sans"
                 required
                 disabled={loading}
               />
@@ -129,7 +129,7 @@ export function AdminLoginForm() {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-3 pl-11 pr-4 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF355E] transition-colors font-sans"
+                className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-3 pl-11 pr-4 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF355E] transition-colors font-sans"
                 required
                 disabled={loading}
               />

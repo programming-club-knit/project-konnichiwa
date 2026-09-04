@@ -60,7 +60,7 @@ export function OpenToWorkSection({ user, onSuccess, onError }: OpenToWorkSectio
   return (
     <form onSubmit={handleSave} className="space-y-6 font-sans">
       {/* Top Banner Box */}
-      <div className="p-5 rounded-2xl bg-[#0B0D19] border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="p-5 rounded-2xl bg-[#0f0f0f] border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <div className="size-12 rounded-xl bg-[#F47174]/10 border border-[#F47174]/20 text-[#F47174] grid place-items-center shrink-0">
             <FiBriefcase className="size-6" />
@@ -84,7 +84,7 @@ export function OpenToWorkSection({ user, onSuccess, onError }: OpenToWorkSectio
       </div>
 
       {/* Directory Showcase Opt-in Toggle */}
-      <div className="p-4 rounded-2xl bg-[#0B0D19] border border-white/10 flex items-center justify-between">
+      <div className="p-4 rounded-2xl bg-[#0f0f0f] border border-white/10 flex items-center justify-between">
         <div>
           <span className="text-sm font-bold text-white block">
             Show Profile in Hire Us Showcase?
@@ -117,7 +117,7 @@ export function OpenToWorkSection({ user, onSuccess, onError }: OpenToWorkSectio
             placeholder="e.g. Frontend Engineer / Full Stack Developer"
             value={headlineRole}
             onChange={(e) => setHeadlineRole(e.target.value)}
-            className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#F47174]"
+            className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#F47174]"
           />
         </div>
 
@@ -128,7 +128,7 @@ export function OpenToWorkSection({ user, onSuccess, onError }: OpenToWorkSectio
           <select
             value={availability}
             onChange={(e) => setAvailability(e.target.value)}
-            className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#F47174]"
+            className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#F47174]"
           >
             <option value="Internship">Internship</option>
             <option value="Full-time">Full-time</option>
@@ -148,7 +148,7 @@ export function OpenToWorkSection({ user, onSuccess, onError }: OpenToWorkSectio
             placeholder="e.g. Web Development / Machine Learning"
             value={domain}
             onChange={(e) => setDomain(e.target.value)}
-            className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#F47174]"
+            className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#F47174]"
           />
         </div>
 
@@ -161,7 +161,7 @@ export function OpenToWorkSection({ user, onSuccess, onError }: OpenToWorkSectio
             placeholder="e.g. React, Next.js, Node.js, TypeScript"
             value={skillsInput}
             onChange={(e) => setSkillsInput(e.target.value)}
-            className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#F47174]"
+            className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#F47174]"
           />
         </div>
       </div>
@@ -182,7 +182,7 @@ export function OpenToWorkSection({ user, onSuccess, onError }: OpenToWorkSectio
               placeholder="https://drive.google.com/..."
               value={resume}
               onChange={(e) => setResume(e.target.value)}
-              className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#F47174]"
+              className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#F47174]"
             />
           </div>
 
@@ -195,7 +195,7 @@ export function OpenToWorkSection({ user, onSuccess, onError }: OpenToWorkSectio
               placeholder="https://yourname.dev"
               value={portfolio}
               onChange={(e) => setPortfolio(e.target.value)}
-              className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#F47174]"
+              className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#F47174]"
             />
           </div>
         </div>
@@ -210,7 +210,7 @@ export function OpenToWorkSection({ user, onSuccess, onError }: OpenToWorkSectio
               placeholder="https://github.com/..."
               value={github}
               onChange={(e) => setGithub(e.target.value)}
-              className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#F47174]"
+              className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#F47174]"
             />
           </div>
 
@@ -223,7 +223,7 @@ export function OpenToWorkSection({ user, onSuccess, onError }: OpenToWorkSectio
               placeholder="https://linkedin.com/in/..."
               value={linkedin}
               onChange={(e) => setLinkedin(e.target.value)}
-              className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#F47174]"
+              className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-xs text-white focus:outline-none focus:border-[#F47174]"
             />
           </div>
         </div>

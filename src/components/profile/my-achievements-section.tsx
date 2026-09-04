@@ -83,7 +83,7 @@ export function MyAchievementsSection({
           {achievements.map((ach, idx) => (
             <div
               key={idx}
-              className="p-3.5 rounded-2xl bg-[#0B0D19] border border-white/10 flex items-center justify-between group"
+              className="p-3.5 rounded-2xl bg-[#0f0f0f] border border-white/10 flex items-center justify-between group"
             >
               <div className="space-y-0.5 min-w-0 font-sans">
                 <div className="flex items-center gap-2">
@@ -107,13 +107,13 @@ export function MyAchievementsSection({
           ))}
         </div>
       ) : (
-        <div className="p-6 rounded-2xl bg-[#0B0D19] border border-white/10 text-center text-xs text-[#8C93B0] font-sans">
+        <div className="p-6 rounded-2xl bg-[#0f0f0f] border border-white/10 text-center text-xs text-[#8C93B0] font-sans">
           You haven&apos;t added any achievements yet. Use the form below to add hackathon wins, GSoC, LFX, or CP ranks!
         </div>
       )}
 
       {/* Add New Achievement Form */}
-      <div className="p-4 rounded-2xl bg-[#0B0D19] border border-white/10 space-y-4 font-sans">
+      <div className="p-4 rounded-2xl bg-[#0f0f0f] border border-white/10 space-y-4 font-sans">
         <h3 className="text-xs font-bold text-white uppercase tracking-wider">Add Achievement</h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -126,7 +126,7 @@ export function MyAchievementsSection({
               placeholder="e.g. SIH 2024 / GSoC '25"
               value={newAchEvent}
               onChange={(e) => setNewAchEvent(e.target.value)}
-              className="w-full bg-[#121528] border border-white/10 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-[#F47174]"
+              className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-[#F47174]"
             />
           </div>
 
@@ -139,7 +139,7 @@ export function MyAchievementsSection({
               placeholder="e.g. Winner / @Google / Candidate Master"
               value={newAchStatus}
               onChange={(e) => setNewAchStatus(e.target.value)}
-              className="w-full bg-[#121528] border border-white/10 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-[#F47174]"
+              className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-[#F47174]"
             />
           </div>
 
@@ -150,7 +150,7 @@ export function MyAchievementsSection({
             <select
               value={newAchCategory}
               onChange={(e) => setNewAchCategory(e.target.value)}
-              className="w-full bg-[#121528] border border-white/10 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-[#F47174]"
+              className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-[#F47174]"
             >
               {CATEGORY_OPTIONS.map((cat) => (
                 <option key={cat} value={cat}>

@@ -31,9 +31,9 @@ export default function LoginPage() {
       }
 
       if (data.role === "admin") {
-        router.push("/admin/dashboard");
+        window.location.href = "/admin/dashboard";
       } else {
-        router.push("/profile");
+        window.location.href = "/profile";
       }
     } catch (err: any) {
       setError(err.message || "Log in failed");
@@ -43,7 +43,17 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#0B0D19] text-white pt-16 pb-16 flex flex-col items-center justify-center relative overflow-hidden selection:bg-[#FF355E]/30 font-sans">
+    <div className="min-h-screen w-full bg-[#0f0f0f] text-white pt-16 pb-16 flex flex-col items-center justify-center relative overflow-hidden selection:bg-[#FF355E]/30 font-sans">
+      {/* Vertical Dashed Guidelines Overlay matching /people */}
+      <div className="pointer-events-none absolute inset-0 z-0 opacity-40">
+        <div className="mx-auto h-full max-w-7xl px-6 lg:px-12 grid grid-cols-5 border-x border-dashed border-white/5">
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+        </div>
+      </div>
+
       <div className="relative z-10 w-full max-w-md px-6 font-sans">
         
         {/* Back to Home Button */}
@@ -66,7 +76,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-[#121528] p-8 shadow-2xl font-sans">
+        <div className="rounded-2xl border border-white/10 bg-[#141414] p-8 shadow-2xl font-sans">
           {error && (
             <div className="mb-6 p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-sans font-bold text-center">
               {error}
@@ -86,7 +96,7 @@ export default function LoginPage() {
                   placeholder="name@knit.ac.in"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-3 pl-10 pr-4 text-sm text-white font-sans focus:outline-none focus:border-[#FF355E]"
+                  className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-3 pl-10 pr-4 text-sm text-white font-sans focus:outline-none focus:border-[#FF355E]"
                 />
               </div>
             </div>
@@ -103,7 +113,7 @@ export default function LoginPage() {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-3 pl-10 pr-4 text-sm text-white font-sans focus:outline-none focus:border-[#FF355E]"
+                  className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-3 pl-10 pr-4 text-sm text-white font-sans focus:outline-none focus:border-[#FF355E]"
                 />
               </div>
             </div>

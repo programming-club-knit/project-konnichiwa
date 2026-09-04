@@ -133,7 +133,17 @@ export default function AdminRegisterPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#0B0D19] text-white pt-12 pb-16 flex flex-col items-center justify-center relative overflow-hidden selection:bg-[#FF355E]/30 font-sans">
+    <div className="min-h-screen w-full bg-[#0f0f0f] text-white pt-12 pb-16 flex flex-col items-center justify-center relative overflow-hidden selection:bg-[#FF355E]/30 font-sans">
+      {/* Vertical Dashed Guidelines Overlay matching /people */}
+      <div className="pointer-events-none absolute inset-0 z-0 opacity-40">
+        <div className="mx-auto h-full max-w-7xl px-6 lg:px-12 grid grid-cols-5 border-x border-dashed border-white/5">
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+        </div>
+      </div>
+
       <div className="relative z-10 w-full max-w-4xl lg:max-w-5xl px-6">
         
         {/* Back to Home Button */}
@@ -148,7 +158,7 @@ export default function AdminRegisterPage() {
         </div>
 
         {fetchingSettings ? (
-          <div className="p-16 text-center border border-white/10 rounded-3xl bg-[#121528] flex items-center justify-center gap-3 text-sm text-white/50 font-sans">
+          <div className="p-16 text-center border border-white/10 rounded-3xl bg-[#141414] flex items-center justify-center gap-3 text-sm text-white/50 font-sans">
             <FiLoader className="size-6 animate-spin text-[#FF355E]" /> Checking portal status...
           </div>
         ) : !allowSignup ? (
@@ -166,7 +176,7 @@ export default function AdminRegisterPage() {
           </div>
         ) : (
           /* Main Card: Landscape on Desktop (lg:flex-row), Portrait on Mobile (flex-col) */
-          <div className="rounded-3xl border border-white/10 bg-[#121528] p-6 sm:p-10 shadow-2xl flex flex-col lg:flex-row gap-8 lg:gap-12 items-stretch font-sans">
+          <div className="rounded-3xl border border-white/10 bg-[#141414] p-6 sm:p-10 shadow-2xl flex flex-col lg:flex-row gap-8 lg:gap-12 items-stretch font-sans">
             
             {/* Left Column: Executive Info & Branding */}
             <div className="flex-1 flex flex-col justify-between space-y-6 lg:border-r lg:border-white/10 lg:pr-10">
@@ -258,7 +268,7 @@ export default function AdminRegisterPage() {
                       placeholder="Ankit"
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
-                      className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                      className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
                     />
                   </div>
                   <div>
@@ -271,7 +281,7 @@ export default function AdminRegisterPage() {
                       placeholder="Singh"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
-                      className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                      className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
                     />
                   </div>
                 </div>
@@ -287,7 +297,7 @@ export default function AdminRegisterPage() {
                       placeholder="ankit_ptsc"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
-                      className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                      className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
                     />
                   </div>
 
@@ -301,7 +311,7 @@ export default function AdminRegisterPage() {
                       placeholder="9876543210"
                       value={mobile}
                       onChange={(e) => setMobile(e.target.value)}
-                      className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                      className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
                     />
                   </div>
                 </div>
@@ -316,7 +326,7 @@ export default function AdminRegisterPage() {
                     placeholder="executive.23201@knit.ac.in"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                    className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
                   />
                   {parsedAcademic.valid && (
                     <p className="mt-1.5 text-[11px] text-emerald-400 font-sans flex items-center gap-1 font-medium">
@@ -336,7 +346,7 @@ export default function AdminRegisterPage() {
                       placeholder="23201"
                       value={rollNo}
                       onChange={(e) => setRollNo(e.target.value)}
-                      className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                      className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
                     />
                   </div>
                   <div>
@@ -348,7 +358,7 @@ export default function AdminRegisterPage() {
                       placeholder="2027"
                       value={batch}
                       onChange={(e) => setBatch(e.target.value)}
-                      className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                      className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
                     />
                   </div>
                 </div>
@@ -361,7 +371,7 @@ export default function AdminRegisterPage() {
                     required
                     value={post}
                     onChange={(e) => setPost(e.target.value)}
-                    className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                    className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
                   >
                     <option value="">Select Post...</option>
                     {POSTS.map((p) => (
@@ -383,7 +393,7 @@ export default function AdminRegisterPage() {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
+                    className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#FF355E]"
                   />
                 </div>
 

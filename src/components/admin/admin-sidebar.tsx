@@ -44,7 +44,7 @@ export function AdminSidebar({
   ];
 
   return (
-    <aside className="w-56 border-r border-white/10 bg-[#0E101A] flex flex-col justify-between p-4 shrink-0 selection:bg-white/20 font-sans">
+    <aside className="w-56 border-r border-white/10 bg-[#141414] flex flex-col justify-between p-4 shrink-0 selection:bg-white/20 font-sans">
       <div>
         {/* Header */}
         <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/10 px-1">

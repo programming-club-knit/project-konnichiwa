@@ -82,33 +82,37 @@ export function AdminDashboard() {
     routerRef.current = router;
   }, [router]);
 
-  const hasFetchedRef = useRef(false);
-
-  // Verify Admin Auth (runs once on mount)
+  // Verify Admin Auth (runs on mount)
   useEffect(() => {
-    if (hasFetchedRef.current) return;
-    hasFetchedRef.current = true;
-    let isMounted = true;
+    let isCancelled = false;
+
+    // Safety timeout: never stay stuck on authenticating loader indefinitely
+    const timeoutId = setTimeout(() => {
+      if (!isCancelled) {
+        setAuthLoading(false);
+      }
+    }, 6000);
 
     const checkAuth = async () => {
       try {
-        const res = await fetch('/api/auth/me');
+        const res = await fetch('/api/auth/me', { cache: 'no-store' });
         if (!res.ok) throw new Error("Unauthorized");
         const data = await res.json();
         
-        if (!data.success || data.user.role !== 'admin') {
+        if (!data.success || data.user?.role !== 'admin') {
           throw new Error("Access denied. Admin required.");
         }
         
-        if (isMounted) {
+        if (!isCancelled) {
           setAdminUser(data.user);
           setAuthLoading(false);
           fetchInitialData();
         }
       } catch (err: any) {
         console.error("Auth verification failed", err);
-        if (isMounted) {
-          routerRef.current.push('/admin');
+        if (!isCancelled) {
+          setAuthLoading(false);
+          router.replace('/admin');
         }
       }
     };
@@ -116,9 +120,10 @@ export function AdminDashboard() {
     checkAuth();
 
     return () => {
-      isMounted = false;
+      isCancelled = true;
+      clearTimeout(timeoutId);
     };
-  }, []);
+  }, [router]);
 
   const [allowSignup, setAllowSignup] = useState<boolean>(true);
 
@@ -482,14 +487,14 @@ export function AdminDashboard() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen w-full flex items-center justify-center bg-[#080910] text-white/60 text-xs font-mono">
+      <div className="min-h-screen w-full flex items-center justify-center bg-[#0f0f0f] text-white/60 text-xs font-mono">
         <FiLoader className="size-4 animate-spin mr-2" /> Authenticating...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex bg-[#080910] text-white font-sans text-xs">
+    <div className="min-h-screen flex bg-[#0f0f0f] text-white font-sans text-xs">
       {/* Toast Notification Banner */}
       {toastMessage && (
         <div className="fixed top-5 right-5 z-50 px-4 py-2.5 bg-white text-black text-xs font-mono font-semibold rounded-lg border border-white/20 shadow-2xl flex items-center gap-2 animate-bounce">

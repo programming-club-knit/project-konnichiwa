@@ -1,5 +1,5 @@
 import { SectionHeader } from "./section-header";
-import type { EventItem } from "@/lib/events";
+import type { EventItem } from "@/lib/event-status";
 import Card5 from "@/components/ui/events-card";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";

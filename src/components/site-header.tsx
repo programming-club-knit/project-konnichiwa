@@ -71,7 +71,7 @@ export function SiteHeader() {
 
       {/* Mobile Drawer */}
       {open && (
-        <div className="border-t border-white/10 bg-[#0B0D19]/95 backdrop-blur-xl px-6 py-6 md:hidden font-sans">
+        <div className="border-t border-white/10 bg-[#0f0f0f]/95 backdrop-blur-xl px-6 py-6 md:hidden font-sans">
           <div className="flex flex-col gap-3">
             {NAV.map((item) => {
               const active = isActive(item.href);

@@ -201,7 +201,7 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen w-full bg-[#0B0D19] flex items-center justify-center text-white/50 text-xs font-mono">
+      <div className="min-h-screen w-full bg-[#0f0f0f] flex items-center justify-center text-white/50 text-xs font-mono">
         <FiLoader className="size-6 animate-spin text-[#F47174] mr-3" /> Loading profile...
       </div>
     );
@@ -210,8 +210,18 @@ export default function ProfilePage() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen w-full bg-[#0B0D19] text-white pt-24 pb-16 font-sans selection:bg-[#F47174]/30">
-      <div className="max-w-6xl mx-auto px-6 font-sans">
+    <div className="min-h-screen w-full bg-[#0f0f0f] text-white pt-24 pb-16 font-sans selection:bg-[#F47174]/30 relative">
+      {/* Vertical Dashed Guidelines Overlay matching /people */}
+      <div className="pointer-events-none absolute inset-0 z-0 opacity-40">
+        <div className="mx-auto h-full max-w-7xl px-6 lg:px-12 grid grid-cols-5 border-x border-dashed border-white/5">
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+          <div className="border-r border-dashed border-white/5 h-full" />
+        </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-6 font-sans relative z-10">
         
         {/* Hidden File Picker Input */}
         <input
@@ -229,7 +239,7 @@ export default function ProfilePage() {
         <div className="flex flex-col lg:flex-row gap-8 items-start">
           
           {/* Left Profile Sidebar */}
-          <aside className="w-full lg:w-72 shrink-0 rounded-3xl border border-white/10 bg-[#121528] p-6 shadow-2xl space-y-6 font-sans">
+          <aside className="w-full lg:w-72 shrink-0 rounded-3xl border border-white/10 bg-[#141414] p-6 shadow-2xl space-y-6 font-sans">
             
             {/* User Profile Card Header */}
             <div className="flex flex-col items-center text-center pb-6 border-b border-white/10 space-y-3">
@@ -371,7 +381,7 @@ export default function ProfilePage() {
           </aside>
 
           {/* Right Main Content Area */}
-          <main className="flex-1 w-full rounded-3xl border border-white/10 bg-[#121528] p-6 sm:p-8 shadow-2xl space-y-6 font-sans">
+          <main className="flex-1 w-full rounded-3xl border border-white/10 bg-[#141414] p-6 sm:p-8 shadow-2xl space-y-6 font-sans">
             
             {/* Alert Notification Messages */}
             {error && (
@@ -416,7 +426,7 @@ export default function ProfilePage() {
                           required
                           value={firstName}
                           onChange={(e) => setFirstName(e.target.value)}
-                          className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#F47174]"
+                          className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#F47174]"
                         />
                       </div>
                       <div>
@@ -428,7 +438,7 @@ export default function ProfilePage() {
                           required
                           value={lastName}
                           onChange={(e) => setLastName(e.target.value)}
-                          className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#F47174]"
+                          className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#F47174]"
                         />
                       </div>
                     </div>
@@ -443,7 +453,7 @@ export default function ProfilePage() {
                           required
                           value={username}
                           onChange={(e) => setUsername(e.target.value)}
-                          className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#F47174]"
+                          className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#F47174]"
                         />
                       </div>
                       <div>
@@ -455,7 +465,7 @@ export default function ProfilePage() {
                           required
                           value={mobile}
                           onChange={(e) => setMobile(e.target.value)}
-                          className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#F47174]"
+                          className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#F47174]"
                         />
                       </div>
                     </div>
@@ -470,7 +480,7 @@ export default function ProfilePage() {
                           placeholder="24305"
                           value={rollNo}
                           onChange={(e) => setRollNo(e.target.value)}
-                          className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#F47174]"
+                          className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#F47174]"
                         />
                       </div>
                       <div>
@@ -482,7 +492,7 @@ export default function ProfilePage() {
                           placeholder="https://example.com/avatar.jpg"
                           value={imageSrc}
                           onChange={(e) => setImageSrc(e.target.value)}
-                          className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#F47174]"
+                          className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#F47174]"
                         />
                       </div>
                     </div>
@@ -496,7 +506,7 @@ export default function ProfilePage() {
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full bg-[#0B0D19] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#F47174]"
+                        className="w-full bg-[#0f0f0f] border border-white/10 rounded-xl py-2.5 px-3.5 text-sm text-white focus:outline-none focus:border-[#F47174]"
                       />
                     </div>
 
@@ -521,7 +531,7 @@ export default function ProfilePage() {
                     </div>
                   </form>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-[#0B0D19] p-6 rounded-2xl border border-white/10 font-sans text-xs">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-[#0f0f0f] p-6 rounded-2xl border border-white/10 font-sans text-xs">
                     <div>
                       <span className="text-[#8C93B0] block mb-1">Email Address</span>
                       <span className="text-white font-bold">{user.email}</span>

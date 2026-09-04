@@ -38,6 +38,7 @@ export type EventType = {
   googleFormLink?: string;
   whatsappGroupLink?: string;
   coverImageUrl?: string;
+  registrationDeadline?: string;
   forceGoogleForm?: boolean;
   useCustomForm?: boolean;
   registrationType?: 'individual' | 'team';

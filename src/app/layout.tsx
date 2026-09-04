@@ -37,7 +37,7 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       className={cn("dark", "h-full", "antialiased", spaceGrotesk.variable, ibmPlexMono.variable, "font-sans", geist.variable)}
     >
-      <body className="flex min-h-screen flex-col bg-background text-foreground relative">
+      <body className="flex min-h-screen flex-col bg-[#0f0f0f] text-foreground relative">
         <GlobalPointer />
         <SiteHeader />
         <main className="flex flex-1 flex-col">{children}</main>

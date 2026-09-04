@@ -7,7 +7,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import type { EventItem } from "@/lib/events";
+import type { EventItem } from "@/lib/event-status";
+import { getEventDynamicStatus } from "@/lib/event-status";
 import Link from "next/link";
 
 interface Card5Props {
@@ -15,6 +16,9 @@ interface Card5Props {
 }
 
 const Card5 = ({ event }: Card5Props) => {
+  const timing = getEventDynamicStatus(event);
+  const { isLive, isPast, label } = timing;
+
   const formattedDate = event.date
     ? new Date(event.date).toLocaleDateString("en-US", {
         month: "short",
@@ -53,8 +57,19 @@ const Card5 = ({ event }: Card5Props) => {
 
           {/* Top Badges */}
           <div className="absolute top-4 left-4 right-4 flex items-center justify-between gap-2 pointer-events-none z-20">
-            <span className="rounded-full bg-gradient-to-r from-[#F47174] to-[#FF4D70] px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white shadow-[0_4px_10px_rgba(244,113,116,0.4)] border border-white/20 backdrop-blur-md">
-              {event.status || "Upcoming"}
+            <span
+              className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest border backdrop-blur-md flex items-center gap-1.5 ${
+                isLive
+                  ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.3)]"
+                  : isPast
+                  ? "bg-black/60 border-white/20 text-slate-300 shadow-md"
+                  : "bg-gradient-to-r from-[#F47174] to-[#FF4D70] text-white shadow-[0_4px_10px_rgba(244,113,116,0.4)] border-white/20"
+              }`}
+            >
+              {isLive && (
+                <span className="size-1.5 rounded-full bg-emerald-400 animate-ping" />
+              )}
+              {label}
             </span>
             <span className="rounded-full bg-black/60 backdrop-blur-md border border-white/10 px-3 py-1 text-xs font-bold font-mono text-white flex items-center gap-1.5 shadow-lg">
               {formattedDate}
@@ -82,7 +97,7 @@ const Card5 = ({ event }: Card5Props) => {
               "flex-1 text-center justify-center py-5 text-sm rounded-2xl shadow-[0_4px_15px_rgba(244,113,116,0.3)] hover:shadow-[0_6px_20px_rgba(244,113,116,0.5)] bg-gradient-to-r from-[#F47174] to-[#FF4D70] border-none",
           })}
         >
-          View Event
+          {isLive ? "Join Event" : isPast ? "View Archive" : "View Event"}
         </Link>
         {event.ruleBookUrl && (
           <a
