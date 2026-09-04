@@ -34,8 +34,12 @@ export type EventItem = {
   teamMinSize?: number;
   teamMaxSize?: number;
   googleFormLink?: string;
+  forceGoogleForm?: boolean;
+  useCustomForm?: boolean;
   ruleBookUrl?: string;
   whatsappGroupLink?: string;
+  registrationFields?: any[];
+  participantFields?: any[];
   resources?: { label: string; url: string }[];
 };
 

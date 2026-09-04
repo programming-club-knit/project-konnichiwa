@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   FiArrowLeft,
+  FiArrowRight,
   FiCalendar,
   FiClock,
   FiMapPin,
@@ -391,20 +392,24 @@ export function EventDetailContent({ event }: EventDetailContentProps) {
                   </>
                 ) : (
                   <>
-                    {event.googleFormLink ? (
+                    <Link
+                      href={`/events/${event.slug || event._id}/register`}
+                      className="w-full py-3.5 px-4 bg-[#FF355E] hover:bg-[#FF4D70] text-white font-semibold text-xs rounded-xl transition-all shadow-lg shadow-[#FF355E]/25 flex items-center justify-center gap-2 text-center"
+                    >
+                      <span>Register for Event</span>
+                      <FiArrowRight className="size-4" />
+                    </Link>
+
+                    {event.googleFormLink && (
                       <a
                         href={event.googleFormLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-full py-3.5 px-4 bg-[#FF355E] hover:bg-[#FF4D70] text-white font-semibold text-xs rounded-xl transition-all shadow-lg shadow-[#FF355E]/20 flex items-center justify-center gap-2 text-center"
+                        className="w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white font-medium text-xs rounded-xl transition-all flex items-center justify-center gap-2 text-center"
                       >
-                        Register for Event <FiExternalLink className="size-4" />
+                        <span>Register via Google Form</span>
+                        <FiExternalLink className="size-3.5 text-slate-400" />
                       </a>
-                    ) : (
-                      <div className="w-full py-3.5 px-4 bg-white/5 border border-white/10 text-slate-300 text-xs rounded-xl flex items-center justify-center gap-2 text-center">
-                        <FiCheckCircle className="size-4 text-emerald-400" />
-                        <span>Registration Opening Soon</span>
-                      </div>
                     )}
 
                     {/* Virtual Meeting Join Link */}
