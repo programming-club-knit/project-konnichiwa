@@ -50,6 +50,32 @@ export function SiteHeader() {
 
   return (
     <header className="absolute top-0 inset-x-0 z-50 bg-transparent font-sans">
+      {/* Top Left: Pixelated PTSC Logo */}
+      <div className="absolute left-4 top-2.5 z-30 sm:left-6 sm:top-3 md:left-8 md:top-4">
+        <Link
+          href="/"
+          className="group flex items-center gap-2.5 transition-transform duration-300 hover:scale-105"
+          title="PTSC Home"
+        >
+          <div className="relative size-8 sm:size-9 md:size-10 overflow-hidden rounded-lg bg-black/50 p-1 border border-white/10 backdrop-blur-sm shadow-[0_0_15px_rgba(0,240,255,0.2)] transition-all duration-300 group-hover:border-[#FF355E]/60 group-hover:shadow-[0_0_20px_rgba(255,53,94,0.4)]">
+            <Image
+              src="/logo-pixel.png"
+              alt="PTSC Pixel Logo"
+              width={40}
+              height={40}
+              className="size-full object-contain [image-rendering:pixelated]"
+              priority
+            />
+          </div>
+          <span
+            className="hidden text-[11px] font-bold tracking-wider text-white transition-colors group-hover:text-[#FF355E] sm:inline-block md:text-xs"
+            style={{ fontFamily: "var(--font-press-start), monospace" }}
+          >
+            PTSC
+          </span>
+        </Link>
+      </div>
+
       <nav className="absolute left-1/2 top-0 z-20 -translate-x-1/2">
         <div className="flex items-center gap-3 rounded-b-2xl bg-black px-4 py-2 sm:gap-6 md:gap-12 md:rounded-b-3xl md:px-8 lg:gap-14">
           {NAV.map((item) => (

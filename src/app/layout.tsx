@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist_Mono, Space_Grotesk, Geist } from "next/font/google";
+import { Geist_Mono, Space_Grotesk, Geist, VT323, Pixelify_Sans, Press_Start_2P, Silkscreen } from "next/font/google";
 import "./globals.css";
 
 import { SiteHeader } from "@/components/site-header";
@@ -19,6 +19,30 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const vt323 = VT323({
+  weight: "400",
+  variable: "--font-vt323",
+  subsets: ["latin"],
+});
+
+const pixelifySans = Pixelify_Sans({
+  weight: ["400", "600", "700"],
+  variable: "--font-pixelify",
+  subsets: ["latin"],
+});
+
+const pressStart2P = Press_Start_2P({
+  weight: "400",
+  variable: "--font-press-start",
+  subsets: ["latin"],
+});
+
+const silkscreen = Silkscreen({
+  weight: ["400", "700"],
+  variable: "--font-silkscreen",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
   title: "PTSC — Programming & Tech Skills Club | KNIT Sultanpur",
   description:
@@ -34,7 +58,19 @@ export default function RootLayout({
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={cn("dark", "h-full", "antialiased", spaceGrotesk.variable, geistMono.variable, "font-sans", geist.variable)}
+      className={cn(
+        "dark",
+        "h-full",
+        "antialiased",
+        spaceGrotesk.variable,
+        geistMono.variable,
+        vt323.variable,
+        pixelifySans.variable,
+        pressStart2P.variable,
+        silkscreen.variable,
+        "font-sans",
+        geist.variable
+      )}
     >
       <body className="flex min-h-screen flex-col bg-[#0f0f0f] text-foreground relative">
         <GlobalPointer />

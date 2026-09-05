@@ -13,6 +13,18 @@ interface FlickeringGridProps extends React.HTMLAttributes<HTMLDivElement> {
   height?: number
   className?: string
   maxOpacity?: number
+  /** Enable mouse-reactive spotlight effect */
+  mouseInteraction?: boolean
+  /** Radius (in px) of the mouse spotlight area */
+  mouseRadius?: number
+  /** Max opacity for squares at the mouse center */
+  mouseMaxOpacity?: number
+  /** Enable a halftone dither dissolve at the bottom */
+  ditherBottom?: boolean
+  /** Height in px of the dither zone from the bottom */
+  ditherHeight?: number
+  /** Max opacity at the very bottom of the dither */
+  ditherMaxOpacity?: number
 }
 
 export const FlickeringGrid: React.FC<FlickeringGridProps> = ({
@@ -24,12 +36,20 @@ export const FlickeringGrid: React.FC<FlickeringGridProps> = ({
   height,
   className,
   maxOpacity = 0.3,
+  mouseInteraction = false,
+  mouseRadius = 150,
+  mouseMaxOpacity = 0.6,
+  ditherBottom = false,
+  ditherHeight = 280,
+  ditherMaxOpacity = 0.85,
   ...props
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [isInView, setIsInView] = useState(false)
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 })
+  // Mutable ref to avoid re-renders on every mousemove
+  const mousePos = useRef<{ x: number; y: number } | null>(null)
 
   const memoizedColor = useMemo(() => {
     const toRGBA = (color: string) => {
@@ -79,35 +99,6 @@ export const FlickeringGrid: React.FC<FlickeringGridProps> = ({
     [flickerChance, maxOpacity]
   )
 
-  const drawGrid = useCallback(
-    (
-      ctx: CanvasRenderingContext2D,
-      width: number,
-      height: number,
-      cols: number,
-      rows: number,
-      squares: Float32Array,
-      dpr: number
-    ) => {
-      ctx.clearRect(0, 0, width, height)
-      ctx.fillStyle = "transparent"
-      ctx.fillRect(0, 0, width, height)
-
-      for (let i = 0; i < cols; i++) {
-        for (let j = 0; j < rows; j++) {
-          const opacity = squares[i * rows + j]
-          ctx.fillStyle = `${memoizedColor}${opacity})`
-          ctx.fillRect(
-            i * (squareSize + gridGap) * dpr,
-            j * (squareSize + gridGap) * dpr,
-            squareSize * dpr,
-            squareSize * dpr
-          )
-        }
-      }
-    },
-    [memoizedColor, squareSize, gridGap]
-  )
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -118,7 +109,29 @@ export const FlickeringGrid: React.FC<FlickeringGridProps> = ({
     let intersectionObserver: IntersectionObserver | null = null
     let gridParams: ReturnType<typeof setupCanvas> | null = null
 
+    // Mouse tracking handler — defined here so it shares the same lifecycle
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!container) return
+      const rect = container.getBoundingClientRect()
+      const x = e.clientX - rect.left
+      const y = e.clientY - rect.top
+      if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
+        mousePos.current = { x, y }
+      } else {
+        mousePos.current = null
+      }
+    }
+    const handleMouseLeave = () => {
+      mousePos.current = null
+    }
+
     if (canvas && container && ctx) {
+      // Set up mouse tracking at window level so overlaid elements don't block it
+      if (mouseInteraction) {
+        window.addEventListener("mousemove", handleMouseMove)
+        document.addEventListener("mouseleave", handleMouseLeave)
+      }
+
       const updateCanvasSize = () => {
         const newWidth = width || container.clientWidth
         const newHeight = height || container.clientHeight
@@ -136,15 +149,66 @@ export const FlickeringGrid: React.FC<FlickeringGridProps> = ({
         lastTime = time
 
         updateSquares(gridParams.squares, deltaTime)
-        drawGrid(
-          ctx,
-          canvas.width,
-          canvas.height,
-          gridParams.cols,
-          gridParams.rows,
-          gridParams.squares,
-          gridParams.dpr
-        )
+
+        // Read mouse position directly from ref (always fresh)
+        const currentMouse = mouseInteraction ? mousePos.current : null
+
+        // Inline draw with mouse spotlight + bottom dither
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        const step = squareSize + gridGap
+        const dpr = gridParams.dpr
+        const canvasH = canvasSize.height
+
+        // Seeded random for deterministic dither pattern
+        const seededRand = (seed: number) => {
+          const x = Math.sin(seed * 12.9898 + seed * 78.233) * 43758.5453
+          return x - Math.floor(x)
+        }
+
+        for (let i = 0; i < gridParams.cols; i++) {
+          for (let j = 0; j < gridParams.rows; j++) {
+            let opacity = gridParams.squares[i * gridParams.rows + j]
+
+            // Bottom dither: boost opacity for squares near the bottom
+            if (ditherBottom) {
+              const sqY = j * step
+              const distFromBottom = canvasH - sqY
+              if (distFromBottom <= ditherHeight) {
+                const t = 1 - distFromBottom / ditherHeight // 0 at top of zone → 1 at bottom
+                const probability = t * t * t // Cubic ease-in
+                const seed = j * 1000 + i
+                const rand = seededRand(seed)
+                if (rand < probability) {
+                  const boosted = ditherMaxOpacity * (0.6 + rand * 0.4)
+                  opacity = Math.max(opacity, boosted)
+                }
+              }
+            }
+
+            // Mouse spotlight
+            if (currentMouse) {
+              const sqCenterX = i * step + squareSize / 2
+              const sqCenterY = j * step + squareSize / 2
+              const dx = sqCenterX - currentMouse.x
+              const dy = sqCenterY - currentMouse.y
+              const dist = Math.sqrt(dx * dx + dy * dy)
+              if (dist < mouseRadius) {
+                const t = 1 - dist / mouseRadius
+                const boosted = mouseMaxOpacity * t * t
+                opacity = Math.max(opacity, boosted)
+              }
+            }
+
+            ctx.fillStyle = `${memoizedColor}${opacity})`
+            ctx.fillRect(
+              i * step * dpr,
+              j * step * dpr,
+              squareSize * dpr,
+              squareSize * dpr
+            )
+          }
+        }
+
         animationFrameId = requestAnimationFrame(animate)
       }
 
@@ -176,8 +240,12 @@ export const FlickeringGrid: React.FC<FlickeringGridProps> = ({
       if (intersectionObserver) {
         intersectionObserver.disconnect()
       }
+      if (mouseInteraction) {
+        window.removeEventListener("mousemove", handleMouseMove)
+        document.removeEventListener("mouseleave", handleMouseLeave)
+      }
     }
-  }, [setupCanvas, updateSquares, drawGrid, width, height, isInView])
+  }, [setupCanvas, updateSquares, width, height, isInView, mouseInteraction, mouseRadius, mouseMaxOpacity, memoizedColor, squareSize, gridGap, ditherBottom, ditherHeight, ditherMaxOpacity, canvasSize.height])
 
   return (
     <div
