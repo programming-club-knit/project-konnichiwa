@@ -15,6 +15,7 @@ import {
   FiLogOut,
   FiExternalLink,
   FiX,
+  FiMenu,
 } from 'react-icons/fi';
 import { useState } from 'react';
 import { UserType } from './types';
@@ -51,10 +52,10 @@ export function AdminSidebar({
 
   const handleSelectTab = (id: TabType) => {
     setActiveTab(id);
-    if (setMobileOpen) {
-      setMobileOpen(false);
-    }
+    setMobileOpen(false);
   };
+
+  const activeTabLabel = navItems.find((item) => item.id === activeTab)?.label ?? 'Overview';
 
   const sidebarContent = (
     <div className="flex flex-col justify-between h-full space-y-6">
@@ -115,7 +116,9 @@ export function AdminSidebar({
               return (
                 <button
                   key={item.id}
+                  type="button"
                   onClick={() => handleSelectTab(item.id)}
+                  aria-current={isActive ? 'page' : undefined}
                   className={`flex items-center justify-between w-full px-3 py-2.5 rounded-md text-sm font-medium transition-all ${
                     isActive
                       ? 'bg-white/10 text-white font-semibold border border-white/20'
@@ -167,6 +170,37 @@ export function AdminSidebar({
 
   return (
     <>
+      <header className="sticky top-0 z-30 flex w-full items-center justify-between border-b border-white/10 bg-[#0B0E17]/95 px-4 py-3 backdrop-blur lg:hidden">
+        <div className="flex min-w-0 items-center gap-3">
+          <Link href="/" aria-label="PTSC home" className="flex shrink-0 items-center gap-2">
+            <span className="flex size-9 items-center justify-center rounded-md border border-white/10 bg-white/5 p-1.5">
+              <Image
+                src="/logo.png"
+                alt="PTSC logo"
+                width={24}
+                height={24}
+                className="size-full object-contain"
+              />
+            </span>
+            <span className="text-sm font-bold tracking-tight text-white">
+              PTSC<span className="text-[#F47174]">.</span>
+            </span>
+          </Link>
+          <span aria-hidden="true" className="h-6 w-px shrink-0 bg-white/15" />
+          <span className="truncate text-sm font-semibold text-slate-200">{activeTabLabel}</span>
+        </div>
+        <button
+          type="button"
+          onClick={() => setMobileOpen(true)}
+          aria-label="Open dashboard navigation"
+          aria-expanded={mobileOpen}
+          aria-controls="admin-mobile-navigation"
+          className="ml-3 grid size-10 shrink-0 place-items-center rounded-lg border border-white/10 text-slate-200 transition-colors hover:bg-white/10 hover:text-white"
+        >
+          <FiMenu className="size-5" />
+        </button>
+      </header>
+
       {/* Desktop Static Sidebar */}
       <aside className="hidden lg:flex w-64 border-r border-white/10 bg-[#0B0E17] flex-col justify-between p-4 shrink-0 selection:bg-[#F47174]/30 font-sans z-20 h-screen sticky top-0">
         {sidebarContent}
@@ -176,12 +210,17 @@ export function AdminSidebar({
       {mobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           {/* Backdrop */}
-          <div 
-            className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity" 
-            onClick={() => setMobileOpen && setMobileOpen(false)}
+          <button
+            type="button"
+            aria-label="Close dashboard navigation"
+            className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity"
+            onClick={() => setMobileOpen(false)}
           />
           {/* Slide-over Menu */}
-          <div className="fixed inset-y-0 left-0 w-72 max-w-[85vw] bg-[#0B0E17] border-r border-white/10 p-4 shadow-2xl z-50 overflow-y-auto animate-in slide-in-from-left duration-200">
+          <div
+            id="admin-mobile-navigation"
+            className="fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] overflow-y-auto border-r border-white/10 bg-[#0B0E17] p-4 shadow-2xl animate-in slide-in-from-left duration-200"
+          >
             {sidebarContent}
           </div>
         </div>
