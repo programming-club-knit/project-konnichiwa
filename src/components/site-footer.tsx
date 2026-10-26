@@ -5,6 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NAV, SOCIAL_PLATFORMS } from "@/components/landing/landing-data";
 
+const FOOTER_NAV = [...NAV, { label: "Dashboard", href: "/admin/dashboard" }];
+
 export function SiteFooter() {
   const pathname = usePathname();
 
@@ -69,7 +71,7 @@ export function SiteFooter() {
               Explore
             </p>
             <ul className="grid grid-cols-2 gap-x-10 gap-y-3 text-sm">
-              {NAV.map((item) => (
+              {FOOTER_NAV.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}

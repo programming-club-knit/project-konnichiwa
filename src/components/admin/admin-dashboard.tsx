@@ -538,7 +538,7 @@ export function AdminDashboard() {
   }
 
   return (
-    <div data-admin-panel="true" className="min-h-screen flex bg-[#090B14] text-slate-100 font-sans selection:bg-[#F47174]/30">
+    <div data-admin-panel="true" className="min-h-screen flex flex-col lg:flex-row bg-[#090B14] text-slate-100 font-sans selection:bg-[#F47174]/30">
       {/* Toast Notification Banner */}
       {toastMessage && (
         <div className="fixed top-5 right-5 z-50 px-4 py-2.5 bg-white text-black text-xs font-mono font-semibold rounded-lg border border-white/20 shadow-2xl flex items-center gap-2 animate-bounce">
@@ -556,7 +556,7 @@ export function AdminDashboard() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 p-8 overflow-y-auto max-w-6xl">
+      <main className="w-full min-w-0 flex-1 p-4 sm:p-6 lg:max-w-6xl lg:p-8">
         {error && (
           <div className="mb-5 p-3.5 rounded-lg border border-red-500/30 bg-red-500/10 text-red-300 text-xs font-mono flex items-center gap-2.5">
             <FiAlertCircle className="size-4 shrink-0" /> {error}
